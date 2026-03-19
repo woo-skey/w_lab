@@ -44,7 +44,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-center text-amber-900 mb-8">
-          위스키 랩
+          위스키 연구소
         </h1>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">로그인</h2>
 

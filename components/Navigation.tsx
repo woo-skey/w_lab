@@ -36,7 +36,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="text-2xl font-bold text-amber-900">
-            🥃 위스키 랩
+            🥃 위스키 연구소
           </Link>
 
           {/* Desktop Menu */}

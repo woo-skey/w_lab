@@ -3,7 +3,7 @@ import "./globals.css";
 import Navigation from "@/components/Navigation";
 
 export const metadata: Metadata = {
-  title: "위스키 랩",
+  title: "위스키 연구소",
   description: "위스키 리뷰, 바 추천, 일정 짜기",
 };
 
