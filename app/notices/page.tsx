@@ -10,6 +10,7 @@ interface Announcement {
   content: string;
   author_id: string;
   created_at: string;
+  author_name?: string;
   users?: { name: string };
 }
 
@@ -34,7 +35,7 @@ export default function NoticesPage() {
     try {
       const { data, error } = await supabase
         .from("announcements")
-        .select("*, users(name)")
+        .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
       setAnnouncements(data || []);
@@ -50,10 +51,12 @@ export default function NoticesPage() {
     if (!formData.title.trim() || !formData.content.trim()) { alert("제목과 내용을 입력해주세요"); return; }
     setSubmitting(true);
     try {
+      const authorName = localStorage.getItem("userName") || "관리자";
       const { error } = await supabase.from("announcements").insert([{
         title: formData.title,
         content: formData.content,
         author_id: userId,
+        author_name: authorName,
       }]);
       if (error) throw error;
 
@@ -170,7 +173,7 @@ export default function NoticesPage() {
                   <div className="px-6 pb-5 border-t border-gray-100">
                     <p className="text-gray-700 mt-4 whitespace-pre-wrap text-sm leading-relaxed">{a.content}</p>
                     <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
-                      <span className="text-xs text-gray-400">작성: {a.users?.name || "관리자"}</span>
+                      <span className="text-xs text-gray-400">작성: {a.author_name || a.users?.name || "관리자"}</span>
                       {isAdmin && (
                         <button
                           onClick={() => handleDelete(a.id)}
