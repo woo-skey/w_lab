@@ -28,6 +28,7 @@ export default function Navigation() {
     { name: "위스키 리뷰", href: "/reviews" },
     { name: "지식", href: "/articles" },
     { name: "일정", href: "/schedule" },
+    ...(userName ? [{ name: "마이페이지", href: "/mypage" }] : []),
   ];
 
   return (
