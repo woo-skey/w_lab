@@ -35,7 +35,7 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-bold text-amber-900">
+          <Link href="/" className="text-2xl font-bold text-blue-900">
             🥃 위스키 연구소
           </Link>
 
@@ -47,8 +47,8 @@ export default function Navigation() {
                 href={item.href}
                 className={`text-sm font-medium transition ${
                   pathname === item.href
-                    ? "text-amber-600 border-b-2 border-amber-600"
-                    : "text-gray-600 hover:text-amber-600"
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 {item.name}
@@ -63,7 +63,7 @@ export default function Navigation() {
                 <span className="text-sm text-gray-700">{userName}님</span>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 text-sm text-amber-600 border border-amber-600 rounded hover:bg-amber-50 transition"
+                  className="px-4 py-2 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition"
                 >
                   로그아웃
                 </button>
@@ -72,13 +72,13 @@ export default function Navigation() {
               <div className="hidden md:flex gap-2">
                 <Link
                   href="/login"
-                  className="px-4 py-2 text-sm text-amber-600 border border-amber-600 rounded hover:bg-amber-50 transition"
+                  className="px-4 py-2 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition"
                 >
                   로그인
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-4 py-2 text-sm bg-amber-600 text-white rounded hover:bg-amber-700 transition"
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                 >
                   회원가입
                 </Link>
@@ -102,7 +102,7 @@ export default function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="block px-4 py-2 text-sm text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded"
+                className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
@@ -111,7 +111,7 @@ export default function Navigation() {
             {userName ? (
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 rounded"
+                className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded"
               >
                 로그아웃
               </button>
@@ -119,14 +119,14 @@ export default function Navigation() {
               <>
                 <Link
                   href="/login"
-                  className="block px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 rounded"
+                  className="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   로그인
                 </Link>
                 <Link
                   href="/signup"
-                  className="block px-4 py-2 text-sm bg-amber-600 text-white rounded hover:bg-amber-700"
+                  className="block px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   회원가입

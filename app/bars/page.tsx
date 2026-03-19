@@ -116,33 +116,33 @@ export default function BarsPage() {
                 <input type="text" value={formData.bar_name}
                   onChange={(e) => setFormData({ ...formData, bar_name: e.target.value })}
                   placeholder="예: The Macallan Lounge"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">링크</label>
                 <input type="url" value={formData.link}
                   onChange={(e) => setFormData({ ...formData, link: e.target.value })}
                   placeholder="https://example.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">비고</label>
                 <textarea value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="이 바의 특징, 추천 음료, 분위기 등을 적어주세요"
-                  rows={4} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" />
+                  rows={4} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
               </div>
               {error && <p className="text-red-600 text-sm">{error}</p>}
               <button type="submit" disabled={submitting}
-                className="w-full py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 disabled:bg-gray-400 transition">
+                className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition">
                 {submitting ? "추천 중..." : "Bar 추천하기"}
               </button>
             </form>
           </div>
         ) : (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-12 text-center">
-            <p className="text-amber-800 mb-3">바를 추천하려면 로그인이 필요합니다.</p>
-            <Link href="/login" className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">로그인하기</Link>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-12 text-center">
+            <p className="text-blue-800 mb-3">바를 추천하려면 로그인이 필요합니다.</p>
+            <Link href="/login" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">로그인하기</Link>
           </div>
         )}
 
@@ -161,17 +161,17 @@ export default function BarsPage() {
                     <form onSubmit={handleEdit} className="space-y-3">
                       <input type="text" value={editingBar.bar_name}
                         onChange={(e) => setEditingBar({ ...editingBar, bar_name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                       <input type="url" value={editingBar.link || ""}
                         onChange={(e) => setEditingBar({ ...editingBar, link: e.target.value })}
                         placeholder="링크"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                       <textarea value={editingBar.notes || ""}
                         onChange={(e) => setEditingBar({ ...editingBar, notes: e.target.value })}
                         rows={3} placeholder="비고"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
                       <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-1.5 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">저장</button>
+                        <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">저장</button>
                         <button type="button" onClick={() => setEditingBar(null)} className="px-4 py-1.5 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">취소</button>
                       </div>
                     </form>
@@ -182,7 +182,7 @@ export default function BarsPage() {
                         {bar.user_id === userId && (
                           <div className="flex gap-1">
                             <button onClick={() => setEditingBar(bar)}
-                              className="text-xs text-gray-500 hover:text-amber-600 px-2 py-1 rounded hover:bg-amber-50 transition">편집</button>
+                              className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
                             <button onClick={() => handleDelete(bar.id)}
                               className="text-xs text-gray-500 hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
                           </div>
@@ -190,7 +190,7 @@ export default function BarsPage() {
                       </div>
                       {bar.link && (
                         <a href={bar.link} target="_blank" rel="noopener noreferrer"
-                          className="text-amber-600 hover:underline text-sm mb-3 block">🔗 웹사이트 방문</a>
+                          className="text-blue-600 hover:underline text-sm mb-3 block">🔗 웹사이트 방문</a>
                       )}
                       {bar.notes && <p className="text-gray-700 mb-4 whitespace-pre-wrap text-sm">{bar.notes}</p>}
                       <div className="flex justify-between items-center text-xs text-gray-500">

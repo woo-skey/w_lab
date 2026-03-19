@@ -192,7 +192,7 @@ export default function SchedulePage() {
                 {userId && (
                   <button
                     onClick={() => setShowCreateForm(!showCreateForm)}
-                    className="text-amber-600 text-sm hover:underline"
+                    className="text-blue-600 text-sm hover:underline"
                   >
                     + 새 일정
                   </button>
@@ -207,9 +207,9 @@ export default function SchedulePage() {
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="일정 이름"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <button type="submit" className="w-full py-1.5 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">
+                  <button type="submit" className="w-full py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                     생성
                   </button>
                 </form>
@@ -217,7 +217,7 @@ export default function SchedulePage() {
 
               {!userId && (
                 <p className="text-xs text-gray-500 mb-3">
-                  <a href="/login" className="text-amber-600 underline">로그인</a>하면 일정을 만들 수 있어요.
+                  <a href="/login" className="text-blue-600 underline">로그인</a>하면 일정을 만들 수 있어요.
                 </p>
               )}
 
@@ -229,19 +229,19 @@ export default function SchedulePage() {
                 <div className="space-y-2">
                   {schedules.map((s) => (
                     <div key={s.id} className={`flex items-center rounded-lg text-sm transition ${
-                      selectedSchedule?.id === s.id ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-800"
+                      selectedSchedule?.id === s.id ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"
                     }`}>
                       <button onClick={() => { setSelectedSchedule(s); setAvailabilityMap({}); }}
                         className="flex-1 text-left px-3 py-2">
                         <p className="font-medium truncate">{s.name}</p>
-                        <p className={`text-xs mt-0.5 ${selectedSchedule?.id === s.id ? "text-amber-100" : "text-gray-500"}`}>
+                        <p className={`text-xs mt-0.5 ${selectedSchedule?.id === s.id ? "text-blue-100" : "text-gray-500"}`}>
                           {new Date(s.created_at).toLocaleDateString("ko-KR")}
                         </p>
                       </button>
                       {s.created_by === userId && (
                         <button onClick={() => handleDeleteSchedule(s.id)}
                           className={`px-2 py-1 mr-1 rounded text-xs transition ${
-                            selectedSchedule?.id === s.id ? "hover:bg-amber-700 text-amber-100" : "hover:bg-red-50 text-gray-400 hover:text-red-500"
+                            selectedSchedule?.id === s.id ? "hover:bg-blue-700 text-blue-100" : "hover:bg-red-50 text-gray-400 hover:text-red-500"
                           }`}>✕</button>
                       )}
                     </div>
@@ -257,14 +257,14 @@ export default function SchedulePage() {
                 <div className="space-y-2">
                   {bestDates.map(([date, info], idx) => (
                     <div key={date} className={`px-3 py-2 rounded-lg text-sm ${
-                      idx === 0 ? "bg-amber-100 border border-amber-300" : "bg-gray-100"
+                      idx === 0 ? "bg-blue-100 border border-blue-300" : "bg-gray-100"
                     }`}>
-                      <p className={`font-medium ${idx === 0 ? "text-amber-900" : "text-gray-800"}`}>
+                      <p className={`font-medium ${idx === 0 ? "text-blue-900" : "text-gray-800"}`}>
                         {new Date(date + "T00:00:00").toLocaleDateString("ko-KR", {
                           month: "long", day: "numeric", weekday: "short"
                         })}
                       </p>
-                      <p className={`text-xs ${idx === 0 ? "text-amber-700" : "text-gray-500"}`}>
+                      <p className={`text-xs ${idx === 0 ? "text-blue-700" : "text-gray-500"}`}>
                         {info.count}명 가능 {idx === 0 ? "👑" : ""}
                       </p>
                     </div>
@@ -347,10 +347,10 @@ export default function SchedulePage() {
                         disabled={!userId}
                         className={`
                           relative aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition
-                          ${isMyDate ? "bg-amber-500 text-white font-bold shadow" : ""}
-                          ${!isMyDate && count > 0 ? "bg-amber-50 border-2 border-amber-200" : ""}
+                          ${isMyDate ? "bg-blue-500 text-white font-bold shadow" : ""}
+                          ${!isMyDate && count > 0 ? "bg-blue-50 border-2 border-blue-200" : ""}
                           ${!isMyDate && count === 0 ? "hover:bg-gray-100" : ""}
-                          ${isToday && !isMyDate ? "ring-2 ring-amber-400" : ""}
+                          ${isToday && !isMyDate ? "ring-2 ring-blue-400" : ""}
                           ${dayOfWeek === 0 && !isMyDate ? "text-red-400" : ""}
                           ${dayOfWeek === 6 && !isMyDate ? "text-blue-400" : ""}
                           ${!userId ? "cursor-default" : "cursor-pointer"}
@@ -358,7 +358,7 @@ export default function SchedulePage() {
                       >
                         <span>{day}</span>
                         {count > 0 && (
-                          <span className={`text-xs font-bold ${isMyDate ? "text-amber-100" : "text-amber-600"}`}>
+                          <span className={`text-xs font-bold ${isMyDate ? "text-blue-100" : "text-blue-600"}`}>
                             {count}명
                           </span>
                         )}
@@ -370,16 +370,16 @@ export default function SchedulePage() {
                 {/* 범례 */}
                 <div className="flex gap-4 mt-6 pt-4 border-t text-xs text-gray-500">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 rounded bg-amber-500" />
+                    <div className="w-4 h-4 rounded bg-blue-500" />
                     <span>내가 가능한 날</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 rounded bg-amber-50 border-2 border-amber-200" />
+                    <div className="w-4 h-4 rounded bg-blue-50 border-2 border-blue-200" />
                     <span>다른 사람이 가능한 날</span>
                   </div>
                   {!userId && (
                     <div className="ml-auto">
-                      <a href="/login" className="text-amber-600 underline">로그인하고 참여하기</a>
+                      <a href="/login" className="text-blue-600 underline">로그인하고 참여하기</a>
                     </div>
                   )}
                 </div>

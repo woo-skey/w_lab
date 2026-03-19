@@ -35,7 +35,7 @@ interface ReviewComment {
   users?: { name: string };
 }
 
-const WHISKEY_TYPES = ["Scotch", "Irish", "Bourbon", "Rye"];
+const WHISKEY_TYPES = ["Scotch", "Irish", "Bourbon/Rye", "Etc"];
 const STAR = ["", "★", "★★", "★★★", "★★★★", "★★★★★"];
 
 export default function ReviewsPage() {
@@ -257,7 +257,7 @@ export default function ReviewsPage() {
           {WHISKEY_TYPES.map((type) => (
             <button key={type} onClick={() => setSelectedType(type)}
               className={`px-6 py-2 rounded-full font-medium transition ${
-                selectedType === type ? "bg-amber-600 text-white" : "bg-white text-gray-700 border border-gray-300 hover:border-amber-400"
+                selectedType === type ? "bg-blue-600 text-white" : "bg-white text-gray-700 border border-gray-300 hover:border-blue-400"
               }`}
             >
               {type}
@@ -268,13 +268,13 @@ export default function ReviewsPage() {
         {/* 위스키 추가 버튼 */}
         {userId ? (
           <button onClick={() => setShowAddForm(!showAddForm)}
-            className="mb-6 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
+            className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
             {showAddForm ? "취소" : "🥃 새 위스키 추가"}
           </button>
         ) : (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-center">
-            <p className="text-amber-800 mb-1">위스키 추가 및 리뷰 작성은 로그인이 필요합니다.</p>
-            <a href="/login" className="text-amber-600 underline font-medium text-sm">로그인하기</a>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
+            <p className="text-blue-800 mb-1">위스키 추가 및 리뷰 작성은 로그인이 필요합니다.</p>
+            <a href="/login" className="text-blue-600 underline font-medium text-sm">로그인하기</a>
           </div>
         )}
 
@@ -288,12 +288,12 @@ export default function ReviewsPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">이름 *</label>
                   <input type="text" value={whiskey.name} onChange={(e) => setWhiskey({ ...whiskey, name: e.target.value })}
                     placeholder="예: Glenmorangie 10" required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">타입 *</label>
                   <select value={whiskey.type} onChange={(e) => setWhiskey({ ...whiskey, type: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     {WHISKEY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
@@ -301,34 +301,34 @@ export default function ReviewsPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">지역</label>
                   <input type="text" value={whiskey.region} onChange={(e) => setWhiskey({ ...whiskey, region: e.target.value })}
                     placeholder="예: Highland"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">숙성 (년)</label>
                   <input type="number" value={whiskey.age} onChange={(e) => setWhiskey({ ...whiskey, age: e.target.value })}
                     placeholder="10"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">도수 (%)</label>
                   <input type="number" step="0.1" value={whiskey.abv} onChange={(e) => setWhiskey({ ...whiskey, abv: e.target.value })}
                     placeholder="43.0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">가격 (₩)</label>
                   <input type="number" value={whiskey.price} onChange={(e) => setWhiskey({ ...whiskey, price: e.target.value })}
                     placeholder="50000"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">테이스팅 노트</label>
                 <textarea value={whiskey.tasting_notes} onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
                   placeholder="풍미, 향, 마감 등" rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" />
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
               </div>
-              <button type="submit" className="w-full py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition">
+              <button type="submit" className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
                 위스키 추가
               </button>
             </form>
@@ -361,13 +361,13 @@ export default function ReviewsPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
                             <input type="text" value={editingWhiskey.name}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, name: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">타입</label>
                             <select value={editingWhiskey.type}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, type: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                               {WHISKEY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                             </select>
                           </div>
@@ -375,25 +375,25 @@ export default function ReviewsPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">지역</label>
                             <input type="text" value={editingWhiskey.region || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, region: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">숙성 (년)</label>
                             <input type="number" value={editingWhiskey.age || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, age: parseInt(e.target.value) || 0 })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">도수 (%)</label>
                             <input type="number" step="0.1" value={editingWhiskey.abv || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, abv: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">가격 (₩)</label>
                             <input type="number" value={editingWhiskey.price || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, price: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                         </div>
                         <div>
@@ -401,10 +401,10 @@ export default function ReviewsPage() {
                           <textarea value={editingWhiskey.tasting_notes || ""}
                             onChange={(e) => setEditingWhiskey({ ...editingWhiskey, tasting_notes: e.target.value })}
                             rows={2}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                         <div className="flex gap-2">
-                          <button type="submit" className="px-6 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">저장</button>
+                          <button type="submit" className="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">저장</button>
                           <button type="button" onClick={() => setEditingWhiskey(null)}
                             className="px-6 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">취소</button>
                         </div>
@@ -415,7 +415,7 @@ export default function ReviewsPage() {
                       <button onClick={() => handleToggleWhiskey(w.id)} className="flex-1 text-left">
                         <div className="flex items-center gap-3 mb-1">
                           <h3 className="text-xl font-bold text-gray-900">{w.name}</h3>
-                          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{w.type}</span>
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{w.type}</span>
                         </div>
                         <div className="flex flex-wrap gap-3 text-sm text-gray-500">
                           {w.region && <span>📍 {w.region}</span>}
@@ -429,13 +429,13 @@ export default function ReviewsPage() {
                       </button>
                       <div className="text-right ml-4 flex-shrink-0 flex flex-col items-end gap-1">
                         {avgRating && (
-                          <div className="text-amber-500 text-lg font-bold">★ {avgRating}</div>
+                          <div className="text-blue-500 text-lg font-bold">★ {avgRating}</div>
                         )}
                         <div className="text-xs text-gray-400">{whiskeyReviews.length}개 리뷰</div>
                         {w.created_by === userId && userId && (
                           <div className="flex gap-1 mt-1">
                             <button onClick={() => setEditingWhiskey(w)}
-                              className="text-xs text-gray-500 hover:text-amber-600 px-2 py-1 rounded hover:bg-amber-50 transition">편집</button>
+                              className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
                             <button onClick={() => handleDeleteWhiskey(w.id)}
                               className="text-xs text-gray-500 hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
                           </div>
@@ -466,13 +466,13 @@ export default function ReviewsPage() {
                               <textarea value={reviewForm.review_text}
                                 onChange={(e) => setReviewForm({ ...reviewForm, review_text: e.target.value })}
                                 placeholder="리뷰를 작성해주세요" rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
                               <input type="text" value={reviewForm.taste_profile}
                                 onChange={(e) => setReviewForm({ ...reviewForm, taste_profile: e.target.value })}
                                 placeholder="테이스팅 프로필 (예: 스모키, 바닐라, 피트)"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                               <div className="flex gap-2">
-                                <button type="submit" className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">
+                                <button type="submit" className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                                   리뷰 등록
                                 </button>
                                 <button type="button" onClick={() => setReviewForm(null)}
@@ -483,13 +483,13 @@ export default function ReviewsPage() {
                             </form>
                           ) : (
                             <button onClick={() => setReviewForm({ whiskey_id: w.id, rating: 5, review_text: "", taste_profile: "" })}
-                              className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">
+                              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                               ✏️ 리뷰 작성
                             </button>
                           )
                         ) : (
                           <p className="text-sm text-gray-500">
-                            <a href="/login" className="text-amber-600 underline">로그인</a>하고 리뷰를 남겨보세요.
+                            <a href="/login" className="text-blue-600 underline">로그인</a>하고 리뷰를 남겨보세요.
                           </p>
                         )}
                       </div>
@@ -522,12 +522,12 @@ export default function ReviewsPage() {
                                     <textarea value={editingReview.review_text}
                                       onChange={(e) => setEditingReview({ ...editingReview, review_text: e.target.value })}
                                       rows={3}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                     <input type="text" value={editingReview.taste_profile}
                                       onChange={(e) => setEditingReview({ ...editingReview, taste_profile: e.target.value })}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                     <div className="flex gap-2">
-                                      <button type="submit" className="px-4 py-1.5 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">
+                                      <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                                         저장
                                       </button>
                                       <button type="button" onClick={() => setEditingReview(null)}
@@ -541,12 +541,12 @@ export default function ReviewsPage() {
                                     {/* 리뷰 내용 */}
                                     <div className="flex justify-between items-start mb-2">
                                       <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm">
+                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
                                           {(r.users?.name || "?")[0].toUpperCase()}
                                         </div>
                                         <div>
                                           <span className="text-sm font-medium text-gray-900">{r.users?.name || "알 수 없음"}</span>
-                                          <div className="text-amber-500 text-sm">{STAR[r.rating]}</div>
+                                          <div className="text-blue-500 text-sm">{STAR[r.rating]}</div>
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-2">
@@ -557,7 +557,7 @@ export default function ReviewsPage() {
                                           <>
                                             <button
                                               onClick={() => setEditingReview({ id: r.id, rating: r.rating, review_text: r.review_text, taste_profile: r.taste_profile })}
-                                              className="text-xs text-gray-500 hover:text-amber-600 transition px-2 py-1 rounded hover:bg-amber-50">
+                                              className="text-xs text-gray-500 hover:text-blue-600 transition px-2 py-1 rounded hover:bg-blue-50">
                                               편집
                                             </button>
                                             <button onClick={() => handleDeleteReview(r.id, w.id)}
@@ -575,7 +575,7 @@ export default function ReviewsPage() {
                                     {r.taste_profile && (
                                       <div className="ml-10 flex flex-wrap gap-1 mb-2">
                                         {r.taste_profile.split(",").map((tag, i) => (
-                                          <span key={i} className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
+                                          <span key={i} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
                                             {tag.trim()}
                                           </span>
                                         ))}
@@ -584,7 +584,7 @@ export default function ReviewsPage() {
 
                                     {/* 댓글 토글 버튼 */}
                                     <button onClick={() => handleToggleReview(r.id)}
-                                      className="ml-10 text-xs text-gray-400 hover:text-amber-600 transition mt-1">
+                                      className="ml-10 text-xs text-gray-400 hover:text-blue-600 transition mt-1">
                                       💬 댓글 {reviewComments.length > 0 ? `${reviewComments.length}개` : ""} {isReviewExpanded ? "▲" : "▼"}
                                     </button>
 
@@ -614,15 +614,15 @@ export default function ReviewsPage() {
                                               onChange={(e) => setCommentText((prev) => ({ ...prev, [r.id]: e.target.value }))}
                                               onKeyDown={(e) => { if (e.key === "Enter") handleAddComment(r.id); }}
                                               placeholder="댓글 입력..."
-                                              className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                                              className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                             <button onClick={() => handleAddComment(r.id)}
-                                              className="px-3 py-1.5 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700 transition">
+                                              className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">
                                               등록
                                             </button>
                                           </div>
                                         ) : (
                                           <p className="text-xs text-gray-400">
-                                            <a href="/login" className="text-amber-600 underline">로그인</a>하고 댓글 달기
+                                            <a href="/login" className="text-blue-600 underline">로그인</a>하고 댓글 달기
                                           </p>
                                         )}
                                       </div>

@@ -157,7 +157,7 @@ export default function ArticlesPage() {
           {CATEGORIES.map((cat) => (
             <button key={cat} onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                selectedCategory === cat ? "bg-amber-600 text-white" : "bg-white text-gray-700 border border-gray-300 hover:border-amber-400"
+                selectedCategory === cat ? "bg-blue-600 text-white" : "bg-white text-gray-700 border border-gray-300 hover:border-blue-400"
               }`}>{cat}</button>
           ))}
         </div>
@@ -166,7 +166,7 @@ export default function ArticlesPage() {
         {userId ? (
           <>
             <button onClick={() => setShowForm(!showForm)}
-              className="mb-6 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
+              className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
               {showForm ? "취소" : "✏️ 새 글 작성"}
             </button>
             {showForm && (
@@ -179,13 +179,13 @@ export default function ArticlesPage() {
                       <input type="text" value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="글의 제목을 입력하세요"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
                       <select value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                       </select>
                     </div>
@@ -195,17 +195,17 @@ export default function ArticlesPage() {
                     <textarea value={formData.content}
                       onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                       placeholder="글의 내용을 입력하세요" rows={8}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" />
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
                   </div>
-                  <button type="submit" className="w-full py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition">글 등록</button>
+                  <button type="submit" className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">글 등록</button>
                 </form>
               </div>
             )}
           </>
         ) : (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 text-center">
-            <p className="text-amber-800 mb-2">글을 작성하려면 로그인이 필요합니다.</p>
-            <a href="/login" className="text-amber-600 underline font-medium">로그인하기</a>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 text-center">
+            <p className="text-blue-800 mb-2">글을 작성하려면 로그인이 필요합니다.</p>
+            <a href="/login" className="text-blue-600 underline font-medium">로그인하기</a>
           </div>
         )}
 
@@ -232,22 +232,22 @@ export default function ArticlesPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">제목</label>
                             <input type="text" value={editingArticle.title}
                               onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
                             <select value={editingArticle.category}
                               onChange={(e) => setEditingArticle({ ...editingArticle, category: e.target.value })}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                               {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                             </select>
                           </div>
                         </div>
                         <textarea value={editingArticle.content}
                           onChange={(e) => setEditingArticle({ ...editingArticle, content: e.target.value })}
-                          rows={8} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" />
+                          rows={8} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
                         <div className="flex gap-2">
-                          <button type="submit" className="px-6 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">저장</button>
+                          <button type="submit" className="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">저장</button>
                           <button type="button" onClick={() => setEditingArticle(null)}
                             className="px-6 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">취소</button>
                         </div>
@@ -260,7 +260,7 @@ export default function ArticlesPage() {
                         <div className="flex justify-between items-start gap-4">
                           <button onClick={() => handleToggleArticle(article.id)} className="flex-1 text-left">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">{article.category}</span>
+                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">{article.category}</span>
                             </div>
                             <h3 className="text-lg font-bold text-gray-900 mb-1">{article.title}</h3>
                             <p className="text-gray-500 text-sm line-clamp-2">{article.content}</p>
@@ -273,7 +273,7 @@ export default function ArticlesPage() {
                             {isOwner && (
                               <>
                                 <button onClick={() => { setEditingArticle(article); setExpandedId(null); }}
-                                  className="text-xs text-gray-500 hover:text-amber-600 px-2 py-1 rounded hover:bg-amber-50 transition">편집</button>
+                                  className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
                                 <button onClick={() => handleDeleteArticle(article.id)}
                                   className="text-xs text-gray-500 hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
                               </>
@@ -298,7 +298,7 @@ export default function ArticlesPage() {
                               ) : (
                                 articleComments.map((comment) => (
                                   <div key={comment.id} className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm flex-shrink-0">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
                                       {(comment.users?.name || "?")[0].toUpperCase()}
                                     </div>
                                     <div className="flex-1 bg-gray-100 rounded-lg px-4 py-2">
@@ -324,13 +324,13 @@ export default function ArticlesPage() {
                                   onChange={(e) => setCommentText((prev) => ({ ...prev, [article.id]: e.target.value }))}
                                   onKeyDown={(e) => { if (e.key === "Enter") handleSubmitComment(article.id); }}
                                   placeholder="댓글을 입력하세요..."
-                                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                 <button onClick={() => handleSubmitComment(article.id)}
-                                  className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">등록</button>
+                                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">등록</button>
                               </div>
                             ) : (
                               <p className="text-sm text-gray-500">
-                                댓글을 달려면 <a href="/login" className="text-amber-600 underline">로그인</a>하세요.
+                                댓글을 달려면 <a href="/login" className="text-blue-600 underline">로그인</a>하세요.
                               </p>
                             )}
                           </div>

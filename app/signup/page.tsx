@@ -105,9 +105,9 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center text-amber-900 mb-8">
+        <h1 className="text-3xl font-bold text-center text-blue-900 mb-8">
           위스키 연구소
         </h1>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">회원가입</h2>
@@ -123,7 +123,7 @@ export default function SignupPage() {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="이름을 입력하세요"
             />
             {errors.name && (
@@ -142,14 +142,14 @@ export default function SignupPage() {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="아이디를 입력하세요"
               />
               <button
                 type="button"
                 onClick={handleUsernameCheck}
                 disabled={loading}
-                className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:bg-gray-400"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
               >
                 중복확인
               </button>
@@ -174,7 +174,7 @@ export default function SignupPage() {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="비밀번호를 입력하세요"
             />
             {errors.password && (
@@ -192,7 +192,7 @@ export default function SignupPage() {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="비밀번호를 다시 입력하세요"
             />
             {errors.confirmPassword && (
@@ -211,7 +211,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 disabled:bg-gray-400 transition"
+            className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
           >
             {loading ? "가입 중..." : "회원가입"}
           </button>
@@ -219,7 +219,7 @@ export default function SignupPage() {
 
         <p className="mt-6 text-center text-gray-600">
           이미 계정이 있으신가요?{" "}
-          <Link href="/login" className="text-amber-600 hover:underline font-medium">
+          <Link href="/login" className="text-blue-600 hover:underline font-medium">
             로그인
           </Link>
         </p>

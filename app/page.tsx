@@ -19,20 +19,20 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <section className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-amber-900 mb-6">
+        <h1 className="text-5xl md:text-6xl font-bold text-blue-900 mb-6">
           위스키 세상에 오신 것을 환영합니다
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
           위스키 리뷰를 공유하고, 바를 추천하고, 친구들과 일정을 맞춰보세요.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link href="/reviews" className="px-8 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-medium">
+          <Link href="/reviews" className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
             위스키 탐색하기
           </Link>
           {!loggedIn && (
-            <Link href="/signup" className="px-8 py-3 border-2 border-amber-600 text-amber-600 rounded-lg hover:bg-amber-50 transition font-medium">
+            <Link href="/signup" className="px-8 py-3 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium">
               가입하기
             </Link>
           )}
@@ -45,17 +45,17 @@ export default function Home() {
             <Link key={feature.href} href={feature.href}
               className="group p-8 bg-white rounded-lg shadow hover:shadow-lg transition border border-gray-100">
               <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition">{feature.title}</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition">{feature.title}</h3>
               <p className="text-gray-600">{feature.description}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="bg-amber-900 text-white py-16">
+      <section className="bg-blue-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">위스키 애호가들의 커뮤니티</h2>
-          <p className="text-amber-100 text-lg">
+          <p className="text-blue-100 text-lg">
             전 세계의 위스키 팬들과 경험을 나누고, 새로운 위스키를 발견하세요.
           </p>
         </div>
