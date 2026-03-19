@@ -35,14 +35,15 @@ interface ReviewComment {
   users?: { name: string };
 }
 
-const WHISKEY_TYPES = ["Scotch", "Irish", "Bourbon/Rye", "Etc"];
+const WHISKEY_TYPES = ["전체", "Scotch", "Irish", "Bourbon/Rye", "Etc"];
 const STAR = ["", "★", "★★", "★★★", "★★★★", "★★★★★"];
 
 export default function ReviewsPage() {
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
   const [reviews, setReviews] = useState<Record<string, Review[]>>({});
   const [comments, setComments] = useState<Record<string, ReviewComment[]>>({});
-  const [selectedType, setSelectedType] = useState("Scotch");
+  const [selectedType, setSelectedType] = useState("전체");
+  const [reviewCounts, setReviewCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedWhiskey, setExpandedWhiskey] = useState<string | null>(null);
@@ -72,9 +73,17 @@ export default function ReviewsPage() {
 
   const fetchWhiskeys = async () => {
     try {
-      const { data, error } = await supabase.from("whiskeys").select("*").order("created_at", { ascending: false });
+      const [{ data, error }, { data: countData }] = await Promise.all([
+        supabase.from("whiskeys").select("*").order("created_at", { ascending: false }),
+        supabase.from("reviews").select("whiskey_id"),
+      ]);
       if (error) throw error;
       setWhiskeys(data || []);
+      const counts: Record<string, number> = {};
+      (countData || []).forEach((r) => {
+        counts[r.whiskey_id] = (counts[r.whiskey_id] || 0) + 1;
+      });
+      setReviewCounts(counts);
     } catch (err) {
       console.error(err);
     } finally {
@@ -244,7 +253,7 @@ export default function ReviewsPage() {
     }
   };
 
-  const filteredWhiskeys = whiskeys.filter((w) => w.type === selectedType);
+  const filteredWhiskeys = selectedType === "전체" ? whiskeys : whiskeys.filter((w) => w.type === selectedType);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -346,6 +355,7 @@ export default function ReviewsPage() {
             {filteredWhiskeys.map((w) => {
               const isExpanded = expandedWhiskey === w.id;
               const whiskeyReviews = reviews[w.id] || [];
+              const displayCount = isExpanded ? whiskeyReviews.length : (reviewCounts[w.id] || 0);
               const avgRating = whiskeyReviews.length
                 ? (whiskeyReviews.reduce((s, r) => s + r.rating, 0) / whiskeyReviews.length).toFixed(1)
                 : null;
@@ -431,7 +441,7 @@ export default function ReviewsPage() {
                         {avgRating && (
                           <div className="text-blue-500 text-lg font-bold">★ {avgRating}</div>
                         )}
-                        <div className="text-xs text-gray-400">{whiskeyReviews.length}개 리뷰</div>
+                        <div className="text-xs text-gray-400">{displayCount}개 리뷰</div>
                         {w.created_by === userId && userId && (
                           <div className="flex gap-1 mt-1">
                             <button onClick={() => setEditingWhiskey(w)}
