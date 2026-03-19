@@ -33,6 +33,7 @@ export default function ArticlesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState<Record<string, string>>({});
   const [userId, setUserId] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
 
   const [formData, setFormData] = useState({ title: "", content: "", category: "기초 지식" });
@@ -40,6 +41,7 @@ export default function ArticlesPage() {
   useEffect(() => {
     const id = localStorage.getItem("userId");
     if (id) setUserId(id);
+    setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchArticles();
   }, []);
 
@@ -219,7 +221,7 @@ export default function ArticlesPage() {
             filteredArticles.map((article) => {
               const isExpanded = expandedId === article.id;
               const articleComments = comments[article.id] || [];
-              const isOwner = article.author_id === userId;
+              const isOwner = (article.author_id === userId || isAdmin);
 
               return (
                 <div key={article.id} className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
@@ -307,7 +309,7 @@ export default function ArticlesPage() {
                                           <span className="text-sm font-medium text-gray-900">{comment.users?.name || "알 수 없음"}</span>
                                           <span className="text-xs text-gray-400">{new Date(comment.created_at).toLocaleDateString("ko-KR")}</span>
                                         </div>
-                                        {comment.user_id === userId && (
+                                        {(comment.user_id === userId || isAdmin) && (
                                           <button onClick={() => handleDeleteComment(comment.id, article.id)}
                                             className="text-xs text-gray-400 hover:text-red-500 transition">삭제</button>
                                         )}

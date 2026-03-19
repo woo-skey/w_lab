@@ -27,6 +27,7 @@ export default function SchedulePage() {
   const [availabilityMap, setAvailabilityMap] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newName, setNewName] = useState("");
 
@@ -37,6 +38,7 @@ export default function SchedulePage() {
   useEffect(() => {
     const id = localStorage.getItem("userId");
     if (id) setUserId(id);
+    setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchSchedules();
   }, []);
 
@@ -238,7 +240,7 @@ export default function SchedulePage() {
                           {new Date(s.created_at).toLocaleDateString("ko-KR")}
                         </p>
                       </button>
-                      {s.created_by === userId && (
+                      {(s.created_by === userId || isAdmin) && (
                         <button onClick={() => handleDeleteSchedule(s.id)}
                           className={`px-2 py-1 mr-1 rounded text-xs transition ${
                             selectedSchedule?.id === s.id ? "hover:bg-blue-700 text-blue-100" : "hover:bg-red-50 text-gray-400 hover:text-red-500"

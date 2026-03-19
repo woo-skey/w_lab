@@ -30,9 +30,9 @@ export default function LoginPage() {
     const result = await login(formData.username, formData.password);
 
     if (result.success) {
-      // TODO: Store user session
       localStorage.setItem("userId", result.userId || "");
       localStorage.setItem("userName", result.name || "");
+      localStorage.setItem("isAdmin", result.isAdmin ? "true" : "false");
       router.push("/");
     } else {
       setError(result.error || "로그인에 실패했습니다");

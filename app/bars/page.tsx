@@ -21,11 +21,13 @@ export default function BarsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [userId, setUserId] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [editingBar, setEditingBar] = useState<Bar | null>(null);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
     if (id) setUserId(id);
+    setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchBars();
   }, []);
 
@@ -179,7 +181,7 @@ export default function BarsPage() {
                     <>
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="text-xl font-bold text-gray-900">{bar.bar_name}</h3>
-                        {bar.user_id === userId && (
+                        {(bar.user_id === userId || isAdmin) && (
                           <div className="flex gap-1">
                             <button onClick={() => setEditingBar(bar)}
                               className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>

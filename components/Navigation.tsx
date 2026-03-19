@@ -18,6 +18,7 @@ export default function Navigation() {
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
+    localStorage.removeItem("isAdmin");
     setUserName("");
     router.push("/");
   };

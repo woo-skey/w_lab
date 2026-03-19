@@ -49,6 +49,7 @@ export default function ReviewsPage() {
   const [expandedWhiskey, setExpandedWhiskey] = useState<string | null>(null);
   const [expandedReview, setExpandedReview] = useState<string | null>(null);
   const [userId, setUserId] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // 위스키 추가 폼
   const [whiskey, setWhiskey] = useState({ name: "", type: "Scotch", region: "", age: "", abv: "", tasting_notes: "", price: "" });
@@ -68,6 +69,7 @@ export default function ReviewsPage() {
   useEffect(() => {
     const id = localStorage.getItem("userId");
     if (id) setUserId(id);
+    setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchWhiskeys();
   }, []);
 
@@ -442,7 +444,7 @@ export default function ReviewsPage() {
                           <div className="text-blue-500 text-lg font-bold">★ {avgRating}</div>
                         )}
                         <div className="text-xs text-gray-400">{displayCount}개 리뷰</div>
-                        {w.created_by === userId && userId && (
+                        {(w.created_by === userId || isAdmin) && userId && (
                           <div className="flex gap-1 mt-1">
                             <button onClick={() => setEditingWhiskey(w)}
                               className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
@@ -512,7 +514,7 @@ export default function ReviewsPage() {
                           whiskeyReviews.map((r) => {
                             const isReviewExpanded = expandedReview === r.id;
                             const reviewComments = comments[r.id] || [];
-                            const isOwner = r.user_id === userId;
+                            const isOwner = (r.user_id === userId || isAdmin);
 
                             return (
                               <div key={r.id} className="px-6 py-4">
