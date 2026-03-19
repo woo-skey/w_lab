@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import TwemojiProvider from "@/components/TwemojiProvider";
+import ThemeProvider from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "위스키 연구소",
@@ -16,11 +17,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="bg-white text-gray-900">
-        <TwemojiProvider>
-          <Navigation />
-          {children}
-        </TwemojiProvider>
+      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+        <ThemeProvider>
+          <TwemojiProvider>
+            <Navigation />
+            {children}
+          </TwemojiProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
