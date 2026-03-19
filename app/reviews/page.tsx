@@ -54,11 +54,7 @@ export default function ReviewsPage() {
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
-    if (!id) {
-      window.location.href = "/login";
-      return;
-    }
-    setUserId(id);
+    if (id) setUserId(id);
     fetchWhiskeys();
     fetchReviews();
   }, []);
@@ -194,12 +190,19 @@ export default function ReviewsPage() {
         </div>
 
         {/* 위스키 추가 버튼 */}
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="mb-8 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
-        >
-          {showAddForm ? "취소" : "새 위스키 추가"}
-        </button>
+        {userId ? (
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="mb-8 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+          >
+            {showAddForm ? "취소" : "새 위스키 추가"}
+          </button>
+        ) : (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 text-center">
+            <p className="text-amber-800 mb-2">위스키 추가 및 리뷰 작성은 로그인이 필요합니다.</p>
+            <a href="/login" className="text-amber-600 underline font-medium">로그인하기</a>
+          </div>
+        )}
 
         {/* 위스키 추가 폼 */}
         {showAddForm && (

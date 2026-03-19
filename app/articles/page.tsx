@@ -10,6 +10,7 @@ interface Article {
   category: string;
   author_id: string;
   created_at: string;
+  users?: { name: string };
 }
 
 const CATEGORIES = ["기초 지식", "테이스팅", "역사", "문화", "기타"];
@@ -29,11 +30,7 @@ export default function ArticlesPage() {
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
-    if (!id) {
-      window.location.href = "/login";
-      return;
-    }
-    setUserId(id);
+    if (id) setUserId(id);
     fetchArticles();
   }, []);
 
@@ -41,7 +38,7 @@ export default function ArticlesPage() {
     try {
       const { data, error } = await supabase
         .from("articles")
-        .select("*")
+        .select("*, users(name)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -127,12 +124,19 @@ export default function ArticlesPage() {
         </div>
 
         {/* 글쓰기 버튼 */}
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="mb-8 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
-        >
-          {showForm ? "취소" : "새 글 작성"}
-        </button>
+        {userId ? (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="mb-8 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+          >
+            {showForm ? "취소" : "새 글 작성"}
+          </button>
+        ) : (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 text-center">
+            <p className="text-amber-800 mb-2">글을 작성하려면 로그인이 필요합니다.</p>
+            <a href="/login" className="text-amber-600 underline font-medium">로그인하기</a>
+          </div>
+        )}
 
         {/* 글쓰기 폼 */}
         {showForm && (
@@ -223,9 +227,8 @@ export default function ArticlesPage() {
                 </p>
 
                 <div className="flex justify-between items-center text-sm text-gray-600">
-                  <p>
-                    작성일: {new Date(article.created_at).toLocaleDateString("ko-KR")}
-                  </p>
+                  <p>작성자: {article.users?.name || "알 수 없음"}</p>
+                  <p>{new Date(article.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               </div>
             ))

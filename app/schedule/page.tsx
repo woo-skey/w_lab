@@ -40,11 +40,7 @@ export default function SchedulePage() {
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
-    if (!id) {
-      window.location.href = "/login";
-      return;
-    }
-    setUserId(id);
+    if (id) setUserId(id);
     fetchSchedules();
   }, []);
 
