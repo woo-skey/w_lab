@@ -18,6 +18,7 @@ interface Review { id: string; rating: number; review_text: string; created_at: 
 interface Article { id: string; title: string; category: string; created_at: string; }
 interface Schedule { id: string; name: string; created_at: string; }
 interface Whiskey { id: string; name: string; type: string; region: string; created_at: string; }
+interface UserComment { id: string; content: string; created_at: string; source: "article" | "review"; target_title?: string; }
 
 interface AdminUser {
   id: string;
@@ -54,6 +55,7 @@ export default function MyPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [uploading, setUploading] = useState(false);
+  const [userComments, setUserComments] = useState<UserComment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 관리자 전용
@@ -70,13 +72,15 @@ export default function MyPage() {
   }, []);
 
   const fetchAll = async (id: string) => {
-    const [profileRes, barsRes, reviewsRes, articlesRes, schedulesRes, whiskeysRes] = await Promise.allSettled([
+    const [profileRes, barsRes, reviewsRes, articlesRes, schedulesRes, whiskeysRes, articleCommentsRes, reviewCommentsRes] = await Promise.allSettled([
       supabase.from("users").select("id, name, username, created_at, avatar_url, is_admin").eq("id", id).single(),
       supabase.from("bars").select("id, bar_name, notes, created_at").eq("user_id", id).order("created_at", { ascending: false }),
       supabase.from("reviews").select("id, rating, review_text, created_at, whiskeys(name, type)").eq("user_id", id).order("created_at", { ascending: false }),
       supabase.from("articles").select("id, title, category, created_at").eq("author_id", id).order("created_at", { ascending: false }),
       supabase.from("schedules").select("id, name, created_at").eq("created_by", id).order("created_at", { ascending: false }),
       supabase.from("whiskeys").select("id, name, type, region, created_at").eq("created_by", id).order("created_at", { ascending: false }),
+      supabase.from("comments").select("id, content, created_at, articles(title)").eq("user_id", id).order("created_at", { ascending: false }),
+      supabase.from("review_comments").select("id, content, created_at").eq("user_id", id).order("created_at", { ascending: false }),
     ]);
 
     if (profileRes.status === "fulfilled" && profileRes.value.data) {
@@ -89,6 +93,25 @@ export default function MyPage() {
     if (articlesRes.status === "fulfilled" && articlesRes.value.data) setArticles(articlesRes.value.data);
     if (schedulesRes.status === "fulfilled" && schedulesRes.value.data) setSchedules(schedulesRes.value.data);
     if (whiskeysRes.status === "fulfilled" && whiskeysRes.value.data) setWhiskeys(whiskeysRes.value.data);
+
+    // 댓글 합치기
+    // eslint-disable-next-line
+    const ac: any[] = articleCommentsRes.status === "fulfilled" ? (articleCommentsRes.value.data || []) : []; // eslint-disable-line
+    // eslint-disable-next-line
+    const rc: any[] = reviewCommentsRes.status === "fulfilled" ? (reviewCommentsRes.value.data || []) : []; // eslint-disable-line
+    const combined: UserComment[] = [
+      ...ac.map((c) => ({
+        id: c.id, content: c.content, created_at: c.created_at,
+        source: "article" as const,
+        target_title: Array.isArray(c.articles) ? c.articles[0]?.title : c.articles?.title || "지식글",
+      })),
+      ...rc.map((c) => ({
+        id: c.id, content: c.content, created_at: c.created_at,
+        source: "review" as const,
+        target_title: "위스키 리뷰",
+      })),
+    ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    setUserComments(combined);
 
     setLoading(false);
   };
@@ -209,6 +232,7 @@ export default function MyPage() {
     { id: "articles", label: `지식글 (${articles.length})` },
     { id: "bars", label: `Bar (${bars.length})` },
     { id: "schedules", label: `일정 (${schedules.length})` },
+    { id: "comments", label: `댓글 (${userComments.length})` },
     ...(profile?.is_admin ? [{ id: "admin", label: "🛡️ 관리자" }] : []),
   ];
 
@@ -406,7 +430,7 @@ export default function MyPage() {
               bars.map((b) => (
                 <div key={b.id} className="bg-white rounded-xl shadow border border-gray-100 p-5">
                   <p className="font-bold text-gray-900">{b.bar_name}</p>
-                  {b.notes && <p className="text-sm text-gray-500 mt-1 line-clamp-2">{b.notes}</p>}
+                  {b.notes && <p className="text-sm text-gray-500 mt-1 break-words whitespace-pre-wrap">{b.notes}</p>}
                   <p className="text-xs text-gray-400 mt-2">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
@@ -421,6 +445,27 @@ export default function MyPage() {
                 <div key={s.id} className="bg-white rounded-xl shadow border border-gray-100 p-5 flex justify-between items-center">
                   <p className="font-bold text-gray-900">{s.name}</p>
                   <p className="text-xs text-gray-400">{new Date(s.created_at).toLocaleDateString("ko-KR")}</p>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {activeTab === "comments" && (
+          <div className="space-y-3">
+            {userComments.length === 0 ? <div className="text-center py-12 text-gray-400">작성한 댓글이 없습니다.</div> : (
+              userComments.map((c) => (
+                <div key={c.id} className="bg-white rounded-xl shadow border border-gray-100 p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      c.source === "article" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
+                    }`}>
+                      {c.source === "article" ? "지식글" : "리뷰"}
+                    </span>
+                    <span className="text-xs text-gray-400 truncate">{c.target_title}</span>
+                  </div>
+                  <p className="text-gray-700 text-sm break-words whitespace-pre-wrap">{c.content}</p>
+                  <p className="text-xs text-gray-400 mt-2">{new Date(c.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
             )}

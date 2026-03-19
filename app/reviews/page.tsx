@@ -460,7 +460,7 @@ export default function ReviewsPage() {
                           {w.price && <span>💰 ₩{w.price.toLocaleString()}</span>}
                         </div>
                         {w.tasting_notes && (
-                          <p className="text-sm text-gray-500 mt-2 line-clamp-1">{w.tasting_notes}</p>
+                          <p className="text-sm text-gray-500 mt-2 break-words whitespace-pre-wrap">{w.tasting_notes}</p>
                         )}
                       </button>
                       <div className="text-right ml-4 flex-shrink-0 flex flex-col items-end gap-1">

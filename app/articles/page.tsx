@@ -315,7 +315,7 @@ export default function ArticlesPage() {
                               <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">{article.category}</span>
                             </div>
                             <h3 className="text-lg font-bold text-gray-900 mb-1">{article.title}</h3>
-                            <p className="text-gray-500 text-sm line-clamp-2">{article.content}</p>
+                            <p className="text-gray-500 text-sm break-words whitespace-pre-wrap line-clamp-3">{article.content}</p>
                             <div className="flex gap-4 mt-3 text-xs text-gray-500">
                               <span>✍️ {article.users?.name || "알 수 없음"}</span>
                               <span>{new Date(article.created_at).toLocaleDateString("ko-KR")}</span>

@@ -175,8 +175,9 @@ export default function Navigation() {
 
             {userName ? (
               <div className="hidden md:flex items-center gap-3">
-                <Link href="/mypage" className="text-sm text-gray-700 hover:text-blue-600 transition">
-                  {userName}님
+                <span className="text-sm text-gray-700">{userName}님</span>
+                <Link href="/mypage" className="text-sm text-gray-600 hover:text-blue-600 transition">
+                  마이페이지
                 </Link>
                 <button
                   onClick={handleLogout}
