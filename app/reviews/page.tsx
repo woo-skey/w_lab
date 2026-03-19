@@ -238,6 +238,16 @@ export default function ReviewsPage() {
     }
   };
 
+  const handleDeleteComment = async (commentId: string, reviewId: string) => {
+    try {
+      const { error } = await supabase.from("review_comments").delete().eq("id", commentId);
+      if (error) throw error;
+      fetchComments(reviewId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleAddComment = async (reviewId: string) => {
     const content = commentText[reviewId]?.trim();
     if (!content) return;
@@ -612,8 +622,16 @@ export default function ReviewsPage() {
                                                 {(c.users?.name || "?")[0].toUpperCase()}
                                               </div>
                                               <div className="flex-1 bg-gray-50 rounded-lg px-3 py-2">
-                                                <span className="text-xs font-medium text-gray-800 mr-2">{c.users?.name || "알 수 없음"}</span>
-                                                <span className="text-xs text-gray-500">{new Date(c.created_at).toLocaleDateString("ko-KR")}</span>
+                                                <div className="flex justify-between items-center">
+                                                  <div>
+                                                    <span className="text-xs font-medium text-gray-800 mr-2">{c.users?.name || "알 수 없음"}</span>
+                                                    <span className="text-xs text-gray-500">{new Date(c.created_at).toLocaleDateString("ko-KR")}</span>
+                                                  </div>
+                                                  {(c.user_id === userId || isAdmin) && (
+                                                    <button onClick={() => handleDeleteComment(c.id, r.id)}
+                                                      className="text-xs text-gray-400 hover:text-red-500 transition">삭제</button>
+                                                  )}
+                                                </div>
                                                 <p className="text-xs text-gray-700 mt-0.5">{c.content}</p>
                                               </div>
                                             </div>

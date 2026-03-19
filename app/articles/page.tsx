@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface Article {
@@ -10,6 +10,7 @@ interface Article {
   category: string;
   author_id: string;
   created_at: string;
+  image_url?: string;
   users?: { name: string };
 }
 
@@ -37,6 +38,9 @@ export default function ArticlesPage() {
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
 
   const [formData, setFormData] = useState({ title: "", content: "", category: "기초 지식" });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -79,15 +83,39 @@ export default function ArticlesPage() {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const uploadImage = async (file: File, articleId: string): Promise<string | null> => {
+    const ext = file.name.split(".").pop();
+    const path = `${articleId}/image.${ext}`;
+    const { error } = await supabase.storage.from("article-images").upload(path, file, { upsert: true });
+    if (error) { console.error(error); return null; }
+    const { data } = supabase.storage.from("article-images").getPublicUrl(path);
+    return data.publicUrl;
+  };
+
   const handleSubmitArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.content.trim()) { alert("제목과 내용을 입력해주세요"); return; }
     try {
-      const { error } = await supabase.from("articles").insert([{
+      const { data, error } = await supabase.from("articles").insert([{
         title: formData.title, content: formData.content, category: formData.category, author_id: userId,
-      }]);
+      }]).select().single();
       if (error) throw error;
+
+      if (imageFile && data) {
+        const imageUrl = await uploadImage(imageFile, data.id);
+        if (imageUrl) await supabase.from("articles").update({ image_url: imageUrl }).eq("id", data.id);
+      }
+
       setFormData({ title: "", content: "", category: "기초 지식" });
+      setImageFile(null);
+      setImagePreview("");
       setShowForm(false);
       fetchArticles();
     } catch (err) {
@@ -199,6 +227,21 @@ export default function ArticlesPage() {
                       placeholder="글의 내용을 입력하세요" rows={8}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">이미지 (선택)</label>
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                    <button type="button" onClick={() => fileInputRef.current?.click()}
+                      className="px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 transition w-full text-center">
+                      {imageFile ? imageFile.name : "📷 이미지 선택"}
+                    </button>
+                    {imagePreview && (
+                      <div className="mt-2 relative inline-block">
+                        <img src={imagePreview} alt="preview" className="max-h-48 rounded-lg object-cover" />
+                        <button type="button" onClick={() => { setImageFile(null); setImagePreview(""); }}
+                          className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">×</button>
+                      </div>
+                    )}
+                  </div>
                   <button type="submit" className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">글 등록</button>
                 </form>
               </div>
@@ -290,6 +333,9 @@ export default function ArticlesPage() {
                       {isExpanded && (
                         <div className="border-t border-gray-100">
                           <div className="p-6 bg-gray-50">
+                            {article.image_url && (
+                              <img src={article.image_url} alt="article" className="w-full max-h-96 object-cover rounded-lg mb-4" />
+                            )}
                             <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{article.content}</p>
                           </div>
                           <div className="p-6">
