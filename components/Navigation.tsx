@@ -186,16 +186,24 @@ export default function Navigation() {
                           <div
                             key={n.id}
                             onClick={() => {
-                              if (n.link) {
-                                router.push(n.link);
+                              const typeMap: Record<string, string> = {
+                                announcement: "/notices",
+                                review: "/reviews",
+                                review_comment: "/reviews",
+                                article_comment: "/articles",
+                                contact_reply: "/contact",
+                              };
+                              const dest = n.link || typeMap[n.type] || null;
+                              if (dest) {
+                                router.push(dest);
                                 setShowNotifications(false);
                               }
                             }}
-                            className={`px-4 py-3 border-b border-gray-50 dark:border-gray-800 text-sm ${
+                            className={`px-4 py-3 border-b border-gray-50 dark:border-gray-800 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
                               n.is_read
                                 ? "bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400"
                                 : "bg-blue-50 dark:bg-blue-950 text-gray-800 dark:text-gray-100"
-                            } ${n.link ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition" : ""}`}
+                            }`}
                           >
                             <p className="leading-snug">{n.message}</p>
                             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">

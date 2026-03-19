@@ -5,7 +5,8 @@
       "Bash(npm run:*)",
       "Bash(for f:*)",
       "Bash(do sed:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(ls \"C:\\\\Users\\\\idimu\\\\.claude\\\\projects\\\\c--Users-idimu-Desktop-w-lab\\\\memory\"\" 2>/dev/null || echo \"empty \")"
     ]
   }
 }
