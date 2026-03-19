@@ -28,7 +28,6 @@ export default function Navigation() {
     { name: "위스키 리뷰", href: "/reviews" },
     { name: "지식", href: "/articles" },
     { name: "일정", href: "/schedule" },
-    ...(userName ? [{ name: "마이페이지", href: "/mypage" }] : []),
   ];
 
   return (
@@ -60,8 +59,10 @@ export default function Navigation() {
           {/* Auth Section */}
           <div className="flex items-center gap-4">
             {userName ? (
-              <div className="hidden md:flex items-center gap-4">
-                <span className="text-sm text-gray-700">{userName}님</span>
+              <div className="hidden md:flex items-center gap-3">
+                <Link href="/mypage" className="text-sm text-gray-700 hover:text-blue-600 transition">
+                  {userName}님
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition"
