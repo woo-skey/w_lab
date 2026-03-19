@@ -336,13 +336,14 @@ export default function ReviewsPage() {
         )}
 
         {/* 위스키 목록 */}
-        <div className="space-y-4">
+        <div>
           {loading ? (
             <div className="text-center py-12 text-gray-500">로딩 중...</div>
           ) : filteredWhiskeys.length === 0 ? (
             <div className="text-center py-12 text-gray-500">아직 위스키가 없습니다.</div>
           ) : (
-            filteredWhiskeys.map((w) => {
+            <div className="grid md:grid-cols-2 gap-4">
+            {filteredWhiskeys.map((w) => {
               const isExpanded = expandedWhiskey === w.id;
               const whiskeyReviews = reviews[w.id] || [];
               const avgRating = whiskeyReviews.length
@@ -637,7 +638,8 @@ export default function ReviewsPage() {
                   )}
                 </div>
               );
-            })
+            })}
+            </div>
           )}
         </div>
       </div>
