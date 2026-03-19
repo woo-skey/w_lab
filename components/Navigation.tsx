@@ -12,10 +12,8 @@ export default function Navigation() {
 
   useEffect(() => {
     const name = localStorage.getItem("userName");
-    if (name) {
-      setUserName(name);
-    }
-  }, []);
+    setUserName(name || "");
+  }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
