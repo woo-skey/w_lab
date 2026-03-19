@@ -23,6 +23,7 @@ export default function BarsPage() {
   const [userId, setUserId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingBar, setEditingBar] = useState<Bar | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -65,6 +66,7 @@ export default function BarsPage() {
       }]);
       if (error) throw error;
       setFormData({ bar_name: "", link: "", notes: "" });
+      setShowModal(false);
       fetchBars();
     } catch (err) {
       console.error(err);
@@ -105,13 +107,93 @@ export default function BarsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Bar 추천</h1>
-        <p className="text-gray-600 mb-8">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
+        {/* 헤더 */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-1">Bar 추천</h1>
+            <p className="text-gray-600">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
+          </div>
+          {userId ? (
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-md hover:shadow-lg"
+            >
+              <span className="text-lg">+</span> Bar 추가하기
+            </button>
+          ) : (
+            <Link href="/login"
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-md">
+              로그인하고 추천하기
+            </Link>
+          )}
+        </div>
 
-        {/* 추천 폼 */}
-        {userId ? (
-          <div className="bg-white rounded-xl shadow-md p-8 mb-12 border border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Bar 추천하기</h2>
+        {/* 바 목록 */}
+        {loading ? (
+          <div className="text-center py-12 text-gray-600">로딩 중...</div>
+        ) : bars.length === 0 ? (
+          <div className="text-center py-12 text-gray-600">아직 추천된 바가 없습니다.</div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {bars.map((bar) => (
+              <div key={bar.id} className="bg-white rounded-xl shadow hover:shadow-lg transition p-6 border border-gray-100">
+                {editingBar?.id === bar.id ? (
+                  <form onSubmit={handleEdit} className="space-y-3">
+                    <input type="text" value={editingBar.bar_name}
+                      onChange={(e) => setEditingBar({ ...editingBar, bar_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="url" value={editingBar.link || ""}
+                      onChange={(e) => setEditingBar({ ...editingBar, link: e.target.value })}
+                      placeholder="링크"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <textarea value={editingBar.notes || ""}
+                      onChange={(e) => setEditingBar({ ...editingBar, notes: e.target.value })}
+                      rows={3} placeholder="비고"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <div className="flex gap-2">
+                      <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">저장</button>
+                      <button type="button" onClick={() => setEditingBar(null)} className="px-4 py-1.5 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">취소</button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-xl font-bold text-gray-900">{bar.bar_name}</h3>
+                      {(bar.user_id === userId || isAdmin) && (
+                        <div className="flex gap-1">
+                          <button onClick={() => setEditingBar(bar)}
+                            className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
+                          <button onClick={() => handleDelete(bar.id)}
+                            className="text-xs text-gray-500 hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                        </div>
+                      )}
+                    </div>
+                    {bar.link && (
+                      <a href={bar.link} target="_blank" rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline text-sm mb-3 block">🔗 웹사이트 방문</a>
+                    )}
+                    {bar.notes && <p className="text-gray-700 mb-4 whitespace-pre-wrap text-sm">{bar.notes}</p>}
+                    <div className="flex justify-between items-center text-xs text-gray-500">
+                      <span>추천: {bar.author_name}</span>
+                      <span>{new Date(bar.created_at).toLocaleDateString("ko-KR")}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 추가 모달 */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Bar 추천하기</h2>
+              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">바 이름 *</label>
@@ -141,72 +223,8 @@ export default function BarsPage() {
               </button>
             </form>
           </div>
-        ) : (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-12 text-center">
-            <p className="text-blue-800 mb-3">바를 추천하려면 로그인이 필요합니다.</p>
-            <Link href="/login" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">로그인하기</Link>
-          </div>
-        )}
-
-        {/* 바 목록 */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">추천된 Bar</h2>
-          {loading ? (
-            <div className="text-center py-12 text-gray-600">로딩 중...</div>
-          ) : bars.length === 0 ? (
-            <div className="text-center py-12 text-gray-600">아직 추천된 바가 없습니다.</div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6">
-              {bars.map((bar) => (
-                <div key={bar.id} className="bg-white rounded-xl shadow hover:shadow-lg transition p-6 border border-gray-100">
-                  {editingBar?.id === bar.id ? (
-                    <form onSubmit={handleEdit} className="space-y-3">
-                      <input type="text" value={editingBar.bar_name}
-                        onChange={(e) => setEditingBar({ ...editingBar, bar_name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      <input type="url" value={editingBar.link || ""}
-                        onChange={(e) => setEditingBar({ ...editingBar, link: e.target.value })}
-                        placeholder="링크"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      <textarea value={editingBar.notes || ""}
-                        onChange={(e) => setEditingBar({ ...editingBar, notes: e.target.value })}
-                        rows={3} placeholder="비고"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">저장</button>
-                        <button type="button" onClick={() => setEditingBar(null)} className="px-4 py-1.5 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">취소</button>
-                      </div>
-                    </form>
-                  ) : (
-                    <>
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-xl font-bold text-gray-900">{bar.bar_name}</h3>
-                        {(bar.user_id === userId || isAdmin) && (
-                          <div className="flex gap-1">
-                            <button onClick={() => setEditingBar(bar)}
-                              className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
-                            <button onClick={() => handleDelete(bar.id)}
-                              className="text-xs text-gray-500 hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
-                          </div>
-                        )}
-                      </div>
-                      {bar.link && (
-                        <a href={bar.link} target="_blank" rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline text-sm mb-3 block">🔗 웹사이트 방문</a>
-                      )}
-                      {bar.notes && <p className="text-gray-700 mb-4 whitespace-pre-wrap text-sm">{bar.notes}</p>}
-                      <div className="flex justify-between items-center text-xs text-gray-500">
-                        <span>추천: {bar.author_name}</span>
-                        <span>{new Date(bar.created_at).toLocaleDateString("ko-KR")}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }

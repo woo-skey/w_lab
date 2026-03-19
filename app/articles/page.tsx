@@ -22,13 +22,13 @@ interface Comment {
   users?: { name: string };
 }
 
-const CATEGORIES = ["기초 지식", "테이스팅", "역사", "문화", "기타"];
+const CATEGORIES = ["전체", "기초 지식", "테이스팅", "역사", "문화", "기타"];
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("기초 지식");
+  const [selectedCategory, setSelectedCategory] = useState("전체");
   const [showForm, setShowForm] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState<Record<string, string>>({});
@@ -146,7 +146,7 @@ export default function ArticlesPage() {
     }
   };
 
-  const filteredArticles = articles.filter((a) => a.category === selectedCategory);
+  const filteredArticles = selectedCategory === "전체" ? articles : articles.filter((a) => a.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-gray-50">
