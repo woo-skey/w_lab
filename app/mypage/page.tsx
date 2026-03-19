@@ -69,27 +69,23 @@ export default function MyPage() {
   }, []);
 
   const fetchAll = async (id: string) => {
-    try {
-      const [profileRes, barsRes, reviewsRes, articlesRes, schedulesRes, whiskeysRes] = await Promise.all([
-        supabase.from("users").select("id, name, username, created_at").eq("id", id).single(),
-        supabase.from("bars").select("id, bar_name, notes, created_at").eq("user_id", id).order("created_at", { ascending: false }),
-        supabase.from("reviews").select("id, rating, review_text, created_at, whiskeys(name, type)").eq("user_id", id).order("created_at", { ascending: false }),
-        supabase.from("articles").select("id, title, category, created_at").eq("author_id", id).order("created_at", { ascending: false }),
-        supabase.from("schedules").select("id, name, created_at").eq("created_by", id).order("created_at", { ascending: false }),
-        supabase.from("whiskeys").select("id, name, type, region, created_at").eq("created_by", id).order("created_at", { ascending: false }),
-      ]);
+    const [profileRes, barsRes, reviewsRes, articlesRes, schedulesRes, whiskeysRes] = await Promise.allSettled([
+      supabase.from("users").select("id, name, username, created_at").eq("id", id).single(),
+      supabase.from("bars").select("id, bar_name, notes, created_at").eq("user_id", id).order("created_at", { ascending: false }),
+      supabase.from("reviews").select("id, rating, review_text, created_at, whiskeys(name, type)").eq("user_id", id).order("created_at", { ascending: false }),
+      supabase.from("articles").select("id, title, category, created_at").eq("author_id", id).order("created_at", { ascending: false }),
+      supabase.from("schedules").select("id, name, created_at").eq("created_by", id).order("created_at", { ascending: false }),
+      supabase.from("whiskeys").select("id, name, type, region, created_at").eq("created_by", id).order("created_at", { ascending: false }),
+    ]);
 
-      if (profileRes.data) setProfile(profileRes.data);
-      if (barsRes.data) setBars(barsRes.data);
-      if (reviewsRes.data) setReviews(reviewsRes.data as unknown as Review[]);
-      if (articlesRes.data) setArticles(articlesRes.data);
-      if (schedulesRes.data) setSchedules(schedulesRes.data);
-      if (whiskeysRes.data) setWhiskeys(whiskeysRes.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    if (profileRes.status === "fulfilled" && profileRes.value.data) setProfile(profileRes.value.data);
+    if (barsRes.status === "fulfilled" && barsRes.value.data) setBars(barsRes.value.data);
+    if (reviewsRes.status === "fulfilled" && reviewsRes.value.data) setReviews(reviewsRes.value.data as unknown as Review[]);
+    if (articlesRes.status === "fulfilled" && articlesRes.value.data) setArticles(articlesRes.value.data);
+    if (schedulesRes.status === "fulfilled" && schedulesRes.value.data) setSchedules(schedulesRes.value.data);
+    if (whiskeysRes.status === "fulfilled" && whiskeysRes.value.data) setWhiskeys(whiskeysRes.value.data);
+
+    setLoading(false);
   };
 
   const tabs = [
