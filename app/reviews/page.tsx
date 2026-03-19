@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/lib/notifications";
 
 interface Whiskey {
   id: string;
@@ -201,6 +202,12 @@ export default function ReviewsPage() {
         taste_profile: reviewForm.taste_profile,
       }]);
       if (error) throw error;
+      // 위스키 등록자에게 알림 (본인 제외)
+      const w = whiskeys.find((w) => w.id === reviewForm.whiskey_id);
+      if (w?.created_by && w.created_by !== userId) {
+        const userName = localStorage.getItem("userName") || "누군가";
+        await createNotification(w.created_by, "review", `🥃 ${userName}님이 "${w.name}"에 리뷰를 남겼습니다.`);
+      }
       setReviewForm(null);
       fetchReviews(reviewForm.whiskey_id);
     } catch (err) {
@@ -258,6 +265,13 @@ export default function ReviewsPage() {
         content,
       }]);
       if (error) throw error;
+      // 리뷰 작성자에게 알림 (본인 제외)
+      const reviewList = Object.values(reviews).flat();
+      const targetReview = reviewList.find((r) => r.id === reviewId);
+      if (targetReview && targetReview.user_id !== userId) {
+        const userName = localStorage.getItem("userName") || "누군가";
+        await createNotification(targetReview.user_id, "comment", `💬 ${userName}님이 회원님의 리뷰에 댓글을 남겼습니다.`);
+      }
       setCommentText((prev) => ({ ...prev, [reviewId]: "" }));
       fetchComments(reviewId);
     } catch (err) {
@@ -277,7 +291,7 @@ export default function ReviewsPage() {
         <div className="flex flex-wrap gap-2 mb-8">
           {WHISKEY_TYPES.map((type) => (
             <button key={type} onClick={() => setSelectedType(type)}
-              className={`px-6 py-2 rounded-full font-medium transition ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                 selectedType === type ? "bg-blue-600 text-white" : "bg-white text-gray-700 border border-gray-300 hover:border-blue-400"
               }`}
             >
@@ -294,7 +308,7 @@ export default function ReviewsPage() {
           </button>
         ) : (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
-            <p className="text-blue-800 mb-1">위스키 추가 및 리뷰 작성은 로그인이 필요합니다.</p>
+            <p className="text-blue-800 mb-2">위스키 추가 및 리뷰 작성은 로그인이 필요합니다.</p>
             <a href="/login" className="text-blue-600 underline font-medium text-sm">로그인하기</a>
           </div>
         )}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/lib/notifications";
 
 interface Article {
   id: string;
@@ -157,6 +158,12 @@ export default function ArticlesPage() {
     try {
       const { error } = await supabase.from("comments").insert([{ article_id: articleId, user_id: userId, content }]);
       if (error) throw error;
+      // 글 작성자에게 알림 (본인 제외)
+      const targetArticle = articles.find((a) => a.id === articleId);
+      if (targetArticle && targetArticle.author_id !== userId) {
+        const userName = localStorage.getItem("userName") || "누군가";
+        await createNotification(targetArticle.author_id, "comment", `💬 ${userName}님이 "${targetArticle.title}"에 댓글을 남겼습니다.`);
+      }
       setCommentText((prev) => ({ ...prev, [articleId]: "" }));
       fetchComments(articleId);
     } catch (err) {
@@ -178,7 +185,7 @@ export default function ArticlesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="max-w-5xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">위스키 지식</h1>
         <p className="text-gray-600 mb-8">위스키에 대한 다양한 정보와 지식을 공유하세요.</p>
 
@@ -248,7 +255,7 @@ export default function ArticlesPage() {
             )}
           </>
         ) : (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 text-center">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
             <p className="text-blue-800 mb-2">글을 작성하려면 로그인이 필요합니다.</p>
             <a href="/login" className="text-blue-600 underline font-medium">로그인하기</a>
           </div>
