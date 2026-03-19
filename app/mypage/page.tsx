@@ -20,6 +20,7 @@ interface Schedule { id: string; name: string; created_at: string; }
 interface Whiskey { id: string; name: string; type: string; region: string; created_at: string; }
 interface UserComment { id: string; content: string; created_at: string; source: "article" | "review"; target_title?: string; }
 
+interface AllAnnouncement { id: string; title: string; content: string; author_id: string; author_name?: string; created_at: string; }
 interface AllArticle { id: string; title: string; content: string; category: string; author_id: string; created_at: string; users?: { name: string }; }
 interface AllReview { id: string; rating: number; review_text: string; user_id: string; created_at: string; users?: { name: string }; whiskeys?: { name: string }; }
 interface AllBar { id: string; bar_name: string; link: string; notes: string; user_id: string; created_at: string; users?: { name: string }; }
@@ -77,6 +78,11 @@ export default function MyPage() {
   const [editingAdminArticle, setEditingAdminArticle] = useState<AllArticle | null>(null);
   const [editingAdminBar, setEditingAdminBar] = useState<AllBar | null>(null);
   const [editingAdminWhiskey, setEditingAdminWhiskey] = useState<AllWhiskey | null>(null);
+  const [allAnnouncements, setAllAnnouncements] = useState<AllAnnouncement[]>([]);
+  const [editingAdminAnnouncement, setEditingAdminAnnouncement] = useState<AllAnnouncement | null>(null);
+  const [announcementForm, setAnnouncementForm] = useState({ title: "", content: "" });
+  const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
+  const [announcementSubmitting, setAnnouncementSubmitting] = useState(false);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -181,7 +187,10 @@ export default function MyPage() {
   const fetchAdminContent = async (tab: string) => {
     setContentLoading(true);
     try {
-      if (tab === "articles") {
+      if (tab === "notices") {
+        const { data } = await supabase.from("announcements").select("*").order("created_at", { ascending: false });
+        setAllAnnouncements(data || []);
+      } else if (tab === "articles") {
         const { data } = await supabase.from("articles").select("*, users(name)").order("created_at", { ascending: false });
         setAllArticles(data || []);
       } else if (tab === "reviews") {
@@ -203,7 +212,37 @@ export default function MyPage() {
 
   const handleAdminSubTab = (tab: string) => {
     setAdminSubTab(tab);
-    if (["articles", "reviews", "bars", "whiskeys"].includes(tab)) fetchAdminContent(tab);
+    if (["notices", "articles", "reviews", "bars", "whiskeys"].includes(tab)) fetchAdminContent(tab);
+  };
+
+  const handleAdminSubmitAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!announcementForm.title.trim() || !announcementForm.content.trim()) return;
+    setAnnouncementSubmitting(true);
+    try {
+      const authorName = localStorage.getItem("userName") || "관리자";
+      const { error } = await supabase.from("announcements").insert([{
+        title: announcementForm.title, content: announcementForm.content,
+        author_id: userId, author_name: authorName,
+      }]);
+      if (error) throw error;
+      setAnnouncementForm({ title: "", content: "" });
+      setShowAnnouncementForm(false);
+      fetchAdminContent("notices");
+    } catch (err) { console.error(err); }
+    finally { setAnnouncementSubmitting(false); }
+  };
+  const handleAdminSaveAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAdminAnnouncement) return;
+    await supabase.from("announcements").update({ title: editingAdminAnnouncement.title, content: editingAdminAnnouncement.content }).eq("id", editingAdminAnnouncement.id);
+    setAllAnnouncements((prev) => prev.map((a) => a.id === editingAdminAnnouncement.id ? { ...a, ...editingAdminAnnouncement } : a));
+    setEditingAdminAnnouncement(null);
+  };
+  const handleAdminDeleteAnnouncement = async (id: string) => {
+    if (!confirm("이 공지를 삭제할까요?")) return;
+    await supabase.from("announcements").delete().eq("id", id);
+    setAllAnnouncements((prev) => prev.filter((a) => a.id !== id));
   };
 
   const handleAdminDeleteArticle = async (id: string) => {
@@ -567,6 +606,7 @@ export default function MyPage() {
               {[
                 { id: "stats", label: "📊 통계" },
                 { id: "users", label: "👥 유저 관리" },
+                { id: "notices", label: "📢 공지" },
                 { id: "articles", label: "📚 지식글" },
                 { id: "reviews", label: "⭐ 리뷰" },
                 { id: "bars", label: "🍸 Bar" },
@@ -638,6 +678,71 @@ export default function MyPage() {
                               className="px-3 py-1.5 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition font-medium disabled:opacity-50">
                               {deletingUserId === u.id ? "삭제 중..." : "회원탈퇴"}
                             </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 공지 관리 */}
+            {adminSubTab === "notices" && (
+              <div className="bg-white rounded-xl shadow border border-gray-100 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="font-bold text-gray-900 text-lg">공지사항 관리</h2>
+                  <button onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
+                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                    {showAnnouncementForm ? "취소" : "📢 공지 작성"}
+                  </button>
+                </div>
+
+                {showAnnouncementForm && (
+                  <form onSubmit={handleAdminSubmitAnnouncement} className="space-y-3 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                    <input value={announcementForm.title}
+                      onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
+                      placeholder="공지 제목" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <textarea value={announcementForm.content} rows={4}
+                      onChange={(e) => setAnnouncementForm({ ...announcementForm, content: e.target.value })}
+                      placeholder="공지 내용" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <button type="submit" disabled={announcementSubmitting}
+                      className="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition">
+                      {announcementSubmitting ? "등록 중..." : "등록"}
+                    </button>
+                  </form>
+                )}
+
+                {contentLoading ? <p className="text-gray-400 text-sm">로딩 중...</p> : (
+                  <div className="space-y-3">
+                    {allAnnouncements.length === 0 ? (
+                      <p className="text-center text-gray-400 text-sm py-8">등록된 공지가 없습니다.</p>
+                    ) : allAnnouncements.map((a) => (
+                      <div key={a.id} className="border border-gray-100 rounded-lg p-4 bg-gray-50">
+                        {editingAdminAnnouncement?.id === a.id ? (
+                          <form onSubmit={handleAdminSaveAnnouncement} className="space-y-3">
+                            <input value={editingAdminAnnouncement.title}
+                              onChange={(e) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, title: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <textarea value={editingAdminAnnouncement.content} rows={4}
+                              onChange={(e) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, content: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <div className="flex gap-2">
+                              <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">저장</button>
+                              <button type="button" onClick={() => setEditingAdminAnnouncement(null)} className="px-4 py-1.5 bg-gray-200 text-gray-700 text-xs rounded-lg hover:bg-gray-300 transition">취소</button>
+                            </div>
+                          </form>
+                        ) : (
+                          <div className="flex justify-between items-start gap-3">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900 text-sm">{a.title}</p>
+                              <p className="text-xs text-gray-500 mt-1 line-clamp-2 break-words">{a.content}</p>
+                              <p className="text-xs text-gray-400 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
+                            </div>
+                            <div className="flex gap-1 flex-shrink-0">
+                              <button onClick={() => setEditingAdminAnnouncement(a)} className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
+                              <button onClick={() => handleAdminDeleteAnnouncement(a.id)} className="text-xs text-gray-500 hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                            </div>
                           </div>
                         )}
                       </div>
