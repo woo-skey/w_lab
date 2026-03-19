@@ -13,7 +13,11 @@ export default function TwemojiProvider({ children }: { children: React.ReactNod
       if (isParsing) return;
       isParsing = true;
       const twemoji = (await import("twemoji")).default;
-      twemoji.parse(document.body, { folder: "svg", ext: ".svg" });
+      twemoji.parse(document.body, {
+        folder: "svg",
+        ext: ".svg",
+        base: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/",
+      });
       setTimeout(() => { isParsing = false; }, 200);
     };
 
