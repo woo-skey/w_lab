@@ -108,25 +108,22 @@ export default function BarsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* 헤더 */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-1">Bar 추천</h1>
-            <p className="text-gray-600">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">Bar 추천</h1>
+        <p className="text-gray-600 mb-8">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
+
+        {userId ? (
+          <button
+            onClick={() => setShowModal(true)}
+            className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            🍸 Bar 추가하기
+          </button>
+        ) : (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
+            <p className="text-blue-800 mb-2">바를 추천하려면 로그인이 필요합니다.</p>
+            <Link href="/login" className="text-blue-600 underline font-medium">로그인하기</Link>
           </div>
-          {userId ? (
-            <button
-              onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-md hover:shadow-lg"
-            >
-              <span className="text-lg">+</span> Bar 추가하기
-            </button>
-          ) : (
-            <Link href="/login"
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-md">
-              로그인하고 추천하기
-            </Link>
-          )}
-        </div>
+        )}
 
         {/* 바 목록 */}
         {loading ? (
