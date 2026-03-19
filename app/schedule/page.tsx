@@ -128,6 +128,18 @@ export default function SchedulePage() {
     setSelectedSchedule({ ...selectedSchedule });
   };
 
+  const handleDeleteSchedule = async (scheduleId: string) => {
+    if (!confirm("일정을 삭제할까요?")) return;
+    try {
+      const { error } = await supabase.from("schedules").delete().eq("id", scheduleId);
+      if (error) throw error;
+      if (selectedSchedule?.id === scheduleId) { setSelectedSchedule(null); setAvailabilityMap({}); }
+      setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleCreateSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim()) return;
@@ -216,20 +228,23 @@ export default function SchedulePage() {
               ) : (
                 <div className="space-y-2">
                   {schedules.map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => { setSelectedSchedule(s); setAvailabilityMap({}); }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${
-                        selectedSchedule?.id === s.id
-                          ? "bg-amber-600 text-white"
-                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                      }`}
-                    >
-                      <p className="font-medium truncate">{s.name}</p>
-                      <p className={`text-xs mt-0.5 ${selectedSchedule?.id === s.id ? "text-amber-100" : "text-gray-500"}`}>
-                        {new Date(s.created_at).toLocaleDateString("ko-KR")}
-                      </p>
-                    </button>
+                    <div key={s.id} className={`flex items-center rounded-lg text-sm transition ${
+                      selectedSchedule?.id === s.id ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-800"
+                    }`}>
+                      <button onClick={() => { setSelectedSchedule(s); setAvailabilityMap({}); }}
+                        className="flex-1 text-left px-3 py-2">
+                        <p className="font-medium truncate">{s.name}</p>
+                        <p className={`text-xs mt-0.5 ${selectedSchedule?.id === s.id ? "text-amber-100" : "text-gray-500"}`}>
+                          {new Date(s.created_at).toLocaleDateString("ko-KR")}
+                        </p>
+                      </button>
+                      {s.created_by === userId && (
+                        <button onClick={() => handleDeleteSchedule(s.id)}
+                          className={`px-2 py-1 mr-1 rounded text-xs transition ${
+                            selectedSchedule?.id === s.id ? "hover:bg-amber-700 text-amber-100" : "hover:bg-red-50 text-gray-400 hover:text-red-500"
+                          }`}>✕</button>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

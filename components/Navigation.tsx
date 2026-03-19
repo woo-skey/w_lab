@@ -24,7 +24,7 @@ export default function Navigation() {
 
   const navItems = [
     { name: "홈", href: "/" },
-    { name: "바 추천", href: "/bars" },
+    { name: "Bar 추천", href: "/bars" },
     { name: "위스키 리뷰", href: "/reviews" },
     { name: "지식", href: "/articles" },
     { name: "일정", href: "/schedule" },

@@ -12,6 +12,7 @@ interface Whiskey {
   abv: number;
   tasting_notes: string;
   price: number;
+  created_by?: string;
 }
 
 interface Review {
@@ -56,6 +57,9 @@ export default function ReviewsPage() {
 
   // 리뷰 편집
   const [editingReview, setEditingReview] = useState<{ id: string; rating: number; review_text: string; taste_profile: string } | null>(null);
+
+  // 위스키 편집
+  const [editingWhiskey, setEditingWhiskey] = useState<Whiskey | null>(null);
 
   // 댓글
   const [commentText, setCommentText] = useState<Record<string, string>>({});
@@ -106,6 +110,34 @@ export default function ReviewsPage() {
     }
   };
 
+  const handleDeleteWhiskey = async (whiskeyId: string) => {
+    if (!confirm("위스키를 삭제하면 관련 리뷰도 모두 삭제됩니다. 계속할까요?")) return;
+    try {
+      const { error } = await supabase.from("whiskeys").delete().eq("id", whiskeyId);
+      if (error) throw error;
+      if (expandedWhiskey === whiskeyId) setExpandedWhiskey(null);
+      fetchWhiskeys();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEditWhiskey = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingWhiskey) return;
+    try {
+      const { error } = await supabase.from("whiskeys").update({
+        name: editingWhiskey.name, type: editingWhiskey.type, region: editingWhiskey.region,
+        age: editingWhiskey.age, abv: editingWhiskey.abv, tasting_notes: editingWhiskey.tasting_notes, price: editingWhiskey.price,
+      }).eq("id", editingWhiskey.id);
+      if (error) throw error;
+      setEditingWhiskey(null);
+      fetchWhiskeys();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleToggleWhiskey = (whiskeyId: string) => {
     if (expandedWhiskey === whiskeyId) {
       setExpandedWhiskey(null);
@@ -134,6 +166,7 @@ export default function ReviewsPage() {
         abv: whiskey.abv ? parseFloat(whiskey.abv) : null,
         tasting_notes: whiskey.tasting_notes || null,
         price: whiskey.price ? parseFloat(whiskey.price) : null,
+        created_by: userId || null,
       }]);
       if (error) throw error;
       setWhiskey({ name: "", type: "Scotch", region: "", age: "", abv: "", tasting_notes: "", price: "" });
@@ -319,9 +352,66 @@ export default function ReviewsPage() {
               return (
                 <div key={w.id} className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
                   {/* 위스키 헤더 */}
-                  <button onClick={() => handleToggleWhiskey(w.id)} className="w-full text-left p-6 hover:bg-gray-50 transition">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
+                  {editingWhiskey?.id === w.id ? (
+                    <div className="p-6">
+                      <form onSubmit={handleEditWhiskey} className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                            <input type="text" value={editingWhiskey.name}
+                              onChange={(e) => setEditingWhiskey({ ...editingWhiskey, name: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">타입</label>
+                            <select value={editingWhiskey.type}
+                              onChange={(e) => setEditingWhiskey({ ...editingWhiskey, type: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                              {WHISKEY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">지역</label>
+                            <input type="text" value={editingWhiskey.region || ""}
+                              onChange={(e) => setEditingWhiskey({ ...editingWhiskey, region: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">숙성 (년)</label>
+                            <input type="number" value={editingWhiskey.age || ""}
+                              onChange={(e) => setEditingWhiskey({ ...editingWhiskey, age: parseInt(e.target.value) || 0 })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">도수 (%)</label>
+                            <input type="number" step="0.1" value={editingWhiskey.abv || ""}
+                              onChange={(e) => setEditingWhiskey({ ...editingWhiskey, abv: parseFloat(e.target.value) || 0 })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">가격 (₩)</label>
+                            <input type="number" value={editingWhiskey.price || ""}
+                              onChange={(e) => setEditingWhiskey({ ...editingWhiskey, price: parseFloat(e.target.value) || 0 })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">테이스팅 노트</label>
+                          <textarea value={editingWhiskey.tasting_notes || ""}
+                            onChange={(e) => setEditingWhiskey({ ...editingWhiskey, tasting_notes: e.target.value })}
+                            rows={2}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                        </div>
+                        <div className="flex gap-2">
+                          <button type="submit" className="px-6 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">저장</button>
+                          <button type="button" onClick={() => setEditingWhiskey(null)}
+                            className="px-6 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">취소</button>
+                        </div>
+                      </form>
+                    </div>
+                  ) : (
+                    <div className="flex items-start p-6 hover:bg-gray-50 transition">
+                      <button onClick={() => handleToggleWhiskey(w.id)} className="flex-1 text-left">
                         <div className="flex items-center gap-3 mb-1">
                           <h3 className="text-xl font-bold text-gray-900">{w.name}</h3>
                           <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{w.type}</span>
@@ -335,16 +425,24 @@ export default function ReviewsPage() {
                         {w.tasting_notes && (
                           <p className="text-sm text-gray-500 mt-2 line-clamp-1">{w.tasting_notes}</p>
                         )}
-                      </div>
-                      <div className="text-right ml-4 flex-shrink-0">
+                      </button>
+                      <div className="text-right ml-4 flex-shrink-0 flex flex-col items-end gap-1">
                         {avgRating && (
                           <div className="text-amber-500 text-lg font-bold">★ {avgRating}</div>
                         )}
                         <div className="text-xs text-gray-400">{whiskeyReviews.length}개 리뷰</div>
-                        <div className="text-gray-400 mt-2">{isExpanded ? "▲" : "▼"}</div>
+                        {w.created_by === userId && userId && (
+                          <div className="flex gap-1 mt-1">
+                            <button onClick={() => setEditingWhiskey(w)}
+                              className="text-xs text-gray-500 hover:text-amber-600 px-2 py-1 rounded hover:bg-amber-50 transition">편집</button>
+                            <button onClick={() => handleDeleteWhiskey(w.id)}
+                              className="text-xs text-gray-500 hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                          </div>
+                        )}
+                        <button onClick={() => handleToggleWhiskey(w.id)} className="text-gray-400 mt-1">{isExpanded ? "▲" : "▼"}</button>
                       </div>
                     </div>
-                  </button>
+                  )}
 
                   {/* 리뷰 목록 */}
                   {isExpanded && (

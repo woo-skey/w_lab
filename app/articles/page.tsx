@@ -33,12 +33,9 @@ export default function ArticlesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState<Record<string, string>>({});
   const [userId, setUserId] = useState("");
+  const [editingArticle, setEditingArticle] = useState<Article | null>(null);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-    category: "기초 지식",
-  });
+  const [formData, setFormData] = useState({ title: "", content: "", category: "기초 지식" });
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -49,10 +46,7 @@ export default function ArticlesPage() {
   const fetchArticles = async () => {
     try {
       const { data, error } = await supabase
-        .from("articles")
-        .select("*, users(name)")
-        .order("created_at", { ascending: false });
-
+        .from("articles").select("*, users(name)").order("created_at", { ascending: false });
       if (error) throw error;
       setArticles(data || []);
     } catch (err) {
@@ -65,11 +59,8 @@ export default function ArticlesPage() {
   const fetchComments = async (articleId: string) => {
     try {
       const { data, error } = await supabase
-        .from("comments")
-        .select("*, users(name)")
-        .eq("article_id", articleId)
-        .order("created_at", { ascending: true });
-
+        .from("comments").select("*, users(name)")
+        .eq("article_id", articleId).order("created_at", { ascending: true });
       if (error) throw error;
       setComments((prev) => ({ ...prev, [articleId]: data || [] }));
     } catch (err) {
@@ -82,24 +73,16 @@ export default function ArticlesPage() {
       setExpandedId(null);
     } else {
       setExpandedId(articleId);
-      if (!comments[articleId]) {
-        fetchComments(articleId);
-      }
+      if (!comments[articleId]) fetchComments(articleId);
     }
   };
 
-  const handleSubmitArticle = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitArticle = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim() || !formData.content.trim()) {
-      alert("제목과 내용을 입력해주세요");
-      return;
-    }
+    if (!formData.title.trim() || !formData.content.trim()) { alert("제목과 내용을 입력해주세요"); return; }
     try {
       const { error } = await supabase.from("articles").insert([{
-        title: formData.title,
-        content: formData.content,
-        category: formData.category,
-        author_id: userId,
+        title: formData.title, content: formData.content, category: formData.category, author_id: userId,
       }]);
       if (error) throw error;
       setFormData({ title: "", content: "", category: "기초 지식" });
@@ -111,22 +94,53 @@ export default function ArticlesPage() {
     }
   };
 
+  const handleDeleteArticle = async (articleId: string) => {
+    if (!confirm("글을 삭제할까요?")) return;
+    try {
+      const { error } = await supabase.from("articles").delete().eq("id", articleId);
+      if (error) throw error;
+      if (expandedId === articleId) setExpandedId(null);
+      fetchArticles();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEditArticle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingArticle) return;
+    try {
+      const { error } = await supabase.from("articles").update({
+        title: editingArticle.title, content: editingArticle.content, category: editingArticle.category,
+      }).eq("id", editingArticle.id);
+      if (error) throw error;
+      setEditingArticle(null);
+      fetchArticles();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleSubmitComment = async (articleId: string) => {
     const content = commentText[articleId]?.trim();
     if (!content) return;
-
     try {
-      const { error } = await supabase.from("comments").insert([{
-        article_id: articleId,
-        user_id: userId,
-        content,
-      }]);
+      const { error } = await supabase.from("comments").insert([{ article_id: articleId, user_id: userId, content }]);
       if (error) throw error;
       setCommentText((prev) => ({ ...prev, [articleId]: "" }));
       fetchComments(articleId);
     } catch (err) {
       console.error(err);
-      alert("댓글 등록에 실패했습니다");
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string, articleId: string) => {
+    try {
+      const { error } = await supabase.from("comments").delete().eq("id", commentId);
+      if (error) throw error;
+      fetchComments(articleId);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -141,27 +155,18 @@ export default function ArticlesPage() {
         {/* 카테고리 필터 */}
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
+            <button key={cat} onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                selectedCategory === cat
-                  ? "bg-amber-600 text-white"
-                  : "bg-white text-gray-700 border border-gray-300 hover:border-amber-400"
-              }`}
-            >
-              {cat}
-            </button>
+                selectedCategory === cat ? "bg-amber-600 text-white" : "bg-white text-gray-700 border border-gray-300 hover:border-amber-400"
+              }`}>{cat}</button>
           ))}
         </div>
 
         {/* 글쓰기 */}
         {userId ? (
           <>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="mb-6 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
-            >
+            <button onClick={() => setShowForm(!showForm)}
+              className="mb-6 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
               {showForm ? "취소" : "✏️ 새 글 작성"}
             </button>
             {showForm && (
@@ -171,40 +176,28 @@ export default function ArticlesPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2 md:col-span-1">
                       <label className="block text-sm font-medium text-gray-700 mb-1">제목 *</label>
-                      <input
-                        type="text"
-                        value={formData.title}
+                      <input type="text" value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="글의 제목을 입력하세요"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                      />
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
-                      <select
-                        value={formData.category}
+                      <select value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                      >
-                        {CATEGORIES.map((cat) => (
-                          <option key={cat} value={cat}>{cat}</option>
-                        ))}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                       </select>
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">내용 *</label>
-                    <textarea
-                      value={formData.content}
+                    <textarea value={formData.content}
                       onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      placeholder="글의 내용을 입력하세요"
-                      rows={8}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
-                    />
+                      placeholder="글의 내용을 입력하세요" rows={8}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" />
                   </div>
-                  <button type="submit" className="w-full py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition">
-                    글 등록
-                  </button>
+                  <button type="submit" className="w-full py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition">글 등록</button>
                 </form>
               </div>
             )}
@@ -226,103 +219,124 @@ export default function ArticlesPage() {
             filteredArticles.map((article) => {
               const isExpanded = expandedId === article.id;
               const articleComments = comments[article.id] || [];
+              const isOwner = article.author_id === userId;
 
               return (
                 <div key={article.id} className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-                  {/* 글 헤더 */}
-                  <button
-                    onClick={() => handleToggleArticle(article.id)}
-                    className="w-full text-left p-6 hover:bg-gray-50 transition"
-                  >
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
-                            {article.category}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">{article.title}</h3>
-                        <p className="text-gray-500 text-sm line-clamp-2">{article.content}</p>
-                      </div>
-                      <span className="text-gray-400 text-lg">{isExpanded ? "▲" : "▼"}</span>
-                    </div>
-                    <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                      <span>✍️ {article.users?.name || "알 수 없음"}</span>
-                      <span>{new Date(article.created_at).toLocaleDateString("ko-KR")}</span>
-                    </div>
-                  </button>
-
-                  {/* 펼쳐진 글 본문 + 댓글 */}
-                  {isExpanded && (
-                    <div className="border-t border-gray-100">
-                      {/* 본문 */}
-                      <div className="p-6 bg-gray-50">
-                        <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{article.content}</p>
-                      </div>
-
-                      {/* 댓글 */}
-                      <div className="p-6">
-                        <h4 className="text-sm font-bold text-gray-700 mb-4">
-                          댓글 {articleComments.length}개
-                        </h4>
-
-                        {/* 댓글 목록 */}
-                        <div className="space-y-3 mb-4">
-                          {articleComments.length === 0 ? (
-                            <p className="text-gray-400 text-sm">첫 댓글을 남겨보세요!</p>
-                          ) : (
-                            articleComments.map((comment) => (
-                              <div key={comment.id} className="flex gap-3">
-                                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm flex-shrink-0">
-                                  {(comment.users?.name || "?")[0].toUpperCase()}
-                                </div>
-                                <div className="flex-1 bg-gray-100 rounded-lg px-4 py-2">
-                                  <div className="flex gap-2 items-center mb-1">
-                                    <span className="text-sm font-medium text-gray-900">
-                                      {comment.users?.name || "알 수 없음"}
-                                    </span>
-                                    <span className="text-xs text-gray-400">
-                                      {new Date(comment.created_at).toLocaleDateString("ko-KR")}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-gray-700">{comment.content}</p>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-
-                        {/* 댓글 입력 */}
-                        {userId ? (
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              value={commentText[article.id] || ""}
-                              onChange={(e) =>
-                                setCommentText((prev) => ({ ...prev, [article.id]: e.target.value }))
-                              }
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") handleSubmitComment(article.id);
-                              }}
-                              placeholder="댓글을 입력하세요..."
-                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                            />
-                            <button
-                              onClick={() => handleSubmitComment(article.id)}
-                              className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition"
-                            >
-                              등록
-                            </button>
+                  {/* 편집 모드 */}
+                  {editingArticle?.id === article.id ? (
+                    <div className="p-6">
+                      <form onSubmit={handleEditArticle} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="col-span-2 md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">제목</label>
+                            <input type="text" value={editingArticle.title}
+                              onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
                           </div>
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            댓글을 달려면{" "}
-                            <a href="/login" className="text-amber-600 underline">로그인</a>
-                            하세요.
-                          </p>
-                        )}
-                      </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+                            <select value={editingArticle.category}
+                              onChange={(e) => setEditingArticle({ ...editingArticle, category: e.target.value })}
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                              {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                        <textarea value={editingArticle.content}
+                          onChange={(e) => setEditingArticle({ ...editingArticle, content: e.target.value })}
+                          rows={8} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" />
+                        <div className="flex gap-2">
+                          <button type="submit" className="px-6 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">저장</button>
+                          <button type="button" onClick={() => setEditingArticle(null)}
+                            className="px-6 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">취소</button>
+                        </div>
+                      </form>
                     </div>
+                  ) : (
+                    <>
+                      {/* 글 헤더 */}
+                      <div className="p-6">
+                        <div className="flex justify-between items-start gap-4">
+                          <button onClick={() => handleToggleArticle(article.id)} className="flex-1 text-left">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">{article.category}</span>
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">{article.title}</h3>
+                            <p className="text-gray-500 text-sm line-clamp-2">{article.content}</p>
+                            <div className="flex gap-4 mt-3 text-xs text-gray-500">
+                              <span>✍️ {article.users?.name || "알 수 없음"}</span>
+                              <span>{new Date(article.created_at).toLocaleDateString("ko-KR")}</span>
+                            </div>
+                          </button>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            {isOwner && (
+                              <>
+                                <button onClick={() => { setEditingArticle(article); setExpandedId(null); }}
+                                  className="text-xs text-gray-500 hover:text-amber-600 px-2 py-1 rounded hover:bg-amber-50 transition">편집</button>
+                                <button onClick={() => handleDeleteArticle(article.id)}
+                                  className="text-xs text-gray-500 hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                              </>
+                            )}
+                            <button onClick={() => handleToggleArticle(article.id)}
+                              className="text-gray-400 text-lg px-2">{isExpanded ? "▲" : "▼"}</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 본문 + 댓글 */}
+                      {isExpanded && (
+                        <div className="border-t border-gray-100">
+                          <div className="p-6 bg-gray-50">
+                            <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{article.content}</p>
+                          </div>
+                          <div className="p-6">
+                            <h4 className="text-sm font-bold text-gray-700 mb-4">댓글 {articleComments.length}개</h4>
+                            <div className="space-y-3 mb-4">
+                              {articleComments.length === 0 ? (
+                                <p className="text-gray-400 text-sm">첫 댓글을 남겨보세요!</p>
+                              ) : (
+                                articleComments.map((comment) => (
+                                  <div key={comment.id} className="flex gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm flex-shrink-0">
+                                      {(comment.users?.name || "?")[0].toUpperCase()}
+                                    </div>
+                                    <div className="flex-1 bg-gray-100 rounded-lg px-4 py-2">
+                                      <div className="flex justify-between items-center mb-1">
+                                        <div className="flex gap-2 items-center">
+                                          <span className="text-sm font-medium text-gray-900">{comment.users?.name || "알 수 없음"}</span>
+                                          <span className="text-xs text-gray-400">{new Date(comment.created_at).toLocaleDateString("ko-KR")}</span>
+                                        </div>
+                                        {comment.user_id === userId && (
+                                          <button onClick={() => handleDeleteComment(comment.id, article.id)}
+                                            className="text-xs text-gray-400 hover:text-red-500 transition">삭제</button>
+                                        )}
+                                      </div>
+                                      <p className="text-sm text-gray-700">{comment.content}</p>
+                                    </div>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                            {userId ? (
+                              <div className="flex gap-2">
+                                <input type="text" value={commentText[article.id] || ""}
+                                  onChange={(e) => setCommentText((prev) => ({ ...prev, [article.id]: e.target.value }))}
+                                  onKeyDown={(e) => { if (e.key === "Enter") handleSubmitComment(article.id); }}
+                                  placeholder="댓글을 입력하세요..."
+                                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                                <button onClick={() => handleSubmitComment(article.id)}
+                                  className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition">등록</button>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-500">
+                                댓글을 달려면 <a href="/login" className="text-amber-600 underline">로그인</a>하세요.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               );
