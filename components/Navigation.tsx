@@ -82,6 +82,7 @@ export default function Navigation() {
     { name: "위스키 리뷰", href: "/reviews" },
     { name: "지식", href: "/articles" },
     { name: "일정", href: "/schedule" },
+    { name: "문의", href: "/contact" },
   ];
 
   return (
@@ -176,7 +177,7 @@ export default function Navigation() {
             {userName ? (
               <div className="hidden md:flex items-center gap-3">
                 <span className="text-sm text-gray-700">{userName}님</span>
-                <Link href="/mypage" className="text-sm text-gray-600 hover:text-blue-600 transition">
+                <Link href="/mypage" className="px-4 py-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition">
                   마이페이지
                 </Link>
                 <button

@@ -285,7 +285,8 @@ export default function ReviewsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">위스키 리뷰</h1>
-        <p className="text-gray-600 mb-8">다양한 위스키를 평가하고 리뷰를 공유하세요.</p>
+        <p className="text-gray-600 mb-2">다양한 위스키를 평가하고 리뷰를 공유하세요.</p>
+        <p className="text-xs text-gray-400 mb-8">위스키 카드를 클릭하면 리뷰 목록이 펼쳐집니다. 새 위스키 추가 후 리뷰 작성 버튼으로 별점과 테이스팅 노트를 남길 수 있습니다.</p>
 
         {/* 타입 필터 */}
         <div className="flex flex-wrap gap-2 mb-8">

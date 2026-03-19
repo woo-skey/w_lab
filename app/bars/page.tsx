@@ -109,7 +109,8 @@ export default function BarsPage() {
       <div className="max-w-5xl mx-auto px-4 py-12">
         {/* 헤더 */}
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Bar 추천</h1>
-        <p className="text-gray-600 mb-8">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
+        <p className="text-gray-600 mb-2">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
+        <p className="text-xs text-gray-400 mb-8">Bar 추가하기 버튼을 눌러 바 이름, 링크, 메모를 입력하면 목록에 추가됩니다. 본인이 등록한 Bar는 편집·삭제할 수 있습니다.</p>
 
         {userId ? (
           <button

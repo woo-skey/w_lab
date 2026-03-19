@@ -12,7 +12,7 @@ export default function Home() {
   }, []);
 
   const features = [
-    { title: "위스키 리뷰", description: "Scotch, Irish, Bourbon, Rye 4가지 종류별로 위스키를 리뷰하고 평가해보세요.", icon: "⭐", href: "/reviews" },
+    { title: "위스키 리뷰", description: "위스키를 리뷰하고 테이스팅 노트와 평점을 공유해보세요.", icon: "⭐", href: "/reviews" },
     { title: "Bar 추천", description: "좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.", icon: "🍸", href: "/bars" },
     { title: "위스키 지식", description: "위스키에 대한 전문 지식글과 정보를 통해 더 깊이 있게 배워보세요.", icon: "📚", href: "/articles" },
     { title: "일정 맞추기", description: "친구들과 위스키 바투어 일정을 함께 짜고 가능한 날을 찾아보세요.", icon: "📅", href: "/schedule" },

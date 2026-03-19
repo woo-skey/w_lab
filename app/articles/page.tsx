@@ -187,7 +187,8 @@ export default function ArticlesPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">위스키 지식</h1>
-        <p className="text-gray-600 mb-8">위스키에 대한 다양한 정보와 지식을 공유하세요.</p>
+        <p className="text-gray-600 mb-2">위스키에 대한 다양한 정보와 지식을 공유하세요.</p>
+        <p className="text-xs text-gray-400 mb-8">카테고리 탭으로 원하는 주제의 글을 찾아보세요. 글을 클릭하면 본문과 댓글이 펼쳐집니다. 새 글 작성 시 이미지도 첨부할 수 있습니다.</p>
 
         {/* 카테고리 필터 */}
         <div className="flex flex-wrap gap-2 mb-8">
