@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface Announcement {
   id: string;
@@ -118,13 +119,7 @@ export default function NoticesPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">내용 *</label>
-                    <textarea
-                      value={formData.content}
-                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      placeholder="공지 내용을 입력하세요"
-                      rows={6}
-                      className="w-full px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
+                    <RichTextEditor value={formData.content} onChange={(html) => setFormData({ ...formData, content: html })} placeholder="내용을 입력하세요" minHeight="200px" />
                   </div>
                   <button
                     type="submit"
@@ -171,7 +166,7 @@ export default function NoticesPage() {
 
                 {expandedId === a.id && (
                   <div className="px-6 pb-5 border-t border-gray-100 dark:border-gray-800">
-                    <p className="text-gray-700 dark:text-gray-300 mt-4 whitespace-pre-wrap text-sm leading-relaxed">{a.content}</p>
+                    <div dangerouslySetInnerHTML={{ __html: a.content }} className="text-sm leading-relaxed" />
                     <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
                       <span className="text-xs text-gray-400 dark:text-gray-500">작성: {a.author_name || a.users?.name || "관리자"}</span>
                       {isAdmin && (

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface Bar {
   id: string;
@@ -144,10 +145,12 @@ export default function BarsPage() {
                       onChange={(e) => setEditingBar({ ...editingBar, link: e.target.value })}
                       placeholder="링크"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" />
-                    <textarea value={editingBar.notes || ""}
-                      onChange={(e) => setEditingBar({ ...editingBar, notes: e.target.value })}
-                      rows={3} placeholder="비고"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" />
+                    <RichTextEditor
+                      value={editingBar.notes || ""}
+                      onChange={(html) => setEditingBar({ ...editingBar, notes: html })}
+                      placeholder="비고"
+                      minHeight="100px"
+                    />
                     <div className="flex gap-2">
                       <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">저장</button>
                       <button type="button" onClick={() => setEditingBar(null)} className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">취소</button>
@@ -170,7 +173,9 @@ export default function BarsPage() {
                       <a href={bar.link} target="_blank" rel="noopener noreferrer"
                         className="text-blue-600 hover:underline text-sm mb-3 block">🔗 웹사이트 방문</a>
                     )}
-                    {bar.notes && <p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-wrap text-sm">{bar.notes}</p>}
+                    {bar.notes && (
+                      <div dangerouslySetInnerHTML={{ __html: bar.notes }} className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-4" />
+                    )}
                     <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
                       <span>추천: {bar.author_name}</span>
                       <span>{new Date(bar.created_at).toLocaleDateString("ko-KR")}</span>
@@ -209,10 +214,12 @@ export default function BarsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">비고</label>
-                <textarea value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                <RichTextEditor
+                  value={formData.notes}
+                  onChange={(html) => setFormData({ ...formData, notes: html })}
                   placeholder="이 바의 특징, 추천 음료, 분위기 등을 적어주세요"
-                  rows={4} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                  minHeight="120px"
+                />
               </div>
               {error && <p className="text-red-600 text-sm">{error}</p>}
               <button type="submit" disabled={submitting}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface Inquiry {
   id: string;
@@ -160,7 +161,7 @@ export default function ContactPage() {
                       {/* 문의 내용 */}
                       <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">문의 내용</p>
-                        <p className="text-gray-800 dark:text-gray-100 text-sm whitespace-pre-wrap break-words">{inq.content}</p>
+                        <div dangerouslySetInnerHTML={{ __html: inq.content }} className="text-sm leading-relaxed text-gray-800 dark:text-gray-100" />
                       </div>
 
                       {/* 기존 답변 */}
@@ -233,10 +234,12 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">내용 *</label>
-                    <textarea value={formData.content}
-                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      placeholder="문의 내용을 자세히 입력해주세요" rows={5}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    <RichTextEditor
+                      value={formData.content}
+                      onChange={(html) => setFormData({ ...formData, content: html })}
+                      placeholder="문의 내용을 자세히 입력해주세요"
+                      minHeight="160px"
+                    />
                   </div>
                   <button type="submit" disabled={submitting}
                     className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition">
@@ -277,7 +280,7 @@ export default function ContactPage() {
                     <div className="px-6 pb-5 border-t border-gray-100 dark:border-gray-800">
                       <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">문의 내용</p>
-                        <p className="text-gray-800 dark:text-gray-100 text-sm whitespace-pre-wrap break-words">{inq.content}</p>
+                        <div dangerouslySetInnerHTML={{ __html: inq.content }} className="text-sm leading-relaxed text-gray-800 dark:text-gray-100" />
                       </div>
                       {inq.reply ? (
                         <div className="mt-3 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-100 dark:border-blue-900">

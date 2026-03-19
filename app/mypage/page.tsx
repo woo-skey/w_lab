@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface UserProfile {
   id: string;
@@ -705,9 +706,12 @@ export default function MyPage() {
                     <input value={announcementForm.title}
                       onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
                       placeholder="공지 제목" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
-                    <textarea value={announcementForm.content} rows={4}
-                      onChange={(e) => setAnnouncementForm({ ...announcementForm, content: e.target.value })}
-                      placeholder="공지 내용" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    <RichTextEditor
+                      value={announcementForm.content}
+                      onChange={(html) => setAnnouncementForm({ ...announcementForm, content: html })}
+                      placeholder="공지 내용"
+                      minHeight="120px"
+                    />
                     <button type="submit" disabled={announcementSubmitting}
                       className="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition">
                       {announcementSubmitting ? "등록 중..." : "등록"}
@@ -726,9 +730,12 @@ export default function MyPage() {
                             <input value={editingAdminAnnouncement.title}
                               onChange={(e) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, title: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
-                            <textarea value={editingAdminAnnouncement.content} rows={4}
-                              onChange={(e) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, content: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                            <RichTextEditor
+                              value={editingAdminAnnouncement.content}
+                              onChange={(html) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, content: html })}
+                              placeholder="공지 내용"
+                              minHeight="120px"
+                            />
                             <div className="flex gap-2">
                               <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">저장</button>
                               <button type="button" onClick={() => setEditingAdminAnnouncement(null)} className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">취소</button>
@@ -738,7 +745,7 @@ export default function MyPage() {
                           <div className="flex justify-between items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-gray-900 dark:text-white text-sm">{a.title}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 break-words">{a.content}</p>
+                              <div dangerouslySetInnerHTML={{ __html: a.content }} className="text-sm leading-relaxed mt-1 line-clamp-2 text-gray-500 dark:text-gray-400" />
                               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
@@ -773,8 +780,12 @@ export default function MyPage() {
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
                               {["기초 지식","테이스팅","역사","문화","기타"].map((c) => <option key={c} value={c}>{c}</option>)}
                             </select>
-                            <textarea value={editingAdminArticle.content} rows={4} onChange={(e) => setEditingAdminArticle({ ...editingAdminArticle, content: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                            <RichTextEditor
+                              value={editingAdminArticle.content}
+                              onChange={(html) => setEditingAdminArticle({ ...editingAdminArticle, content: html })}
+                              placeholder="글 내용"
+                              minHeight="120px"
+                            />
                             <div className="flex gap-2">
                               <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">저장</button>
                               <button type="button" onClick={() => setEditingAdminArticle(null)} className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">취소</button>
@@ -788,7 +799,7 @@ export default function MyPage() {
                                 <span className="text-xs text-gray-400 dark:text-gray-500">{a.users?.name || "-"}</span>
                               </div>
                               <p className="font-medium text-gray-900 dark:text-white text-sm">{a.title}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 break-words">{a.content}</p>
+                              <div dangerouslySetInnerHTML={{ __html: a.content }} className="text-sm leading-relaxed mt-1 line-clamp-2 text-gray-500 dark:text-gray-400" />
                               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface Whiskey {
   id: string;
@@ -360,9 +361,12 @@ export default function ReviewsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">테이스팅 노트</label>
-                <textarea value={whiskey.tasting_notes} onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
-                  placeholder="풍미, 향, 마감 등" rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                <RichTextEditor
+                  value={whiskey.tasting_notes}
+                  onChange={(html) => setWhiskey({ ...whiskey, tasting_notes: html })}
+                  placeholder="풍미, 향, 마감 등"
+                  minHeight="160px"
+                />
               </div>
               <button type="submit" className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
                 위스키 추가
@@ -500,10 +504,12 @@ export default function ReviewsPage() {
                                   ))}
                                 </select>
                               </div>
-                              <textarea value={reviewForm.review_text}
-                                onChange={(e) => setReviewForm({ ...reviewForm, review_text: e.target.value })}
-                                placeholder="리뷰를 작성해주세요" rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              <RichTextEditor
+                                value={reviewForm.review_text}
+                                onChange={(html) => setReviewForm({ ...reviewForm, review_text: html })}
+                                placeholder="리뷰를 작성해주세요"
+                                minHeight="160px"
+                              />
                               <input type="text" value={reviewForm.taste_profile}
                                 onChange={(e) => setReviewForm({ ...reviewForm, taste_profile: e.target.value })}
                                 placeholder="테이스팅 프로필 (예: 스모키, 바닐라, 피트)"
@@ -556,10 +562,12 @@ export default function ReviewsPage() {
                                         ))}
                                       </select>
                                     </div>
-                                    <textarea value={editingReview.review_text}
-                                      onChange={(e) => setEditingReview({ ...editingReview, review_text: e.target.value })}
-                                      rows={3}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                    <RichTextEditor
+                                      value={editingReview.review_text}
+                                      onChange={(html) => setEditingReview({ ...editingReview, review_text: html })}
+                                      placeholder="리뷰를 작성해주세요"
+                                      minHeight="160px"
+                                    />
                                     <input type="text" value={editingReview.taste_profile}
                                       onChange={(e) => setEditingReview({ ...editingReview, taste_profile: e.target.value })}
                                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
@@ -607,7 +615,7 @@ export default function ReviewsPage() {
                                     </div>
 
                                     {r.review_text && (
-                                      <p className="text-gray-700 dark:text-gray-300 text-sm mb-2 ml-10">{r.review_text}</p>
+                                      <div dangerouslySetInnerHTML={{ __html: r.review_text }} className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-2 ml-10" />
                                     )}
                                     {r.taste_profile && (
                                       <div className="ml-10 flex flex-wrap gap-1 mb-2">
