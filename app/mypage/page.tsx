@@ -19,6 +19,27 @@ interface Article { id: string; title: string; category: string; created_at: str
 interface Schedule { id: string; name: string; created_at: string; }
 interface Whiskey { id: string; name: string; type: string; region: string; created_at: string; }
 
+interface AdminUser {
+  id: string;
+  name: string;
+  username: string;
+  created_at: string;
+  is_admin: boolean;
+  avatar_url?: string;
+  review_count?: number;
+  article_count?: number;
+  bar_count?: number;
+}
+
+interface AdminStats {
+  totalUsers: number;
+  totalReviews: number;
+  totalArticles: number;
+  totalBars: number;
+  totalWhiskeys: number;
+  totalSchedules: number;
+}
+
 const STAR = ["", "★", "★★", "★★★", "★★★★", "★★★★★"];
 
 export default function MyPage() {
@@ -34,6 +55,12 @@ export default function MyPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 관리자 전용
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -52,7 +79,11 @@ export default function MyPage() {
       supabase.from("whiskeys").select("id, name, type, region, created_at").eq("created_by", id).order("created_at", { ascending: false }),
     ]);
 
-    if (profileRes.status === "fulfilled" && profileRes.value.data) setProfile(profileRes.value.data);
+    if (profileRes.status === "fulfilled" && profileRes.value.data) {
+      const profileData = profileRes.value.data;
+      setProfile(profileData);
+      if (profileData.is_admin) fetchAdminData();
+    }
     if (barsRes.status === "fulfilled" && barsRes.value.data) setBars(barsRes.value.data);
     if (reviewsRes.status === "fulfilled" && reviewsRes.value.data) setReviews(reviewsRes.value.data as unknown as Review[]);
     if (articlesRes.status === "fulfilled" && articlesRes.value.data) setArticles(articlesRes.value.data);
@@ -60,6 +91,92 @@ export default function MyPage() {
     if (whiskeysRes.status === "fulfilled" && whiskeysRes.value.data) setWhiskeys(whiskeysRes.value.data);
 
     setLoading(false);
+  };
+
+  const fetchAdminData = async () => {
+    setAdminLoading(true);
+    try {
+      const [usersRes, reviewsRes, articlesRes, barsRes, whiskeysRes, schedulesRes] = await Promise.allSettled([
+        supabase.from("users").select("id, name, username, created_at, is_admin, avatar_url").order("created_at", { ascending: false }),
+        supabase.from("reviews").select("id, user_id"),
+        supabase.from("articles").select("id, author_id"),
+        supabase.from("bars").select("id, user_id"),
+        supabase.from("whiskeys").select("id"),
+        supabase.from("schedules").select("id"),
+      ]);
+
+      const usersData = usersRes.status === "fulfilled" ? (usersRes.value.data || []) : [];
+      const reviewsData = reviewsRes.status === "fulfilled" ? (reviewsRes.value.data || []) : [];
+      const articlesData = articlesRes.status === "fulfilled" ? (articlesRes.value.data || []) : [];
+      const barsData = barsRes.status === "fulfilled" ? (barsRes.value.data || []) : [];
+
+      // 유저별 활동 수 계산
+      const reviewCountMap: Record<string, number> = {};
+      reviewsData.forEach((r) => { reviewCountMap[r.user_id] = (reviewCountMap[r.user_id] || 0) + 1; });
+      const articleCountMap: Record<string, number> = {};
+      articlesData.forEach((a) => { articleCountMap[a.author_id] = (articleCountMap[a.author_id] || 0) + 1; });
+      const barCountMap: Record<string, number> = {};
+      barsData.forEach((b) => { barCountMap[b.user_id] = (barCountMap[b.user_id] || 0) + 1; });
+
+      const enrichedUsers: AdminUser[] = usersData.map((u) => ({
+        ...u,
+        review_count: reviewCountMap[u.id] || 0,
+        article_count: articleCountMap[u.id] || 0,
+        bar_count: barCountMap[u.id] || 0,
+      }));
+      setAdminUsers(enrichedUsers);
+
+      setAdminStats({
+        totalUsers: usersData.length,
+        totalReviews: reviewsData.length,
+        totalArticles: articlesData.length,
+        totalBars: barsData.length,
+        totalWhiskeys: whiskeysRes.status === "fulfilled" ? (whiskeysRes.value.data?.length || 0) : 0,
+        totalSchedules: schedulesRes.status === "fulfilled" ? (schedulesRes.value.data?.length || 0) : 0,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  const handleToggleAdmin = async (targetId: string, currentAdmin: boolean) => {
+    if (targetId === userId) { alert("본인의 관리자 권한은 변경할 수 없습니다."); return; }
+    try {
+      const { error } = await supabase.from("users").update({ is_admin: !currentAdmin }).eq("id", targetId);
+      if (error) throw error;
+      setAdminUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, is_admin: !currentAdmin } : u));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteUser = async (targetId: string, targetName: string) => {
+    if (targetId === userId) { alert("본인 계정은 여기서 탈퇴할 수 없습니다."); return; }
+    if (!confirm(`"${targetName}" 회원을 탈퇴시킬까요?\n해당 유저의 모든 데이터가 삭제됩니다.`)) return;
+    setDeletingUserId(targetId);
+    try {
+      // 연관 데이터 삭제
+      await Promise.allSettled([
+        supabase.from("reviews").delete().eq("user_id", targetId),
+        supabase.from("articles").delete().eq("author_id", targetId),
+        supabase.from("bars").delete().eq("user_id", targetId),
+        supabase.from("schedules").delete().eq("created_by", targetId),
+        supabase.from("whiskeys").delete().eq("created_by", targetId),
+        supabase.from("comments").delete().eq("user_id", targetId),
+        supabase.from("review_comments").delete().eq("user_id", targetId),
+      ]);
+      const { error } = await supabase.from("users").delete().eq("id", targetId);
+      if (error) throw error;
+      setAdminUsers((prev) => prev.filter((u) => u.id !== targetId));
+      if (adminStats) setAdminStats({ ...adminStats, totalUsers: adminStats.totalUsers - 1 });
+    } catch (err) {
+      console.error(err);
+      alert("삭제에 실패했습니다.");
+    } finally {
+      setDeletingUserId(null);
+    }
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +209,7 @@ export default function MyPage() {
     { id: "articles", label: `지식글 (${articles.length})` },
     { id: "bars", label: `Bar (${bars.length})` },
     { id: "schedules", label: `일정 (${schedules.length})` },
+    ...(profile?.is_admin ? [{ id: "admin", label: "🛡️ 관리자" }] : []),
   ];
 
   if (loading) {
@@ -306,6 +424,94 @@ export default function MyPage() {
                 </div>
               ))
             )}
+          </div>
+        )}
+
+        {/* 관리자 패널 */}
+        {activeTab === "admin" && profile?.is_admin && (
+          <div className="space-y-6">
+            {/* 사이트 전체 통계 */}
+            <div className="bg-white rounded-xl shadow border border-gray-100 p-6">
+              <h2 className="font-bold text-gray-900 mb-4 text-lg">사이트 통계</h2>
+              {adminLoading ? (
+                <p className="text-gray-400 text-sm">로딩 중...</p>
+              ) : adminStats ? (
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                  {[
+                    { label: "전체 유저", count: adminStats.totalUsers, color: "text-blue-600" },
+                    { label: "전체 리뷰", count: adminStats.totalReviews, color: "text-green-600" },
+                    { label: "전체 지식글", count: adminStats.totalArticles, color: "text-purple-600" },
+                    { label: "전체 Bar", count: adminStats.totalBars, color: "text-orange-500" },
+                    { label: "전체 위스키", count: adminStats.totalWhiskeys, color: "text-amber-600" },
+                    { label: "전체 일정", count: adminStats.totalSchedules, color: "text-pink-500" },
+                  ].map((s) => (
+                    <div key={s.label} className="text-center p-3 bg-gray-50 rounded-lg">
+                      <p className={`text-2xl font-bold ${s.color}`}>{s.count}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            {/* 유저 관리 */}
+            <div className="bg-white rounded-xl shadow border border-gray-100 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-bold text-gray-900 text-lg">유저 관리</h2>
+                <span className="text-sm text-gray-500">{adminUsers.length}명</span>
+              </div>
+              {adminLoading ? (
+                <p className="text-gray-400 text-sm">로딩 중...</p>
+              ) : (
+                <div className="space-y-3">
+                  {adminUsers.map((u) => (
+                    <div key={u.id} className={`flex items-center justify-between p-4 rounded-lg border ${u.id === userId ? "border-blue-200 bg-blue-50" : "border-gray-100 bg-gray-50"}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm overflow-hidden flex-shrink-0">
+                          {u.avatar_url ? (
+                            <img src={u.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                          ) : (
+                            (u.name || "?")[0].toUpperCase()
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-900 text-sm">{u.name}</span>
+                            {u.is_admin && <span className="px-1.5 py-0.5 bg-blue-600 text-white text-xs rounded-full">관리자</span>}
+                            {u.id === userId && <span className="px-1.5 py-0.5 bg-gray-400 text-white text-xs rounded-full">본인</span>}
+                          </div>
+                          <p className="text-xs text-gray-500">@{u.username}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            가입: {new Date(u.created_at).toLocaleDateString("ko-KR")} · 리뷰 {u.review_count} · 글 {u.article_count} · Bar {u.bar_count}
+                          </p>
+                        </div>
+                      </div>
+                      {u.id !== userId && (
+                        <div className="flex gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => handleToggleAdmin(u.id, u.is_admin)}
+                            className={`px-3 py-1.5 text-xs rounded-lg transition font-medium ${
+                              u.is_admin
+                                ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            }`}
+                          >
+                            {u.is_admin ? "관리자 해제" : "관리자 지정"}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.name)}
+                            disabled={deletingUserId === u.id}
+                            className="px-3 py-1.5 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition font-medium disabled:opacity-50"
+                          >
+                            {deletingUserId === u.id ? "삭제 중..." : "회원탈퇴"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
