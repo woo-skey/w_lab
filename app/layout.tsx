@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
+import TwemojiProvider from "@/components/TwemojiProvider";
 
 export const metadata: Metadata = {
   title: "위스키 연구소",
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="bg-white text-gray-900">
-        <Navigation />
-        {children}
+        <TwemojiProvider>
+          <Navigation />
+          {children}
+        </TwemojiProvider>
       </body>
     </html>
   );

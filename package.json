@@ -14,7 +14,8 @@
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-calendar": "^6.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "twemoji": "^14.0.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
