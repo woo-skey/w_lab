@@ -50,9 +50,61 @@ export default function SchedulePage() {
 
   useEffect(() => {
     if (selectedSchedule) {
+      const fetchScheduleDetails = async (scheduleId: string) => {
+        try {
+          // Get schedule dates
+          const { data: dates, error: datesError } = await supabase
+            .from("schedule_dates")
+            .select("*")
+            .eq("schedule_id", scheduleId)
+            .order("date", { ascending: true });
+
+          if (datesError) throw datesError;
+          setScheduleDates(dates || []);
+
+          // Get availability counts
+          if (dates && dates.length > 0) {
+            const { data: avail, error: availError } = await supabase
+              .from("user_availability")
+              .select("schedule_date_id, user_id")
+              .in(
+                "schedule_date_id",
+                dates.map((d) => d.id)
+              );
+
+            if (availError) throw availError;
+
+            // Calculate counts per date
+            const counts: Record<string, number> = {};
+            dates.forEach((d) => {
+              counts[d.id] = 0;
+            });
+
+            avail?.forEach((a) => {
+              if (counts.hasOwnProperty(a.schedule_date_id)) {
+                counts[a.schedule_date_id]++;
+              }
+            });
+
+            // Map to availability
+            const result = dates.map((d) => ({
+              date: d.date,
+              count: counts[d.id],
+              isAvailable: avail?.some(
+                (a) => a.schedule_date_id === d.id && a.user_id === userId
+              ),
+            }));
+
+            setAvailability(result);
+          }
+        } catch (err) {
+          console.error("Failed to fetch schedule details:", err);
+        }
+      };
+
       fetchScheduleDetails(selectedSchedule.id);
     }
-  }, [selectedSchedule]);
+  }, [selectedSchedule, userId]);
 
   const fetchSchedules = async () => {
     try {
@@ -70,58 +122,6 @@ export default function SchedulePage() {
       console.error("Failed to fetch schedules:", err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchScheduleDetails = async (scheduleId: string) => {
-    try {
-      // Get schedule dates
-      const { data: dates, error: datesError } = await supabase
-        .from("schedule_dates")
-        .select("*")
-        .eq("schedule_id", scheduleId)
-        .order("date", { ascending: true });
-
-      if (datesError) throw datesError;
-      setScheduleDates(dates || []);
-
-      // Get availability counts
-      if (dates && dates.length > 0) {
-        const { data: avail, error: availError } = await supabase
-          .from("user_availability")
-          .select("schedule_date_id, user_id")
-          .in(
-            "schedule_date_id",
-            dates.map((d) => d.id)
-          );
-
-        if (availError) throw availError;
-
-        // Calculate counts per date
-        const counts: Record<string, number> = {};
-        dates.forEach((d) => {
-          counts[d.id] = 0;
-        });
-
-        avail?.forEach((a) => {
-          if (counts.hasOwnProperty(a.schedule_date_id)) {
-            counts[a.schedule_date_id]++;
-          }
-        });
-
-        // Map to availability
-        const result = dates.map((d) => ({
-          date: d.date,
-          count: counts[d.id],
-          isAvailable: avail?.some(
-            (a) => a.schedule_date_id === d.id && a.user_id === userId
-          ),
-        }));
-
-        setAvailability(result);
-      }
-    } catch (err) {
-      console.error("Failed to fetch schedule details:", err);
     }
   };
 
@@ -192,7 +192,7 @@ export default function SchedulePage() {
 
       // Refresh availability
       if (selectedSchedule) {
-        fetchScheduleDetails(selectedSchedule.id);
+        setSelectedSchedule({ ...selectedSchedule });
       }
     } catch (err) {
       console.error("Failed to toggle availability:", err);
