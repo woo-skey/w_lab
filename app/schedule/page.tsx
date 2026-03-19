@@ -179,11 +179,45 @@ export default function SchedulePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-5xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">일정 맞추기</h1>
         <p className="text-gray-600 mb-8">
           달력에서 가능한 날을 클릭해서 멤버들과 일정을 조율하세요.
         </p>
+
+        {/* 새 일정 버튼 */}
+        {userId ? (
+          <>
+            <button
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              {showCreateForm ? "취소" : "📅 새 일정 만들기"}
+            </button>
+            {showCreateForm && (
+              <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
+                <h2 className="text-lg font-bold text-gray-900 mb-4">새 일정 만들기</h2>
+                <form onSubmit={handleCreateSchedule} className="flex gap-3">
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="일정 이름을 입력하세요"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                    생성
+                  </button>
+                </form>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
+            <p className="text-blue-800 mb-2">일정을 만들려면 로그인이 필요합니다.</p>
+            <a href="/login" className="text-blue-600 underline font-medium text-sm">로그인하기</a>
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-4 gap-6">
           {/* 사이드바: 일정 목록 */}
@@ -191,37 +225,7 @@ export default function SchedulePage() {
             <div className="bg-white rounded-xl shadow border border-gray-100 p-4">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-bold text-gray-900">일정 목록</h2>
-                {userId && (
-                  <button
-                    onClick={() => setShowCreateForm(!showCreateForm)}
-                    className="text-blue-600 text-sm hover:underline"
-                  >
-                    + 새 일정
-                  </button>
-                )}
               </div>
-
-              {/* 새 일정 생성 */}
-              {showCreateForm && (
-                <form onSubmit={handleCreateSchedule} className="mb-4">
-                  <input
-                    type="text"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    placeholder="일정 이름"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button type="submit" className="w-full py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
-                    생성
-                  </button>
-                </form>
-              )}
-
-              {!userId && (
-                <p className="text-xs text-gray-500 mb-3">
-                  <a href="/login" className="text-blue-600 underline">로그인</a>하면 일정을 만들 수 있어요.
-                </p>
-              )}
 
               {loading ? (
                 <p className="text-gray-500 text-sm">로딩 중...</p>
