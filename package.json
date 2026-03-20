@@ -22,7 +22,6 @@
     "react": "^19.0.0",
     "react-calendar": "^6.0.0",
     "react-dom": "^19.0.0",
-    "tiptap-extension-font-size": "^1.2.0",
     "twemoji": "^14.0.2"
   },
   "devDependencies": {
