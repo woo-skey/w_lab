@@ -326,7 +326,12 @@ export default function ReviewsPage() {
 
         {/* 위스키 추가 버튼 */}
         {userId ? (
-          <button onClick={() => setShowAddForm(!showAddForm)}
+          <button onClick={() => {
+              if (!showAddForm && selectedType !== "전체") {
+                setWhiskey((prev) => ({ ...prev, type: selectedType }));
+              }
+              setShowAddForm(!showAddForm);
+            }}
             className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
             {showAddForm ? "취소" : "🥃 새 위스키 추가"}
           </button>

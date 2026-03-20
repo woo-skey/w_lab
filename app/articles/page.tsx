@@ -204,7 +204,12 @@ export default function ArticlesPage() {
         {/* 글쓰기 */}
         {userId ? (
           <>
-            <button onClick={() => setShowForm(!showForm)}
+            <button onClick={() => {
+                if (!showForm && selectedCategory !== "전체") {
+                  setFormData((prev) => ({ ...prev, category: selectedCategory }));
+                }
+                setShowForm(!showForm);
+              }}
               className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
               {showForm ? "취소" : "✏️ 새 글 작성"}
             </button>
