@@ -236,7 +236,7 @@ export default function SchedulePage() {
                     <div key={s.id} className={`flex items-center rounded-lg text-sm transition ${
                       selectedSchedule?.id === s.id ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                     }`}>
-                      <button onClick={() => { setSelectedSchedule(s); setAvailabilityMap({}); }}
+                      <button onClick={() => { if (selectedSchedule?.id !== s.id) { setAvailabilityMap({}); setSelectedSchedule(s); } }}
                         className="flex-1 text-left px-3 py-2">
                         <p className="font-medium truncate">{s.name}</p>
                         <p className={`text-xs mt-0.5 ${selectedSchedule?.id === s.id ? "text-blue-100" : "text-gray-500 dark:text-gray-400"}`}>
