@@ -525,18 +525,18 @@ export default function ReviewsPage() {
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{w.name}</h3>
                           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{w.type}</span>
                         </div>
-                        <div className="flex flex-wrap gap-3 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
                           {w.region && <span>📍 {w.region}</span>}
                           {w.age && <span>🗓 {w.age}년</span>}
                           {w.abv && <span>🔥 {w.abv}%</span>}
                           {w.price && <span>💰 ₩{w.price.toLocaleString()}</span>}
                         </div>
                         {(w.nose || w.palate || w.finish_note || w.tasting_notes) && (
-                          <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-0.5">
-                            {w.nose && <p className="text-xs text-gray-500 dark:text-gray-400"><span className="font-medium text-gray-600 dark:text-gray-300">🌸 향</span> {w.nose}</p>}
-                            {w.palate && <p className="text-xs text-gray-500 dark:text-gray-400"><span className="font-medium text-gray-600 dark:text-gray-300">👅 맛</span> {w.palate}</p>}
-                            {w.finish_note && <p className="text-xs text-gray-500 dark:text-gray-400"><span className="font-medium text-gray-600 dark:text-gray-300">✨ 피니쉬</span> {w.finish_note}</p>}
-                            {w.tasting_notes && <p className="text-xs text-gray-500 dark:text-gray-400"><span className="font-medium text-gray-600 dark:text-gray-300">📝 설명</span> {w.tasting_notes}</p>}
+                          <div className="mt-3 space-y-2">
+                            {w.nose && <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">🌸 향&nbsp;&nbsp;</span>{w.nose}</p>}
+                            {w.palate && <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">👅 맛&nbsp;&nbsp;</span>{w.palate}</p>}
+                            {w.finish_note && <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">✨ 피니쉬&nbsp;&nbsp;</span>{w.finish_note}</p>}
+                            {w.tasting_notes && <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">📝 설명&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
                           </div>
                         )}
                       </button>
