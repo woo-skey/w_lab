@@ -459,7 +459,9 @@ export default function MyPage() {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     >
                       <option value="">선택</option>
-                      <option>🥃 위스키</option>
+                      <option>🥃 스카치 위스키</option>
+                      <option>🥃 아이리시 위스키</option>
+                      <option>🥃 버번/라이 위스키</option>
                       <option>🍺 맥주</option>
                       <option>🍷 와인</option>
                       <option>🍶 사케</option>
