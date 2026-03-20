@@ -18,6 +18,26 @@ body {
 .rich-content ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 0.75em; }
 .rich-content li { margin-bottom: 0.25em; }
 
+/* 달력 카드 플립 */
+.calendar-cell { perspective: 500px; }
+.calendar-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.calendar-cell.flipped .calendar-card { transform: rotateY(180deg); }
+.calendar-front,
+.calendar-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 0.75rem;
+}
+.calendar-back { transform: rotateY(180deg); }
+
 img.emoji {
   height: 1em;
   width: 1em;

@@ -362,40 +362,47 @@ export default function SchedulePage() {
                     const dayOfWeek = (firstDay + day - 1) % 7;
 
                     return (
-                      <div key={dateStr} className="relative">
-                        <button
-                          onClick={() => handleToggleDate(dateStr)}
-                          onMouseEnter={() => count > 0 && setHoveredDate(dateStr)}
-                          onMouseLeave={() => setHoveredDate(null)}
-                          disabled={!userId}
-                          className={`
-                            w-full aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition
+                      <div
+                        key={dateStr}
+                        className={`calendar-cell aspect-square ${count > 0 ? "flipped-on-hover" : ""} ${hoveredDate === dateStr ? "flipped" : ""}`}
+                        onMouseEnter={() => count > 0 && setHoveredDate(dateStr)}
+                        onMouseLeave={() => setHoveredDate(null)}
+                        onClick={() => userId && handleToggleDate(dateStr)}
+                        style={{ cursor: userId ? "pointer" : "default" }}
+                      >
+                        <div className="calendar-card">
+                          {/* 앞면 */}
+                          <div className={`calendar-front flex flex-col items-center justify-center text-sm
                             ${isMyDate ? "bg-blue-500 text-white font-bold shadow" : ""}
                             ${!isMyDate && count > 0 ? "bg-blue-50 dark:bg-blue-950 border-2 border-blue-200 dark:border-blue-800" : ""}
-                            ${!isMyDate && count === 0 ? "hover:bg-gray-100 dark:hover:bg-gray-700" : ""}
+                            ${!isMyDate && count === 0 ? "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700" : ""}
                             ${isToday && !isMyDate ? "ring-2 ring-blue-400" : ""}
                             ${dayOfWeek === 0 && !isMyDate ? "text-red-400" : ""}
                             ${dayOfWeek === 6 && !isMyDate ? "text-blue-400" : ""}
-                            ${!userId ? "cursor-default" : "cursor-pointer"}
-                          `}
-                        >
-                          <span>{day}</span>
-                          {count > 0 && (
-                            <span className={`text-xs font-bold ${isMyDate ? "text-blue-100" : "text-blue-600"}`}>
-                              {count}명
-                            </span>
-                          )}
-                        </button>
-                        {hoveredDate === dateStr && info?.users && info.users.length > 0 && (
-                          <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg px-3 py-2 shadow-xl whitespace-nowrap pointer-events-none">
-                            <p className="font-semibold mb-1 text-white">{new Date(dateStr + "T00:00:00").toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" })}</p>
-                            <p className="font-semibold mb-1 text-blue-300">{count}명 가능</p>
-                            {info.users.map((name, i) => (
-                              <p key={i} className="leading-snug">· {name}</p>
-                            ))}
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700" />
+                          `}>
+                            <span>{day}</span>
+                            {count > 0 && (
+                              <span className={`text-xs font-bold ${isMyDate ? "text-blue-100" : "text-blue-600"}`}>
+                                {count}명
+                              </span>
+                            )}
                           </div>
-                        )}
+
+                          {/* 뒷면 */}
+                          <div className="calendar-back bg-gray-900 dark:bg-gray-700 text-white flex flex-col items-center justify-center px-1 overflow-hidden">
+                            <p className="text-xs font-bold text-blue-300 leading-tight text-center mb-0.5">
+                              {new Date(dateStr + "T00:00:00").toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })}
+                            </p>
+                            <div className="w-full text-center space-y-0.5">
+                              {info?.users?.slice(0, 4).map((name, i) => (
+                                <p key={i} className="text-xs leading-tight truncate">· {name}</p>
+                              ))}
+                              {(info?.users?.length || 0) > 4 && (
+                                <p className="text-xs text-gray-400">+{(info?.users?.length || 0) - 4}명</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
