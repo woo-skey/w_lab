@@ -453,7 +453,7 @@ export default function MyPage() {
               {reviews.length === 0 ? <p className="text-gray-400 dark:text-gray-500 text-sm">작성한 리뷰가 없습니다.</p> : (
                 <div className="space-y-2">
                   {reviews.slice(0, 3).map((r) => (
-                    <div key={r.id} className="flex justify-between items-center text-sm">
+                    <div key={r.id} onClick={() => router.push("/reviews")} className="flex justify-between items-center text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition">
                       <span className="text-gray-700 dark:text-gray-300 truncate">{r.whiskeys?.name || "위스키"}</span>
                       <span className="text-blue-500 text-xs ml-2 flex-shrink-0">{STAR[r.rating]}</span>
                     </div>
@@ -466,7 +466,7 @@ export default function MyPage() {
               {articles.length === 0 ? <p className="text-gray-400 dark:text-gray-500 text-sm">작성한 글이 없습니다.</p> : (
                 <div className="space-y-2">
                   {articles.slice(0, 3).map((a) => (
-                    <div key={a.id} className="text-sm">
+                    <div key={a.id} onClick={() => router.push("/articles")} className="text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition">
                       <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded mr-2">{a.category}</span>
                       <span className="text-gray-700 dark:text-gray-300">{a.title}</span>
                     </div>
@@ -479,7 +479,7 @@ export default function MyPage() {
               {bars.length === 0 ? <p className="text-gray-400 dark:text-gray-500 text-sm">추천한 바가 없습니다.</p> : (
                 <div className="space-y-2">
                   {bars.slice(0, 3).map((b) => (
-                    <div key={b.id} className="text-sm text-gray-700 dark:text-gray-300">{b.bar_name}</div>
+                    <div key={b.id} onClick={() => router.push("/bars")} className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition">{b.bar_name}</div>
                   ))}
                 </div>
               )}
@@ -489,7 +489,7 @@ export default function MyPage() {
               {schedules.length === 0 ? <p className="text-gray-400 dark:text-gray-500 text-sm">만든 일정이 없습니다.</p> : (
                 <div className="space-y-2">
                   {schedules.slice(0, 3).map((s) => (
-                    <div key={s.id} className="flex justify-between items-center text-sm">
+                    <div key={s.id} onClick={() => router.push("/schedule")} className="flex justify-between items-center text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition">
                       <span className="text-gray-700 dark:text-gray-300">{s.name}</span>
                       <span className="text-xs text-gray-400 dark:text-gray-500">{new Date(s.created_at).toLocaleDateString("ko-KR")}</span>
                     </div>
@@ -504,7 +504,7 @@ export default function MyPage() {
           <div className="space-y-3">
             {reviews.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500">작성한 리뷰가 없습니다.</div> : (
               reviews.map((r) => (
-                <div key={r.id} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
+                <div key={r.id} onClick={() => router.push("/reviews")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-bold text-gray-900 dark:text-white">{r.whiskeys?.name || "위스키"}</p>
@@ -524,7 +524,7 @@ export default function MyPage() {
           <div className="grid md:grid-cols-2 gap-3">
             {whiskeys.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500 col-span-2">추가한 위스키가 없습니다.</div> : (
               whiskeys.map((w) => (
-                <div key={w.id} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
+                <div key={w.id} onClick={() => router.push("/reviews")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
                   <div className="flex justify-between items-start">
                     <p className="font-bold text-gray-900 dark:text-white">{w.name}</p>
                     <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{w.type}</span>
@@ -541,7 +541,7 @@ export default function MyPage() {
           <div className="space-y-3">
             {articles.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500">작성한 글이 없습니다.</div> : (
               articles.map((a) => (
-                <div key={a.id} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
+                <div key={a.id} onClick={() => router.push("/articles")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
                   <div className="flex justify-between items-start">
                     <p className="font-bold text-gray-900 dark:text-white">{a.title}</p>
                     <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-2 flex-shrink-0">{a.category}</span>
@@ -557,7 +557,7 @@ export default function MyPage() {
           <div className="grid md:grid-cols-2 gap-3">
             {bars.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500 col-span-2">추천한 바가 없습니다.</div> : (
               bars.map((b) => (
-                <div key={b.id} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
+                <div key={b.id} onClick={() => router.push("/bars")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
                   <p className="font-bold text-gray-900 dark:text-white">{b.bar_name}</p>
                   {b.notes && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 break-words whitespace-pre-wrap">{b.notes}</p>}
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
@@ -571,7 +571,7 @@ export default function MyPage() {
           <div className="space-y-3">
             {schedules.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500">만든 일정이 없습니다.</div> : (
               schedules.map((s) => (
-                <div key={s.id} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 flex justify-between items-center">
+                <div key={s.id} onClick={() => router.push("/schedule")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 flex justify-between items-center cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
                   <p className="font-bold text-gray-900 dark:text-white">{s.name}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">{new Date(s.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
@@ -584,7 +584,7 @@ export default function MyPage() {
           <div className="space-y-3">
             {userComments.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500">작성한 댓글이 없습니다.</div> : (
               userComments.map((c) => (
-                <div key={c.id} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
+                <div key={c.id} onClick={() => router.push(c.source === "article" ? "/articles" : "/reviews")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                       c.source === "article" ? "bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300" : "bg-blue-100 text-blue-700"
