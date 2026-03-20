@@ -745,7 +745,7 @@ export default function MyPage() {
                           <div className="flex justify-between items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-gray-900 dark:text-white text-sm">{a.title}</p>
-                              <div dangerouslySetInnerHTML={{ __html: a.content }} className="text-sm leading-relaxed mt-1 line-clamp-2 text-gray-500 dark:text-gray-400" />
+                              <div dangerouslySetInnerHTML={{ __html: a.content }} className="rich-content text-sm leading-relaxed mt-1 line-clamp-2 text-gray-500 dark:text-gray-400" />
                               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
@@ -799,7 +799,7 @@ export default function MyPage() {
                                 <span className="text-xs text-gray-400 dark:text-gray-500">{a.users?.name || "-"}</span>
                               </div>
                               <p className="font-medium text-gray-900 dark:text-white text-sm">{a.title}</p>
-                              <div dangerouslySetInnerHTML={{ __html: a.content }} className="text-sm leading-relaxed mt-1 line-clamp-2 text-gray-500 dark:text-gray-400" />
+                              <div dangerouslySetInnerHTML={{ __html: a.content }} className="rich-content text-sm leading-relaxed mt-1 line-clamp-2 text-gray-500 dark:text-gray-400" />
                               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">

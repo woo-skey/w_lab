@@ -680,7 +680,7 @@ export default function ReviewsPage() {
                                     </div>
 
                                     {r.review_text && (
-                                      <div dangerouslySetInnerHTML={{ __html: r.review_text }} className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-3 ml-10" />
+                                      <div dangerouslySetInnerHTML={{ __html: r.review_text }} className="rich-content text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-3 ml-10" />
                                     )}
                                     {(r.nose || r.palate || r.finish_note || r.remarks) && (
                                       <div className="ml-10 mb-2 grid grid-cols-2 gap-x-4 gap-y-1">
