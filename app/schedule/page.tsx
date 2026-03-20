@@ -242,9 +242,6 @@ export default function SchedulePage() {
                       <button onClick={() => { if (selectedSchedule?.id !== s.id) { setAvailabilityMap({}); setSelectedSchedule(s); } }}
                         className="flex-1 text-left px-3 py-2">
                         <p className="font-medium truncate">{s.name}</p>
-                        <p className={`text-xs mt-0.5 ${selectedSchedule?.id === s.id ? "text-blue-100" : "text-gray-500 dark:text-gray-400"}`}>
-                          {new Date(s.created_at).toLocaleDateString("ko-KR")}
-                        </p>
                       </button>
                       {(s.created_by === userId || isAdmin) && (
                         <button onClick={() => handleDeleteSchedule(s.id)}
@@ -375,6 +372,7 @@ export default function SchedulePage() {
                         </button>
                         {hoveredDate === dateStr && info?.users && info.users.length > 0 && (
                           <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg px-3 py-2 shadow-xl whitespace-nowrap pointer-events-none">
+                            <p className="font-semibold mb-1 text-white">{new Date(dateStr + "T00:00:00").toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" })}</p>
                             <p className="font-semibold mb-1 text-blue-300">{count}명 가능</p>
                             {info.users.map((name, i) => (
                               <p key={i} className="leading-snug">· {name}</p>
