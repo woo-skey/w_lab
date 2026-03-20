@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 import RichTextEditor from "@/components/RichTextEditor";
+import UserProfilePopup from "@/components/UserProfilePopup";
 
 interface Whiskey {
   id: string;
@@ -711,13 +712,8 @@ export default function ReviewsPage() {
                                     {/* 리뷰 내용 */}
                                     <div className="flex justify-between items-start mb-2">
                                       <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
-                                          {(r.users?.name || "?")[0].toUpperCase()}
-                                        </div>
-                                        <div>
-                                          <span className="text-sm font-medium text-gray-900 dark:text-white">{r.users?.name || "알 수 없음"}</span>
-                                          <div className="text-blue-500 text-sm">{STAR[r.rating]}</div>
-                                        </div>
+                                        <UserProfilePopup userId={r.user_id} displayName={r.users?.name || "알 수 없음"} />
+                                        <div className="text-blue-500 text-sm">{STAR[r.rating]}</div>
                                       </div>
                                       <div className="flex items-center gap-2">
                                         <span className="text-xs text-gray-400 dark:text-gray-500">
@@ -773,13 +769,10 @@ export default function ReviewsPage() {
                                         ) : (
                                           reviewComments.map((c) => (
                                             <div key={c.id} className="flex gap-2">
-                                              <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 text-xs font-bold flex-shrink-0">
-                                                {(c.users?.name || "?")[0].toUpperCase()}
-                                              </div>
                                               <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2">
                                                 <div className="flex justify-between items-center">
-                                                  <div>
-                                                    <span className="text-xs font-medium text-gray-800 dark:text-gray-100 mr-2">{c.users?.name || "알 수 없음"}</span>
+                                                  <div className="flex items-center gap-2">
+                                                    <UserProfilePopup userId={c.user_id} displayName={c.users?.name || "알 수 없음"} />
                                                     <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(c.created_at).toLocaleDateString("ko-KR")}</span>
                                                   </div>
                                                   {(c.user_id === userId || isAdmin) && (

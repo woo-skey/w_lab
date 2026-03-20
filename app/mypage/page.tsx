@@ -13,6 +13,9 @@ interface UserProfile {
   created_at: string;
   avatar_url?: string;
   is_admin?: boolean;
+  bio?: string;
+  favorite_category?: string;
+  favorite_whiskey?: string;
 }
 
 interface Bar { id: string; bar_name: string; notes: string; created_at: string; }
@@ -65,6 +68,9 @@ export default function MyPage() {
   const [uploading, setUploading] = useState(false);
   const [userComments, setUserComments] = useState<UserComment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({ bio: "", favorite_category: "", favorite_whiskey: "" });
+  const [profileSaving, setProfileSaving] = useState(false);
 
   // 관리자 전용
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
@@ -95,7 +101,7 @@ export default function MyPage() {
 
   const fetchAll = async (id: string) => {
     const [profileRes, barsRes, reviewsRes, articlesRes, schedulesRes, whiskeysRes, articleCommentsRes, reviewCommentsRes] = await Promise.allSettled([
-      supabase.from("users").select("id, name, username, created_at, avatar_url, is_admin").eq("id", id).single(),
+      supabase.from("users").select("id, name, username, created_at, avatar_url, is_admin, bio, favorite_category, favorite_whiskey").eq("id", id).single(),
       supabase.from("bars").select("id, bar_name, notes, created_at").eq("user_id", id).order("created_at", { ascending: false }),
       supabase.from("reviews").select("id, rating, review_text, created_at, whiskeys(name, type)").eq("user_id", id).order("created_at", { ascending: false }),
       supabase.from("articles").select("id, title, category, created_at").eq("author_id", id).order("created_at", { ascending: false }),
@@ -354,6 +360,19 @@ export default function MyPage() {
     }
   };
 
+  const handleSaveProfile = async () => {
+    if (!userId) return;
+    setProfileSaving(true);
+    await supabase.from("users").update({
+      bio: profileForm.bio || null,
+      favorite_category: profileForm.favorite_category || null,
+      favorite_whiskey: profileForm.favorite_whiskey || null,
+    }).eq("id", userId);
+    setProfile((prev) => prev ? { ...prev, ...profileForm } : prev);
+    setEditingProfile(false);
+    setProfileSaving(false);
+  };
+
   const tabs = [
     { id: "overview", label: "개요" },
     { id: "reviews", label: `리뷰 (${reviews.length})` },
@@ -414,6 +433,91 @@ export default function MyPage() {
                 프로필 사진 변경
               </p>
             </div>
+          </div>
+
+          {/* 한줄소개 / 관심주류 / 최애위스키 */}
+          <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-800">
+            {editingProfile ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">한 줄 소개</label>
+                  <input
+                    type="text"
+                    value={profileForm.bio}
+                    onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
+                    placeholder="나를 한 마디로 소개해보세요"
+                    maxLength={80}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">관심 주류 카테고리</label>
+                    <select
+                      value={profileForm.favorite_category}
+                      onChange={(e) => setProfileForm({ ...profileForm, favorite_category: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    >
+                      <option value="">선택</option>
+                      <option>🥃 위스키</option>
+                      <option>🍺 맥주</option>
+                      <option>🍷 와인</option>
+                      <option>🍶 사케</option>
+                      <option>🍸 칵테일</option>
+                      <option>🥂 샴페인</option>
+                      <option>🫙 전통주</option>
+                      <option>🍹 기타</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">최애 위스키</label>
+                    <input
+                      type="text"
+                      value={profileForm.favorite_whiskey}
+                      onChange={(e) => setProfileForm({ ...profileForm, favorite_whiskey: e.target.value })}
+                      placeholder="ex) Lagavulin 16"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={handleSaveProfile} disabled={profileSaving}
+                    className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                    {profileSaving ? "저장 중..." : "저장"}
+                  </button>
+                  <button onClick={() => setEditingProfile(false)}
+                    className="px-4 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                    취소
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1.5 text-sm">
+                  {profile?.bio && <p className="text-gray-700 dark:text-gray-200 italic border-l-2 border-blue-400 pl-3">{profile.bio}</p>}
+                  <div className="flex flex-wrap gap-3 text-gray-500 dark:text-gray-400 text-xs">
+                    {profile?.favorite_category && <span>🍹 {profile.favorite_category}</span>}
+                    {profile?.favorite_whiskey && <span>🥃 최애: {profile.favorite_whiskey}</span>}
+                  </div>
+                  {!profile?.bio && !profile?.favorite_category && !profile?.favorite_whiskey && (
+                    <p className="text-gray-400 dark:text-gray-600 text-xs">한 줄 소개와 관심 주류를 설정해보세요.</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => {
+                    setProfileForm({
+                      bio: profile?.bio || "",
+                      favorite_category: profile?.favorite_category || "",
+                      favorite_whiskey: profile?.favorite_whiskey || "",
+                    });
+                    setEditingProfile(true);
+                  }}
+                  className="text-xs text-blue-500 hover:text-blue-700 flex-shrink-0"
+                >
+                  ✎ 편집
+                </button>
+              </div>
+            )}
           </div>
 
           {/* 활동 통계 */}

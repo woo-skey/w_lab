@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 import RichTextEditor from "@/components/RichTextEditor";
+import UserProfilePopup from "@/components/UserProfilePopup";
 
 interface Article {
   id: string;
@@ -319,7 +320,7 @@ export default function ArticlesPage() {
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{article.title}</h3>
                             <div dangerouslySetInnerHTML={{ __html: article.content }} className="rich-content text-gray-500 dark:text-gray-400 text-sm break-words line-clamp-3" />
                             <div className="flex gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400">
-                              <span>✍️ {article.users?.name || "알 수 없음"}</span>
+                              <UserProfilePopup userId={article.author_id} displayName={article.users?.name || "알 수 없음"} />
                               <span>{new Date(article.created_at).toLocaleDateString("ko-KR")}</span>
                             </div>
                           </button>
@@ -355,13 +356,10 @@ export default function ArticlesPage() {
                               ) : (
                                 articleComments.map((comment) => (
                                   <div key={comment.id} className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
-                                      {(comment.users?.name || "?")[0].toUpperCase()}
-                                    </div>
                                     <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
                                       <div className="flex justify-between items-center mb-1">
                                         <div className="flex gap-2 items-center">
-                                          <span className="text-sm font-medium text-gray-900 dark:text-white">{comment.users?.name || "알 수 없음"}</span>
+                                          <UserProfilePopup userId={comment.user_id} displayName={comment.users?.name || "알 수 없음"} />
                                           <span className="text-xs text-gray-400 dark:text-gray-500">{new Date(comment.created_at).toLocaleDateString("ko-KR")}</span>
                                         </div>
                                         {(comment.user_id === userId || isAdmin) && (
