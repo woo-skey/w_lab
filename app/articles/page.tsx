@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
+import SafeHtml from "@/components/SafeHtml";
 
 interface Article {
   id: string;
@@ -318,7 +319,7 @@ export default function ArticlesPage() {
                               <span className="text-xs bg-blue-100 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-full">{article.category}</span>
                             </div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{article.title}</h3>
-                            <div dangerouslySetInnerHTML={{ __html: article.content }} className="rich-content text-gray-500 dark:text-gray-400 text-sm break-words line-clamp-3" />
+                            <SafeHtml html={article.content} className="rich-content text-gray-500 dark:text-gray-400 text-sm break-words line-clamp-3" />
                             <div className="flex gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400">
                               <UserProfilePopup userId={article.author_id} displayName={article.users?.name || "알 수 없음"} />
                               <span>{new Date(article.created_at).toLocaleDateString("ko-KR")}</span>
@@ -346,7 +347,7 @@ export default function ArticlesPage() {
                             {article.image_url && (
                               <img src={article.image_url} alt="article" className="w-full max-h-96 object-cover rounded-lg mb-4" />
                             )}
-                            <div dangerouslySetInnerHTML={{ __html: article.content }} className="rich-content text-sm leading-relaxed" />
+                            <SafeHtml html={article.content} className="rich-content text-sm leading-relaxed" />
                           </div>
                           <div className="p-6">
                             <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">댓글 {articleComments.length}개</h4>

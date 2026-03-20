@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import RichTextEditor from "@/components/RichTextEditor";
+import SafeHtml from "@/components/SafeHtml";
 
 interface Inquiry {
   id: string;
@@ -161,7 +162,7 @@ export default function ContactPage() {
                       {/* 문의 내용 */}
                       <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">문의 내용</p>
-                        <div dangerouslySetInnerHTML={{ __html: inq.content }} className="rich-content text-sm leading-relaxed text-gray-800 dark:text-gray-100" />
+                        <SafeHtml html={inq.content} className="rich-content text-sm leading-relaxed text-gray-800 dark:text-gray-100" />
                       </div>
 
                       {/* 기존 답변 */}
@@ -280,7 +281,7 @@ export default function ContactPage() {
                     <div className="px-6 pb-5 border-t border-gray-100 dark:border-gray-800">
                       <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">문의 내용</p>
-                        <div dangerouslySetInnerHTML={{ __html: inq.content }} className="rich-content text-sm leading-relaxed text-gray-800 dark:text-gray-100" />
+                        <SafeHtml html={inq.content} className="rich-content text-sm leading-relaxed text-gray-800 dark:text-gray-100" />
                       </div>
                       {inq.reply ? (
                         <div className="mt-3 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-100 dark:border-blue-900">

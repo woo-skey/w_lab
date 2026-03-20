@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
+import SafeHtml from "@/components/SafeHtml";
 
 interface Announcement {
   id: string;
@@ -167,7 +168,7 @@ export default function NoticesPage() {
 
                 {expandedId === a.id && (
                   <div className="px-6 pb-5 border-t border-gray-100 dark:border-gray-800">
-                    <div dangerouslySetInnerHTML={{ __html: a.content }} className="rich-content text-sm leading-relaxed" />
+                    <SafeHtml html={a.content} className="rich-content text-sm leading-relaxed" />
                     <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
                       <UserProfilePopup userId={a.author_id} displayName={a.author_name || a.users?.name || "관리자"} />
                       {isAdmin && (

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import RichTextEditor from "@/components/RichTextEditor";
+import SafeHtml from "@/components/SafeHtml";
 
 interface Bar {
   id: string;
@@ -174,7 +175,7 @@ export default function BarsPage() {
                         className="text-blue-600 hover:underline text-sm mb-3 block">🔗 웹사이트 방문</a>
                     )}
                     {bar.notes && (
-                      <div dangerouslySetInnerHTML={{ __html: bar.notes }} className="rich-content text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-4" />
+                      <SafeHtml html={bar.notes} className="rich-content text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-4" />
                     )}
                     <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
                       <span>추천: {bar.author_name}</span>
