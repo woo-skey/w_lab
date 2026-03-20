@@ -11,7 +11,7 @@ interface Schedule {
 }
 
 interface AvailabilityMap {
-  [date: string]: { count: number; isAvailable: boolean; dateId: string };
+  [date: string]: { count: number; isAvailable: boolean; dateId: string; users: string[] };
 }
 
 const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
@@ -30,6 +30,7 @@ export default function SchedulePage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newName, setNewName] = useState("");
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -57,15 +58,17 @@ export default function SchedulePage() {
 
         const { data: avail, error: availError } = await supabase
           .from("user_availability")
-          .select("schedule_date_id, user_id")
+          .select("schedule_date_id, user_id, users(name)")
           .in("schedule_date_id", dates.map((d) => d.id));
         if (availError) throw availError;
 
         const map: AvailabilityMap = {};
         dates.forEach((d) => {
-          const count = avail?.filter((a) => a.schedule_date_id === d.id).length || 0;
-          const isAvailable = avail?.some((a) => a.schedule_date_id === d.id && a.user_id === userId) || false;
-          map[d.date] = { count, isAvailable, dateId: d.id };
+          const dateAvail = avail?.filter((a) => a.schedule_date_id === d.id) || [];
+          const count = dateAvail.length;
+          const isAvailable = dateAvail.some((a) => a.user_id === userId);
+          const users = dateAvail.map((a) => (a.users as any)?.name || "알 수 없음");
+          map[d.date] = { count, isAvailable, dateId: d.id, users };
         });
         setAvailabilityMap(map);
       } catch (err) {
@@ -346,28 +349,40 @@ export default function SchedulePage() {
                     const dayOfWeek = (firstDay + day - 1) % 7;
 
                     return (
-                      <button
-                        key={dateStr}
-                        onClick={() => handleToggleDate(dateStr)}
-                        disabled={!userId}
-                        className={`
-                          relative aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition
-                          ${isMyDate ? "bg-blue-500 text-white font-bold shadow" : ""}
-                          ${!isMyDate && count > 0 ? "bg-blue-50 dark:bg-blue-950 border-2 border-blue-200 dark:border-blue-800" : ""}
-                          ${!isMyDate && count === 0 ? "hover:bg-gray-100 dark:hover:bg-gray-700" : ""}
-                          ${isToday && !isMyDate ? "ring-2 ring-blue-400" : ""}
-                          ${dayOfWeek === 0 && !isMyDate ? "text-red-400" : ""}
-                          ${dayOfWeek === 6 && !isMyDate ? "text-blue-400" : ""}
-                          ${!userId ? "cursor-default" : "cursor-pointer"}
-                        `}
-                      >
-                        <span>{day}</span>
-                        {count > 0 && (
-                          <span className={`text-xs font-bold ${isMyDate ? "text-blue-100" : "text-blue-600"}`}>
-                            {count}명
-                          </span>
+                      <div key={dateStr} className="relative">
+                        <button
+                          onClick={() => handleToggleDate(dateStr)}
+                          onMouseEnter={() => count > 0 && setHoveredDate(dateStr)}
+                          onMouseLeave={() => setHoveredDate(null)}
+                          disabled={!userId}
+                          className={`
+                            w-full aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition
+                            ${isMyDate ? "bg-blue-500 text-white font-bold shadow" : ""}
+                            ${!isMyDate && count > 0 ? "bg-blue-50 dark:bg-blue-950 border-2 border-blue-200 dark:border-blue-800" : ""}
+                            ${!isMyDate && count === 0 ? "hover:bg-gray-100 dark:hover:bg-gray-700" : ""}
+                            ${isToday && !isMyDate ? "ring-2 ring-blue-400" : ""}
+                            ${dayOfWeek === 0 && !isMyDate ? "text-red-400" : ""}
+                            ${dayOfWeek === 6 && !isMyDate ? "text-blue-400" : ""}
+                            ${!userId ? "cursor-default" : "cursor-pointer"}
+                          `}
+                        >
+                          <span>{day}</span>
+                          {count > 0 && (
+                            <span className={`text-xs font-bold ${isMyDate ? "text-blue-100" : "text-blue-600"}`}>
+                              {count}명
+                            </span>
+                          )}
+                        </button>
+                        {hoveredDate === dateStr && info?.users && info.users.length > 0 && (
+                          <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg px-3 py-2 shadow-xl whitespace-nowrap pointer-events-none">
+                            <p className="font-semibold mb-1 text-blue-300">{count}명 가능</p>
+                            {info.users.map((name, i) => (
+                              <p key={i} className="leading-snug">· {name}</p>
+                            ))}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700" />
+                          </div>
                         )}
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
