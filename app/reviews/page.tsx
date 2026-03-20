@@ -24,6 +24,10 @@ interface Review {
   rating: number;
   review_text: string;
   taste_profile: string;
+  nose: string;
+  palate: string;
+  finish_note: string;
+  remarks: string;
   created_at: string;
   users?: { name: string };
 }
@@ -57,10 +61,10 @@ export default function ReviewsPage() {
   const [whiskey, setWhiskey] = useState({ name: "", type: "Scotch", region: "", age: "", abv: "", tasting_notes: "", price: "" });
 
   // 리뷰 작성 폼
-  const [reviewForm, setReviewForm] = useState<{ whiskey_id: string; rating: number; review_text: string; taste_profile: string } | null>(null);
+  const [reviewForm, setReviewForm] = useState<{ whiskey_id: string; rating: number; review_text: string; taste_profile: string; nose: string; palate: string; finish_note: string; remarks: string } | null>(null);
 
   // 리뷰 편집
-  const [editingReview, setEditingReview] = useState<{ id: string; rating: number; review_text: string; taste_profile: string } | null>(null);
+  const [editingReview, setEditingReview] = useState<{ id: string; rating: number; review_text: string; taste_profile: string; nose: string; palate: string; finish_note: string; remarks: string } | null>(null);
 
   // 위스키 편집
   const [editingWhiskey, setEditingWhiskey] = useState<Whiskey | null>(null);
@@ -201,6 +205,10 @@ export default function ReviewsPage() {
         rating: reviewForm.rating,
         review_text: reviewForm.review_text,
         taste_profile: reviewForm.taste_profile,
+        nose: reviewForm.nose || null,
+        palate: reviewForm.palate || null,
+        finish_note: reviewForm.finish_note || null,
+        remarks: reviewForm.remarks || null,
       }]);
       if (error) throw error;
       // 위스키 등록자에게 알림 (본인 제외)
@@ -236,6 +244,10 @@ export default function ReviewsPage() {
         rating: editingReview.rating,
         review_text: editingReview.review_text,
         taste_profile: editingReview.taste_profile,
+        nose: editingReview.nose || null,
+        palate: editingReview.palate || null,
+        finish_note: editingReview.finish_note || null,
+        remarks: editingReview.remarks || null,
       }).eq("id", editingReview.id);
       if (error) throw error;
       setEditingReview(null);
@@ -507,13 +519,39 @@ export default function ReviewsPage() {
                               <RichTextEditor
                                 value={reviewForm.review_text}
                                 onChange={(html) => setReviewForm({ ...reviewForm, review_text: html })}
-                                placeholder="리뷰를 작성해주세요"
-                                minHeight="160px"
+                                placeholder="전체 리뷰를 자유롭게 작성해주세요"
+                                minHeight="120px"
                               />
-                              <input type="text" value={reviewForm.taste_profile}
-                                onChange={(e) => setReviewForm({ ...reviewForm, taste_profile: e.target.value })}
-                                placeholder="테이스팅 프로필 (예: 스모키, 바닐라, 피트)"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">🌸 향 (Nose)</label>
+                                  <input type="text" value={reviewForm.nose}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, nose: e.target.value })}
+                                    placeholder="예: 바닐라, 꿀, 시트러스"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">👅 맛 (Palate)</label>
+                                  <input type="text" value={reviewForm.palate}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, palate: e.target.value })}
+                                    placeholder="예: 스모키, 오크, 카라멜"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">✨ 피니쉬 (Finish)</label>
+                                  <input type="text" value={reviewForm.finish_note}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, finish_note: e.target.value })}
+                                    placeholder="예: 길고 따뜻한 여운"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">📝 비고</label>
+                                  <input type="text" value={reviewForm.remarks}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, remarks: e.target.value })}
+                                    placeholder="기타 메모"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                </div>
+                              </div>
                               <div className="flex gap-2">
                                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                                   리뷰 등록
@@ -525,7 +563,7 @@ export default function ReviewsPage() {
                               </div>
                             </form>
                           ) : (
-                            <button onClick={() => setReviewForm({ whiskey_id: w.id, rating: 5, review_text: "", taste_profile: "" })}
+                            <button onClick={() => setReviewForm({ whiskey_id: w.id, rating: 5, review_text: "", taste_profile: "", nose: "", palate: "", finish_note: "", remarks: "" })}
                               className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                               ✏️ 리뷰 작성
                             </button>
@@ -565,12 +603,39 @@ export default function ReviewsPage() {
                                     <RichTextEditor
                                       value={editingReview.review_text}
                                       onChange={(html) => setEditingReview({ ...editingReview, review_text: html })}
-                                      placeholder="리뷰를 작성해주세요"
-                                      minHeight="160px"
+                                      placeholder="전체 리뷰를 자유롭게 작성해주세요"
+                                      minHeight="120px"
                                     />
-                                    <input type="text" value={editingReview.taste_profile}
-                                      onChange={(e) => setEditingReview({ ...editingReview, taste_profile: e.target.value })}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div>
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">🌸 향 (Nose)</label>
+                                        <input type="text" value={editingReview.nose || ""}
+                                          onChange={(e) => setEditingReview({ ...editingReview, nose: e.target.value })}
+                                          placeholder="예: 바닐라, 꿀, 시트러스"
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">👅 맛 (Palate)</label>
+                                        <input type="text" value={editingReview.palate || ""}
+                                          onChange={(e) => setEditingReview({ ...editingReview, palate: e.target.value })}
+                                          placeholder="예: 스모키, 오크, 카라멜"
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">✨ 피니쉬 (Finish)</label>
+                                        <input type="text" value={editingReview.finish_note || ""}
+                                          onChange={(e) => setEditingReview({ ...editingReview, finish_note: e.target.value })}
+                                          placeholder="예: 길고 따뜻한 여운"
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">📝 비고</label>
+                                        <input type="text" value={editingReview.remarks || ""}
+                                          onChange={(e) => setEditingReview({ ...editingReview, remarks: e.target.value })}
+                                          placeholder="기타 메모"
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                      </div>
+                                    </div>
                                     <div className="flex gap-2">
                                       <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                                         저장
@@ -601,7 +666,7 @@ export default function ReviewsPage() {
                                         {isOwner && (
                                           <>
                                             <button
-                                              onClick={() => setEditingReview({ id: r.id, rating: r.rating, review_text: r.review_text, taste_profile: r.taste_profile })}
+                                              onClick={() => setEditingReview({ id: r.id, rating: r.rating, review_text: r.review_text, taste_profile: r.taste_profile, nose: r.nose || "", palate: r.palate || "", finish_note: r.finish_note || "", remarks: r.remarks || "" })}
                                               className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 transition px-2 py-1 rounded hover:bg-blue-50">
                                               편집
                                             </button>
@@ -615,15 +680,22 @@ export default function ReviewsPage() {
                                     </div>
 
                                     {r.review_text && (
-                                      <div dangerouslySetInnerHTML={{ __html: r.review_text }} className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-2 ml-10" />
+                                      <div dangerouslySetInnerHTML={{ __html: r.review_text }} className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-3 ml-10" />
                                     )}
-                                    {r.taste_profile && (
-                                      <div className="ml-10 flex flex-wrap gap-1 mb-2">
-                                        {r.taste_profile.split(",").map((tag, i) => (
-                                          <span key={i} className="text-xs bg-blue-50 dark:bg-blue-950 text-blue-700 px-2 py-0.5 rounded-full">
-                                            {tag.trim()}
-                                          </span>
-                                        ))}
+                                    {(r.nose || r.palate || r.finish_note || r.remarks) && (
+                                      <div className="ml-10 mb-2 grid grid-cols-2 gap-x-4 gap-y-1">
+                                        {r.nose && (
+                                          <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">🌸 향</span> {r.nose}</p>
+                                        )}
+                                        {r.palate && (
+                                          <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">👅 맛</span> {r.palate}</p>
+                                        )}
+                                        {r.finish_note && (
+                                          <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">✨ 피니쉬</span> {r.finish_note}</p>
+                                        )}
+                                        {r.remarks && (
+                                          <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">📝 비고</span> {r.remarks}</p>
+                                        )}
                                       </div>
                                     )}
 

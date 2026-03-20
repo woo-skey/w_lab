@@ -17,6 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();` }} />
+      </head>
       <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
         <ThemeProvider>
           <TwemojiProvider>
