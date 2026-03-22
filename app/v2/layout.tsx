@@ -85,7 +85,6 @@ export default function V2Layout({ children }: { children: React.ReactNode }) {
           >
             <span>⌕</span>
             <span className="flex-1 text-left">검색</span>
-            <kbd className="text-xs border border-white/15 rounded px-1 text-white/25">⌘K</kbd>
           </button>
         </div>
 

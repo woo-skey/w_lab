@@ -115,11 +115,6 @@ export default function HomeV2() {
         ))}
       </div>
 
-      {/* Spotlight 힌트 */}
-      <div className="mt-16 flex items-center justify-center gap-2 text-white/20 text-sm">
-        <kbd className="border border-white/15 rounded px-1.5 py-0.5 text-xs">⌘K</kbd>
-        <span>로 빠른 검색</span>
-      </div>
     </main>
   );
 }
