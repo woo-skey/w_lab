@@ -45,13 +45,43 @@ export default function ArticlesPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
+  const [articleLikes, setArticleLikes] = useState<Record<string, number>>({});
+  const [likedArticles, setLikedArticles] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
-    if (id) setUserId(id);
+    if (id) { setUserId(id); fetchArticleLikes(id); }
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchArticles();
   }, []);
+
+  const fetchArticleLikes = async (uid: string) => {
+    const { data } = await supabase.from("article_likes").select("article_id, user_id");
+    if (!data) return;
+    const counts: Record<string, number> = {};
+    const liked = new Set<string>();
+    data.forEach((l) => {
+      counts[l.article_id] = (counts[l.article_id] || 0) + 1;
+      if (l.user_id === uid) liked.add(l.article_id);
+    });
+    setArticleLikes(counts);
+    setLikedArticles(liked);
+  };
+
+  const handleLikeArticle = async (articleId: string) => {
+    if (!userId) { alert("로그인이 필요합니다."); return; }
+    if (likedArticles.has(articleId)) {
+      await supabase.from("article_likes").delete().eq("article_id", articleId).eq("user_id", userId);
+      setLikedArticles((prev) => { const n = new Set(prev); n.delete(articleId); return n; });
+      setArticleLikes((prev) => ({ ...prev, [articleId]: Math.max((prev[articleId] || 1) - 1, 0) }));
+    } else {
+      await supabase.from("article_likes").insert([{ article_id: articleId, user_id: userId }]);
+      setLikedArticles((prev) => new Set([...prev, articleId]));
+      setArticleLikes((prev) => ({ ...prev, [articleId]: (prev[articleId] || 0) + 1 }));
+    }
+  };
 
   const fetchArticles = async () => {
     try {
@@ -184,7 +214,12 @@ export default function ArticlesPage() {
     }
   };
 
-  const filteredArticles = selectedCategory === "전체" ? articles : articles.filter((a) => a.category === selectedCategory);
+  const filteredArticles = articles
+    .filter((a) =>
+      (selectedCategory === "전체" || a.category === selectedCategory) &&
+      (searchQuery === "" || a.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+    .sort((a, b) => sortBy === "popular" ? (articleLikes[b.id] || 0) - (articleLikes[a.id] || 0) : 0);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -201,6 +236,25 @@ export default function ArticlesPage() {
                 selectedCategory === cat ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-blue-400"
               }`}>{cat}</button>
           ))}
+        </div>
+
+        {/* 검색 + 정렬 */}
+        <div className="flex gap-3 mb-6 items-center">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="글 제목 검색..."
+            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-400"
+          />
+          <div className="flex gap-1">
+            {(["latest", "popular"] as const).map((s) => (
+              <button key={s} onClick={() => setSortBy(s)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition ${sortBy === s ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 hover:border-blue-400"}`}>
+                {s === "latest" ? "최신순" : "인기순"}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 글쓰기 */}
@@ -326,6 +380,10 @@ export default function ArticlesPage() {
                             </div>
                           </button>
                           <div className="flex items-center gap-1 flex-shrink-0">
+                            <button onClick={() => handleLikeArticle(article.id)}
+                              className={`text-sm px-2 py-1 rounded transition flex items-center gap-1 ${likedArticles.has(article.id) ? "text-red-500" : "text-gray-400 dark:text-gray-500 hover:text-red-400"}`}>
+                              {likedArticles.has(article.id) ? "❤️" : "🤍"} {articleLikes[article.id] || 0}
+                            </button>
                             {isOwner && (
                               <>
                                 <button onClick={() => { setEditingArticle(article); setExpandedId(null); }}

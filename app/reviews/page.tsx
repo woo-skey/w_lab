@@ -76,10 +76,14 @@ export default function ReviewsPage() {
 
   // 댓글
   const [commentText, setCommentText] = useState<Record<string, string>>({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
+  const [reviewLikes, setReviewLikes] = useState<Record<string, number>>({});
+  const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
-    if (id) setUserId(id);
+    if (id) { setUserId(id); fetchReviewLikes(id); }
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchWhiskeys();
   }, []);
@@ -101,6 +105,32 @@ export default function ReviewsPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReviewLikes = async (uid: string) => {
+    const { data } = await supabase.from("review_likes").select("review_id, user_id");
+    if (!data) return;
+    const counts: Record<string, number> = {};
+    const liked = new Set<string>();
+    data.forEach((l) => {
+      counts[l.review_id] = (counts[l.review_id] || 0) + 1;
+      if (l.user_id === uid) liked.add(l.review_id);
+    });
+    setReviewLikes(counts);
+    setLikedReviews(liked);
+  };
+
+  const handleLikeReview = async (reviewId: string) => {
+    if (!userId) { alert("로그인이 필요합니다."); return; }
+    if (likedReviews.has(reviewId)) {
+      await supabase.from("review_likes").delete().eq("review_id", reviewId).eq("user_id", userId);
+      setLikedReviews((prev) => { const n = new Set(prev); n.delete(reviewId); return n; });
+      setReviewLikes((prev) => ({ ...prev, [reviewId]: Math.max((prev[reviewId] || 1) - 1, 0) }));
+    } else {
+      await supabase.from("review_likes").insert([{ review_id: reviewId, user_id: userId }]);
+      setLikedReviews((prev) => new Set([...prev, reviewId]));
+      setReviewLikes((prev) => ({ ...prev, [reviewId]: (prev[reviewId] || 0) + 1 }));
     }
   };
 
@@ -304,7 +334,12 @@ export default function ReviewsPage() {
     }
   };
 
-  const filteredWhiskeys = selectedType === "전체" ? whiskeys : whiskeys.filter((w) => w.type === selectedType);
+  const filteredWhiskeys = whiskeys
+    .filter((w) =>
+      (selectedType === "전체" || w.type === selectedType) &&
+      (searchQuery === "" || w.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+    .sort((a, b) => sortBy === "popular" ? (reviewCounts[b.id] || 0) - (reviewCounts[a.id] || 0) : 0);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -324,6 +359,25 @@ export default function ReviewsPage() {
               {type}
             </button>
           ))}
+        </div>
+
+        {/* 검색 + 정렬 */}
+        <div className="flex gap-3 mb-6 items-center">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="위스키 이름 검색..."
+            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-400"
+          />
+          <div className="flex gap-1">
+            {(["latest", "popular"] as const).map((s) => (
+              <button key={s} onClick={() => setSortBy(s)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition ${sortBy === s ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 hover:border-blue-400"}`}>
+                {s === "latest" ? "최신순" : "인기순"}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 위스키 추가 버튼 */}
@@ -756,11 +810,17 @@ export default function ReviewsPage() {
                                       </div>
                                     )}
 
-                                    {/* 댓글 토글 버튼 */}
-                                    <button onClick={() => handleToggleReview(r.id)}
-                                      className="ml-10 text-xs text-gray-400 dark:text-gray-500 hover:text-blue-600 transition mt-1">
-                                      💬 댓글 {reviewComments.length > 0 ? `${reviewComments.length}개` : ""} {isReviewExpanded ? "▲" : "▼"}
-                                    </button>
+                                    {/* 좋아요 + 댓글 */}
+                                    <div className="ml-10 flex items-center gap-3 mt-1">
+                                      <button onClick={() => handleLikeReview(r.id)}
+                                        className={`text-xs transition flex items-center gap-1 ${likedReviews.has(r.id) ? "text-red-500" : "text-gray-400 dark:text-gray-500 hover:text-red-400"}`}>
+                                        {likedReviews.has(r.id) ? "❤️" : "🤍"} {reviewLikes[r.id] || 0}
+                                      </button>
+                                      <button onClick={() => handleToggleReview(r.id)}
+                                        className="text-xs text-gray-400 dark:text-gray-500 hover:text-blue-600 transition">
+                                        💬 댓글 {reviewComments.length > 0 ? `${reviewComments.length}개` : ""} {isReviewExpanded ? "▲" : "▼"}
+                                      </button>
+                                    </div>
 
                                     {/* 댓글 섹션 */}
                                     {isReviewExpanded && (

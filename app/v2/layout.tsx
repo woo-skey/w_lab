@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import SpotlightSearch from "@/components/SpotlightSearch";
+import { supabase } from "@/lib/supabase";
+
+interface SearchResult { id: string; title: string; subtitle?: string; icon: string; href: string; }
+
 
 const NAV = [
   { href: "/v2", icon: "⊞", label: "홈", exact: true },
@@ -28,10 +31,36 @@ export default function V2Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim()) { setSearchResults([]); return; }
+    const [wRes, bRes, aRes] = await Promise.allSettled([
+      supabase.from("whiskeys").select("id, name, type").ilike("name", `%${q}%`).limit(3),
+      supabase.from("bars").select("id, name").ilike("name", `%${q}%`).limit(3),
+      supabase.from("articles").select("id, title, category").ilike("title", `%${q}%`).limit(3),
+    ]);
+    const results: SearchResult[] = [];
+    if (wRes.status === "fulfilled") (wRes.value.data || []).forEach((w) => results.push({ id: w.id, title: w.name, subtitle: w.type, icon: "🥃", href: "/reviews" }));
+    if (bRes.status === "fulfilled") (bRes.value.data || []).forEach((b) => results.push({ id: b.id, title: b.name, icon: "🍸", href: "/bars" }));
+    if (aRes.status === "fulfilled") (aRes.value.data || []).forEach((a) => results.push({ id: a.id, title: a.title, subtitle: a.category, icon: "📚", href: "/articles" }));
+    setSearchResults(results);
+  }, []);
 
   useEffect(() => {
     setUserName(localStorage.getItem("userName") || "");
     setUserId(localStorage.getItem("userId") || "");
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => doSearch(searchQuery), 250);
+    return () => clearTimeout(t);
+  }, [searchQuery, doSearch]);
+
+  useEffect(() => {
     // v2에선 전역 Navigation 숨기기
     const nav = document.querySelector("nav");
     if (nav) nav.style.display = "none";
@@ -73,19 +102,34 @@ export default function V2Layout({ children }: { children: React.ReactNode }) {
           <p className="text-white/30 text-xs mt-0.5">v2 · macOS</p>
         </div>
 
-        {/* Spotlight 버튼 */}
-        <div className="px-3 mb-4">
-          <button
-            onClick={() => {
-              const e = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true });
-              window.dispatchEvent(e);
-            }}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/35 text-sm transition-colors hover:text-white/60 hover:bg-white/5"
-            style={{ border: "1px solid rgba(255,255,255,0.08)" }}
-          >
-            <span>⌕</span>
-            <span className="flex-1 text-left">검색</span>
-          </button>
+        {/* 검색 */}
+        <div className="px-3 mb-4 relative" ref={searchRef}>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}>
+            <span className="text-white/30 text-sm">⌕</span>
+            <input
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+              onFocus={() => setSearchOpen(true)}
+              onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
+              placeholder="검색..."
+              className="flex-1 bg-transparent text-white/70 placeholder-white/25 text-sm outline-none"
+            />
+            {searchQuery && <button onClick={() => { setSearchQuery(""); setSearchResults([]); }} className="text-white/25 hover:text-white/50 text-xs">✕</button>}
+          </div>
+          {searchOpen && searchResults.length > 0 && (
+            <div className="absolute top-full left-3 right-3 mt-1 rounded-xl overflow-hidden z-50" style={{ background: "rgba(18,18,24,0.98)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
+              {searchResults.map((r) => (
+                <button key={r.id + r.icon} onClick={() => { router.push(r.href); setSearchQuery(""); setSearchOpen(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm text-white/65 hover:bg-white/8 transition-colors">
+                  <span>{r.icon}</span>
+                  <div className="min-w-0">
+                    <p className="truncate">{r.title}</p>
+                    {r.subtitle && <p className="text-xs text-white/30 truncate">{r.subtitle}</p>}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="px-3 mb-2">
@@ -156,8 +200,6 @@ export default function V2Layout({ children }: { children: React.ReactNode }) {
         {children}
       </div>
 
-      {/* Spotlight */}
-      <SpotlightSearch />
     </div>
   );
 }
