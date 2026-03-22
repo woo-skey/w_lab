@@ -50,9 +50,9 @@ export default function HomeV2() {
   }, []);
 
   return (
-    <main className="min-h-screen px-10 pt-14 pb-20" style={{ fontFamily: SF }}>
+    <main className="min-h-screen flex flex-col items-center justify-center px-10 pt-14 pb-20" style={{ fontFamily: SF }}>
       {/* 히어로 */}
-      <div className="mb-16">
+      <div className="mb-16 text-center">
         <h1
           className="text-5xl md:text-6xl font-bold mb-4 tracking-tight"
           style={{
@@ -63,7 +63,7 @@ export default function HomeV2() {
         >
           위스키 연구소
         </h1>
-        <p className="text-white/45 text-lg max-w-lg leading-relaxed">
+        <p className="text-white/45 text-lg max-w-lg leading-relaxed mx-auto">
           리뷰를 공유하고, 바를 추천하고, 친구들과 일정을 맞춰보세요.
         </p>
         {mounted && !loggedIn && (
@@ -80,7 +80,7 @@ export default function HomeV2() {
       </div>
 
       {/* 피처 카드 */}
-      <div className="grid md:grid-cols-2 gap-4 max-w-3xl">
+      <div className="grid md:grid-cols-2 gap-4 w-full max-w-3xl">
         {features.map((f) => (
           <Link key={f.href} href={f.href}
             className="group relative rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 cursor-pointer overflow-hidden"
@@ -116,7 +116,7 @@ export default function HomeV2() {
       </div>
 
       {/* Spotlight 힌트 */}
-      <div className="mt-16 flex items-center gap-2 text-white/20 text-sm">
+      <div className="mt-16 flex items-center justify-center gap-2 text-white/20 text-sm">
         <kbd className="border border-white/15 rounded px-1.5 py-0.5 text-xs">⌘K</kbd>
         <span>로 빠른 검색</span>
       </div>
