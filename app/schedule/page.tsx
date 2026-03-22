@@ -389,18 +389,18 @@ export default function SchedulePage() {
                           </div>
 
                           {/* 뒷면 */}
-                          <div className="calendar-back bg-gray-900 dark:bg-gray-700 text-white flex flex-col items-center justify-center px-1 overflow-hidden">
-                            <p className="text-xs font-bold text-blue-300 leading-tight text-center mb-0.5">
+                          <div className="calendar-back bg-gray-900 dark:bg-gray-700 text-white flex flex-col items-center justify-center px-1 py-1 overflow-hidden">
+                            <p className="text-xs font-bold text-blue-300 leading-tight text-center mb-1">
                               {new Date(dateStr + "T00:00:00").toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })}
                             </p>
-                            <div className="w-full text-center space-y-0.5">
-                              {info?.users?.slice(0, 4).map((name, i) => (
-                                <p key={i} className="text-xs leading-tight truncate">· {name}</p>
+                            <div className="w-full grid grid-cols-2 gap-x-1 gap-y-0.5 text-center">
+                              {info?.users?.slice(0, 6).map((name, i) => (
+                                <p key={i} className="text-xs leading-tight truncate">{name}</p>
                               ))}
-                              {(info?.users?.length || 0) > 4 && (
-                                <p className="text-xs text-gray-400">+{(info?.users?.length || 0) - 4}명</p>
-                              )}
                             </div>
+                            {(info?.users?.length || 0) > 6 && (
+                              <p className="text-xs text-gray-400 mt-0.5">+{(info?.users?.length || 0) - 6}</p>
+                            )}
                           </div>
                         </div>
                       </div>
