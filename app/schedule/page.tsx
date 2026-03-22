@@ -197,33 +197,33 @@ export default function SchedulePage() {
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">일정 맞추기</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-2">달력에서 가능한 날을 클릭해서 멤버들과 일정을 조율하세요.</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-8">새 일정 만들기로 이름을 정하고, 달력에서 참여 가능한 날짜를 클릭하면 됩니다. 여러 명이 같은 일정에 참여해 날짜를 선택하면 최다 가능 날짜가 자동으로 표시됩니다.</p>
+        <h1 className="text-4xl font-bold text-white mb-2">일정 맞추기</h1>
+        <p className="text-white/55 mb-2">달력에서 가능한 날을 클릭해서 멤버들과 일정을 조율하세요.</p>
+        <p className="text-xs text-white/30 mb-8">새 일정 만들기로 이름을 정하고, 달력에서 참여 가능한 날짜를 클릭하면 됩니다. 여러 명이 같은 일정에 참여해 날짜를 선택하면 최다 가능 날짜가 자동으로 표시됩니다.</p>
 
         {/* 새 일정 버튼 */}
         {userId ? (
           <>
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition"
             >
               {showCreateForm ? "취소" : "📅 새 일정 만들기"}
             </button>
             {showCreateForm && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md p-6 mb-6 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">새 일정 만들기</h2>
+              <div className="glass-card rounded-xl p-6 mb-6">
+                <h2 className="text-lg font-bold text-white mb-4">새 일정 만들기</h2>
                 <form onSubmit={handleCreateSchedule} className="flex gap-3">
                   <input
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="일정 이름을 입력하세요"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500"
+                    className="glass-input flex-1 px-4 py-2 rounded-lg"
                   />
-                  <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                  <button type="submit" className="px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition font-medium">
                     생성
                   </button>
                 </form>
@@ -231,30 +231,30 @@ export default function SchedulePage() {
             )}
           </>
         ) : (
-          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6 text-center">
-            <p className="text-blue-800 dark:text-blue-300 mb-2">일정을 만들려면 로그인이 필요합니다.</p>
-            <a href="/login" className="text-blue-600 underline font-medium text-sm">로그인하기</a>
+          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+            <p className="text-white/60 mb-2">일정을 만들려면 로그인이 필요합니다.</p>
+            <a href="/login" className="text-indigo-400 underline font-medium text-sm">로그인하기</a>
           </div>
         )}
 
         <div className="grid lg:grid-cols-4 gap-6">
           {/* 사이드바: 일정 목록 */}
           <div className="lg:col-span-1 space-y-4">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-4">
+            <div className="glass-card rounded-xl p-4">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="font-bold text-gray-900 dark:text-white">일정 목록</h2>
+                <h2 className="font-bold text-white">일정 목록</h2>
               </div>
 
               {loading ? (
-                <p className="text-gray-500 dark:text-gray-400 text-sm">로딩 중...</p>
+                <p className="text-white/40 text-sm">로딩 중...</p>
               ) : schedules.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400 text-sm">일정이 없습니다.</p>
+                <p className="text-white/35 text-sm">일정이 없습니다.</p>
               ) : (
                 <div className="space-y-2">
                   {schedules.map((s) => (
                     <div key={s.id} className={`flex items-center rounded-lg text-sm transition ${
-                      selectedSchedule?.id === s.id ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"
-                    }`}>
+                      selectedSchedule?.id === s.id ? "bg-indigo-500/80 text-white" : "text-white/70"
+                    }`} style={selectedSchedule?.id === s.id ? {} : { background: "rgba(255,255,255,0.05)" }}>
                       <button onClick={() => { if (selectedSchedule?.id !== s.id) { setAvailabilityMap({}); setSelectedSchedule(s); } }}
                         className="flex-1 text-left px-3 py-2">
                         <p className="font-medium truncate">{s.name}</p>
@@ -262,7 +262,7 @@ export default function SchedulePage() {
                       {(s.created_by === userId || isAdmin) && (
                         <button onClick={() => handleDeleteSchedule(s.id)}
                           className={`px-2 py-1 mr-1 rounded text-xs transition ${
-                            selectedSchedule?.id === s.id ? "hover:bg-blue-700 text-blue-100" : "hover:bg-red-50 text-gray-400 dark:text-gray-500 hover:text-red-500"
+                            selectedSchedule?.id === s.id ? "hover:bg-indigo-600 text-indigo-100" : "text-white/35 hover:text-red-400 hover:bg-red-500/10"
                           }`}>✕</button>
                       )}
                     </div>
@@ -273,19 +273,19 @@ export default function SchedulePage() {
 
             {/* 추천 날짜 */}
             {bestDates.length > 0 && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-4">
-                <h2 className="font-bold text-gray-900 dark:text-white mb-3">🏆 최다 가능 날짜</h2>
+              <div className="glass-card rounded-xl p-4">
+                <h2 className="font-bold text-white mb-3">🏆 최다 가능 날짜</h2>
                 <div className="space-y-2">
                   {bestDates.map(([date, info], idx) => (
                     <div key={date} className={`px-3 py-2 rounded-lg text-sm ${
-                      idx === 0 ? "bg-blue-100 dark:bg-blue-950 border border-blue-300 dark:border-blue-700" : "bg-gray-100 dark:bg-gray-800"
-                    }`}>
-                      <p className={`font-medium ${idx === 0 ? "text-blue-900 dark:text-blue-400" : "text-gray-800 dark:text-gray-100"}`}>
+                      idx === 0 ? "border border-indigo-400/40" : ""
+                    }`} style={{ background: idx === 0 ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.05)" }}>
+                      <p className={`font-medium ${idx === 0 ? "text-indigo-300" : "text-white/70"}`}>
                         {new Date(date + "T00:00:00").toLocaleDateString("ko-KR", {
                           month: "long", day: "numeric", weekday: "short"
                         })}
                       </p>
-                      <p className={`text-xs ${idx === 0 ? "text-blue-700 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`}>
+                      <p className={`text-xs ${idx === 0 ? "text-indigo-400" : "text-white/40"}`}>
                         {info.count}명 가능 {idx === 0 ? "👑" : ""}
                       </p>
                     </div>
@@ -298,12 +298,12 @@ export default function SchedulePage() {
           {/* 메인: 달력 */}
           <div className="lg:col-span-3">
             {selectedSchedule ? (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">{selectedSchedule.name}</h2>
+                    <h2 className="text-xl font-bold text-white">{selectedSchedule.name}</h2>
                     {userId && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-white/45 mt-1">
                         가능한 날짜를 클릭해서 체크하세요 ✓
                       </p>
                     )}
@@ -315,11 +315,11 @@ export default function SchedulePage() {
                         setViewYear(d.getFullYear());
                         setViewMonth(d.getMonth());
                       }}
-                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400"
+                      className="p-2 rounded-lg hover:bg-white/8 transition text-white/55"
                     >
                       ◀
                     </button>
-                    <span className="font-semibold text-gray-900 dark:text-white min-w-[80px] text-center">
+                    <span className="font-semibold text-white min-w-[80px] text-center">
                       {viewYear}년 {MONTHS[viewMonth]}
                     </span>
                     <button
@@ -328,7 +328,7 @@ export default function SchedulePage() {
                         setViewYear(d.getFullYear());
                         setViewMonth(d.getMonth());
                       }}
-                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400"
+                      className="p-2 rounded-lg hover:bg-white/8 transition text-white/55"
                     >
                       ▶
                     </button>
@@ -339,7 +339,7 @@ export default function SchedulePage() {
                 <div className="grid grid-cols-7 mb-2">
                   {DAYS.map((day, i) => (
                     <div key={day} className={`text-center text-sm font-medium py-2 ${
-                      i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-gray-600 dark:text-gray-400"
+                      i === 0 ? "text-red-400" : i === 6 ? "text-indigo-400" : "text-white/45"
                     }`}>
                       {day}
                     </div>
@@ -364,7 +364,7 @@ export default function SchedulePage() {
                     return (
                       <div
                         key={dateStr}
-                        className={`calendar-cell aspect-square ${count > 0 ? "flipped-on-hover" : ""} ${hoveredDate === dateStr ? "flipped" : ""}`}
+                        className={`calendar-cell aspect-square ${hoveredDate === dateStr ? "flipped" : ""}`}
                         onMouseEnter={() => count > 0 && setHoveredDate(dateStr)}
                         onMouseLeave={() => setHoveredDate(null)}
                         onClick={() => userId && handleToggleDate(dateStr)}
@@ -373,33 +373,34 @@ export default function SchedulePage() {
                         <div className="calendar-card">
                           {/* 앞면 */}
                           <div className={`calendar-front flex flex-col items-center justify-center text-sm
-                            ${isMyDate ? "bg-blue-500 text-white font-bold shadow" : ""}
-                            ${!isMyDate && count > 0 ? "bg-blue-50 dark:bg-blue-950 border-2 border-blue-200 dark:border-blue-800" : ""}
-                            ${!isMyDate && count === 0 ? "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700" : ""}
-                            ${isToday && !isMyDate ? "ring-2 ring-blue-400" : ""}
+                            ${isMyDate ? "bg-indigo-500 text-white font-bold" : ""}
+                            ${!isMyDate && count > 0 ? "border border-indigo-400/40" : ""}
+                            ${!isMyDate && count === 0 ? "hover:bg-white/8" : ""}
+                            ${isToday && !isMyDate ? "ring-2 ring-indigo-400/60" : ""}
                             ${dayOfWeek === 0 && !isMyDate ? "text-red-400" : ""}
-                            ${dayOfWeek === 6 && !isMyDate ? "text-blue-400" : ""}
-                          `}>
-                            <span>{day}</span>
+                            ${dayOfWeek === 6 && !isMyDate ? "text-indigo-400" : ""}
+                          `}
+                          style={!isMyDate && count > 0 ? { background: "rgba(99,102,241,0.12)" } : {}}>
+                            <span className={isMyDate ? "text-white" : "text-white/80"}>{day}</span>
                             {count > 0 && (
-                              <span className={`text-xs font-bold ${isMyDate ? "text-blue-100" : "text-blue-600"}`}>
+                              <span className={`text-xs font-bold ${isMyDate ? "text-indigo-100" : "text-indigo-300"}`}>
                                 {count}명
                               </span>
                             )}
                           </div>
 
                           {/* 뒷면 */}
-                          <div className="calendar-back bg-gray-900 dark:bg-gray-700 text-white flex flex-col items-center justify-center px-1 py-1 overflow-hidden">
-                            <p className="text-xs font-bold text-blue-300 leading-tight text-center mb-1">
+                          <div className="calendar-back flex flex-col items-center justify-center px-1 py-1 overflow-hidden" style={{ background: "rgba(18,18,30,0.95)", border: "1px solid rgba(99,102,241,0.3)" }}>
+                            <p className="text-xs font-bold text-indigo-300 leading-tight text-center mb-1">
                               {new Date(dateStr + "T00:00:00").toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })}
                             </p>
                             <div className="w-full grid grid-cols-2 gap-x-1 gap-y-0.5 text-center">
                               {info?.users?.slice(0, 6).map((name, i) => (
-                                <p key={i} className="text-xs leading-tight truncate">{name}</p>
+                                <p key={i} className="text-xs leading-tight truncate text-white/80">{name}</p>
                               ))}
                             </div>
                             {(info?.users?.length || 0) > 6 && (
-                              <p className="text-xs text-gray-400 mt-0.5">+{(info?.users?.length || 0) - 6}</p>
+                              <p className="text-xs text-white/35 mt-0.5">+{(info?.users?.length || 0) - 6}</p>
                             )}
                           </div>
                         </div>
@@ -409,24 +410,24 @@ export default function SchedulePage() {
                 </div>
 
                 {/* 범례 */}
-                <div className="flex gap-4 mt-6 pt-4 border-t dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex gap-4 mt-6 pt-4 border-t border-white/8 text-xs text-white/40">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 rounded bg-blue-500" />
+                    <div className="w-4 h-4 rounded bg-indigo-500" />
                     <span>내가 가능한 날</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 rounded bg-blue-50 dark:bg-blue-950 border-2 border-blue-200 dark:border-blue-800" />
+                    <div className="w-4 h-4 rounded border border-indigo-400/40" style={{ background: "rgba(99,102,241,0.12)" }} />
                     <span>다른 사람이 가능한 날</span>
                   </div>
                   {!userId && (
                     <div className="ml-auto">
-                      <a href="/login" className="text-blue-600 underline">로그인하고 참여하기</a>
+                      <a href="/login" className="text-indigo-400 underline">로그인하고 참여하기</a>
                     </div>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-12 text-center text-gray-500 dark:text-gray-400">
+              <div className="glass-card rounded-xl p-12 text-center text-white/40">
                 왼쪽에서 일정을 선택하거나 새 일정을 만들어보세요.
               </div>
             )}
@@ -435,32 +436,32 @@ export default function SchedulePage() {
 
         {/* 관리자 전용: 계정별 선택 날짜 */}
         {isAdmin && selectedSchedule && userDateMap.length > 0 && (
-          <div className="mt-8 bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">🔐 관리자 — 계정별 가능 날짜</h2>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">각 유저가 선택한 날짜 목록입니다.</p>
+          <div className="mt-8 glass-card rounded-xl p-6">
+            <h2 className="text-lg font-bold text-white mb-1">🔐 관리자 — 계정별 가능 날짜</h2>
+            <p className="text-xs text-white/30 mb-5">각 유저가 선택한 날짜 목록입니다.</p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-2 px-3 text-gray-600 dark:text-gray-400 font-semibold w-32">유저</th>
-                    <th className="text-left py-2 px-3 text-gray-600 dark:text-gray-400 font-semibold">선택 날짜</th>
-                    <th className="text-right py-2 px-3 text-gray-600 dark:text-gray-400 font-semibold w-16">총</th>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left py-2 px-3 text-white/50 font-semibold w-32">유저</th>
+                    <th className="text-left py-2 px-3 text-white/50 font-semibold">선택 날짜</th>
+                    <th className="text-right py-2 px-3 text-white/50 font-semibold w-16">총</th>
                   </tr>
                 </thead>
                 <tbody>
                   {userDateMap.map(({ name, dates }) => (
-                    <tr key={name} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                      <td className="py-3 px-3 font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap">{name}</td>
+                    <tr key={name} className="border-b border-white/8 hover:bg-white/5 transition">
+                      <td className="py-3 px-3 font-medium text-white whitespace-nowrap">{name}</td>
                       <td className="py-3 px-3">
                         <div className="flex flex-wrap gap-1.5">
                           {dates.map((d) => (
-                            <span key={d} className="px-2 py-0.5 bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium">
+                            <span key={d} className="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-medium">
                               {new Date(d + "T00:00:00").toLocaleDateString("ko-KR", { month: "short", day: "numeric", weekday: "short" })}
                             </span>
                           ))}
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-right font-bold text-blue-600 dark:text-blue-400">{dates.length}일</td>
+                      <td className="py-3 px-3 text-right font-bold text-indigo-400">{dates.length}일</td>
                     </tr>
                   ))}
                 </tbody>

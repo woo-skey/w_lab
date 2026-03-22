@@ -78,6 +78,7 @@ export default function ReviewsPage() {
   const [commentText, setCommentText] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
+  const [page, setPage] = useState(1);
   const [reviewLikes, setReviewLikes] = useState<Record<string, number>>({});
   const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set());
 
@@ -341,19 +342,23 @@ export default function ReviewsPage() {
     )
     .sort((a, b) => sortBy === "popular" ? (reviewCounts[b.id] || 0) - (reviewCounts[a.id] || 0) : 0);
 
+  const PAGE_SIZE = 10;
+  const totalPages = Math.ceil(filteredWhiskeys.length / PAGE_SIZE);
+  const pagedWhiskeys = filteredWhiskeys.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">위스키 리뷰</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-2">다양한 위스키를 평가하고 리뷰를 공유하세요.</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-8">위스키 카드를 클릭하면 리뷰 목록이 펼쳐집니다. 새 위스키 추가 후 리뷰 작성 버튼으로 별점과 테이스팅 노트를 남길 수 있습니다.</p>
+        <h1 className="text-4xl font-bold text-white mb-2">위스키 리뷰</h1>
+        <p className="text-white/55 mb-2">다양한 위스키를 평가하고 리뷰를 공유하세요.</p>
+        <p className="text-xs text-white/30 mb-8">위스키 카드를 클릭하면 리뷰 목록이 펼쳐집니다. 새 위스키 추가 후 리뷰 작성 버튼으로 별점과 테이스팅 노트를 남길 수 있습니다.</p>
 
         {/* 타입 필터 */}
         <div className="flex flex-wrap gap-2 mb-8">
           {WHISKEY_TYPES.map((type) => (
-            <button key={type} onClick={() => setSelectedType(type)}
+            <button key={type} onClick={() => { setSelectedType(type); setPage(1); }}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                selectedType === type ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-blue-400"
+                selectedType === type ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
               }`}
             >
               {type}
@@ -368,12 +373,12 @@ export default function ReviewsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="위스키 이름 검색..."
-            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-400"
+            className="glass-input flex-1 px-4 py-2 rounded-lg text-sm"
           />
           <div className="flex gap-1">
             {(["latest", "popular"] as const).map((s) => (
-              <button key={s} onClick={() => setSortBy(s)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition ${sortBy === s ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 hover:border-blue-400"}`}>
+              <button key={s} onClick={() => { setSortBy(s); setPage(1); }}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition ${sortBy === s ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/55 border border-white/10 hover:border-indigo-400/50"}`}>
                 {s === "latest" ? "최신순" : "인기순"}
               </button>
             ))}
@@ -388,91 +393,91 @@ export default function ReviewsPage() {
               }
               setShowAddForm(!showAddForm);
             }}
-            className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            className="mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition">
             {showAddForm ? "취소" : "🥃 새 위스키 추가"}
           </button>
         ) : (
-          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6 text-center">
-            <p className="text-blue-800 dark:text-blue-300 mb-2">위스키 추가 및 리뷰 작성은 로그인이 필요합니다.</p>
-            <a href="/login" className="text-blue-600 underline font-medium text-sm">로그인하기</a>
+          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+            <p className="text-white/60 mb-2">위스키 추가 및 리뷰 작성은 로그인이 필요합니다.</p>
+            <a href="/login" className="text-indigo-400 underline font-medium text-sm">로그인하기</a>
           </div>
         )}
 
         {/* 위스키 추가 폼 */}
         {showAddForm && (
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md p-8 mb-8 border border-gray-100 dark:border-gray-800">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">새 위스키 추가</h2>
+          <div className="glass-card rounded-xl p-8 mb-8">
+            <h2 className="text-xl font-bold text-white mb-6">새 위스키 추가</h2>
             <form onSubmit={handleAddWhiskey} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">이름 *</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">이름 *</label>
                   <input type="text" value={whiskey.name} onChange={(e) => setWhiskey({ ...whiskey, name: e.target.value })}
                     placeholder="예: Glenmorangie 10" required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">타입 *</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">타입 *</label>
                   <select value={whiskey.type} onChange={(e) => setWhiskey({ ...whiskey, type: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
+                    className="glass-input w-full px-4 py-2 rounded-lg">
                     {WHISKEY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">지역</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">지역</label>
                   <input type="text" value={whiskey.region} onChange={(e) => setWhiskey({ ...whiskey, region: e.target.value })}
                     placeholder="예: Highland"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">숙성 (년)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">숙성 (년)</label>
                   <input type="number" value={whiskey.age} onChange={(e) => setWhiskey({ ...whiskey, age: e.target.value })}
                     placeholder="10"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">도수 (%)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">도수 (%)</label>
                   <input type="number" step="0.1" value={whiskey.abv} onChange={(e) => setWhiskey({ ...whiskey, abv: e.target.value })}
                     placeholder="43.0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">가격 (₩)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">가격 (₩)</label>
                   <input type="number" value={whiskey.price} onChange={(e) => setWhiskey({ ...whiskey, price: e.target.value })}
                     placeholder="50000"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">🌸 향 (Nose)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">🌸 향 (Nose)</label>
                   <input type="text" value={whiskey.nose}
                     onChange={(e) => setWhiskey({ ...whiskey, nose: e.target.value })}
                     placeholder="예: 바닐라, 꿀, 시트러스"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">👅 맛 (Palate)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">👅 맛 (Palate)</label>
                   <input type="text" value={whiskey.palate}
                     onChange={(e) => setWhiskey({ ...whiskey, palate: e.target.value })}
                     placeholder="예: 스모키, 오크, 카라멜"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">✨ 피니쉬 (Finish)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">✨ 피니쉬 (Finish)</label>
                   <input type="text" value={whiskey.finish_note}
                     onChange={(e) => setWhiskey({ ...whiskey, finish_note: e.target.value })}
                     placeholder="예: 길고 따뜻한 여운"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">📝 설명</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">📝 설명</label>
                   <input type="text" value={whiskey.tasting_notes}
                     onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
                     placeholder="기타 특징"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                    className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
               </div>
-              <button type="submit" className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
+              <button type="submit" className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">
                 위스키 추가
               </button>
             </form>
@@ -482,12 +487,12 @@ export default function ReviewsPage() {
         {/* 위스키 목록 */}
         <div>
           {loading ? (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">로딩 중...</div>
+            <div className="text-center py-12 text-white/40">로딩 중...</div>
           ) : filteredWhiskeys.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">아직 위스키가 없습니다.</div>
+            <div className="text-center py-12 text-white/40">아직 위스키가 없습니다.</div>
           ) : (
             <div className="grid md:grid-cols-2 gap-4">
-            {filteredWhiskeys.map((w) => {
+            {pagedWhiskeys.map((w) => {
               const isExpanded = expandedWhiskey === w.id;
               const whiskeyReviews = reviews[w.id] || [];
               const displayCount = isExpanded ? whiskeyReviews.length : (reviewCounts[w.id] || 0);
@@ -496,92 +501,92 @@ export default function ReviewsPage() {
                 : null;
 
               return (
-                <div key={w.id} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 overflow-hidden">
+                <div key={w.id} className="glass-card rounded-xl overflow-hidden">
                   {/* 위스키 헤더 */}
                   {editingWhiskey?.id === w.id ? (
                     <div className="p-6">
                       <form onSubmit={handleEditWhiskey} className="space-y-4">
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">이름</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">이름</label>
                             <input type="text" value={editingWhiskey.name}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, name: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">타입</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">타입</label>
                             <select value={editingWhiskey.type}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, type: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
+                              className="glass-input w-full px-3 py-2 rounded-lg">
                               {WHISKEY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                             </select>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">지역</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">지역</label>
                             <input type="text" value={editingWhiskey.region || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, region: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">숙성 (년)</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">숙성 (년)</label>
                             <input type="number" value={editingWhiskey.age || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, age: parseInt(e.target.value) || 0 })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">도수 (%)</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">도수 (%)</label>
                             <input type="number" step="0.1" value={editingWhiskey.abv || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, abv: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">가격 (₩)</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">가격 (₩)</label>
                             <input type="number" value={editingWhiskey.price || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, price: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">🌸 향</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">🌸 향</label>
                             <input type="text" value={editingWhiskey.nose || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, nose: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">👅 맛</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">👅 맛</label>
                             <input type="text" value={editingWhiskey.palate || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, palate: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">✨ 피니쉬</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">✨ 피니쉬</label>
                             <input type="text" value={editingWhiskey.finish_note || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, finish_note: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">📝 설명</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">📝 설명</label>
                             <input type="text" value={editingWhiskey.tasting_notes || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, tasting_notes: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <button type="submit" className="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">저장</button>
+                          <button type="submit" className="px-6 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">저장</button>
                           <button type="button" onClick={() => setEditingWhiskey(null)}
-                            className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">취소</button>
+                            className="px-6 py-2 bg-white/8 text-white/70 text-sm rounded-lg hover:bg-white/12 transition">취소</button>
                         </div>
                       </form>
                     </div>
                   ) : (
-                    <div className="flex items-start p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <div className="flex items-start p-6 hover:bg-white/5 transition">
                       <button onClick={() => handleToggleWhiskey(w.id)} className="flex-1 text-left">
                         <div className="flex items-center gap-3 mb-1">
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{w.name}</h3>
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{w.type}</span>
+                          <h3 className="text-xl font-bold text-white">{w.name}</h3>
+                          <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{w.type}</span>
                         </div>
-                        <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <div className="flex flex-wrap gap-4 text-sm text-white/40 mt-1">
                           {w.region && <span>📍 {w.region}</span>}
                           {w.age && <span>🗓 {w.age}년</span>}
                           {w.abv && <span>🔥 {w.abv}%</span>}
@@ -589,10 +594,10 @@ export default function ReviewsPage() {
                         </div>
                         {(w.nose || w.palate || w.finish_note || w.tasting_notes) && (
                           <div className="mt-3 space-y-2">
-                            {w.nose && <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">🌸 향&nbsp;&nbsp;</span>{w.nose}</p>}
-                            {w.palate && <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">👅 맛&nbsp;&nbsp;</span>{w.palate}</p>}
-                            {w.finish_note && <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">✨ 피니쉬&nbsp;&nbsp;</span>{w.finish_note}</p>}
-                            {w.tasting_notes && <p className="text-sm text-gray-600 dark:text-gray-300"><span className="font-semibold">📝 설명&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
+                            {w.nose && <p className="text-sm text-white/55"><span className="font-semibold">🌸 향&nbsp;&nbsp;</span>{w.nose}</p>}
+                            {w.palate && <p className="text-sm text-white/55"><span className="font-semibold">👅 맛&nbsp;&nbsp;</span>{w.palate}</p>}
+                            {w.finish_note && <p className="text-sm text-white/55"><span className="font-semibold">✨ 피니쉬&nbsp;&nbsp;</span>{w.finish_note}</p>}
+                            {w.tasting_notes && <p className="text-sm text-white/55"><span className="font-semibold">📝 설명&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
                           </div>
                         )}
                       </button>
@@ -600,33 +605,33 @@ export default function ReviewsPage() {
                         {avgRating && (
                           <div className="text-blue-500 text-lg font-bold">★ {avgRating}</div>
                         )}
-                        <div className="text-xs text-gray-400 dark:text-gray-500">{displayCount}개 리뷰</div>
+                        <div className="text-xs text-white/30">{displayCount}개 리뷰</div>
                         {(w.created_by === userId || isAdmin) && userId && (
                           <div className="flex gap-1 mt-1">
                             <button onClick={() => setEditingWhiskey(w)}
-                              className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
+                              className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
                             <button onClick={() => handleDeleteWhiskey(w.id)}
-                              className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                              className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
                           </div>
                         )}
-                        <button onClick={() => handleToggleWhiskey(w.id)} className="text-gray-400 dark:text-gray-500 mt-1">{isExpanded ? "▲" : "▼"}</button>
+                        <button onClick={() => handleToggleWhiskey(w.id)} className="text-white/30 mt-1">{isExpanded ? "▲" : "▼"}</button>
                       </div>
                     </div>
                   )}
 
                   {/* 리뷰 목록 */}
                   {isExpanded && (
-                    <div className="border-t border-gray-100 dark:border-gray-800">
+                    <div className="border-t border-white/8">
                       {/* 리뷰 작성 버튼 */}
-                      <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-800">
+                      <div className="px-6 py-4 border-b border-white/8" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {userId ? (
                           reviewForm?.whiskey_id === w.id ? (
                             <form onSubmit={handleAddReview} className="space-y-3">
                               <div className="flex gap-2 items-center">
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">평점</span>
+                                <span className="text-sm font-medium text-white/70">평점</span>
                                 <select value={reviewForm.rating}
                                   onChange={(e) => setReviewForm({ ...reviewForm, rating: parseInt(e.target.value) })}
-                                  className="px-2 py-1 border border-gray-300 rounded text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
+                                  className="glass-input px-2 py-1 rounded text-sm">
                                   {[5, 4, 3, 2, 1].map((r) => (
                                     <option key={r} value={r}>{STAR[r]} ({r}/5)</option>
                                   ))}
@@ -640,61 +645,61 @@ export default function ReviewsPage() {
                               />
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">🌸 향 (Nose)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1">🌸 향 (Nose)</label>
                                   <input type="text" value={reviewForm.nose}
                                     onChange={(e) => setReviewForm({ ...reviewForm, nose: e.target.value })}
                                     placeholder="예: 바닐라, 꿀, 시트러스"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                    className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">👅 맛 (Palate)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1">👅 맛 (Palate)</label>
                                   <input type="text" value={reviewForm.palate}
                                     onChange={(e) => setReviewForm({ ...reviewForm, palate: e.target.value })}
                                     placeholder="예: 스모키, 오크, 카라멜"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                    className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">✨ 피니쉬 (Finish)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1">✨ 피니쉬 (Finish)</label>
                                   <input type="text" value={reviewForm.finish_note}
                                     onChange={(e) => setReviewForm({ ...reviewForm, finish_note: e.target.value })}
                                     placeholder="예: 길고 따뜻한 여운"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                    className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">📝 비고</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1">📝 비고</label>
                                   <input type="text" value={reviewForm.remarks}
                                     onChange={(e) => setReviewForm({ ...reviewForm, remarks: e.target.value })}
                                     placeholder="기타 메모"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                    className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                               </div>
                               <div className="flex gap-2">
-                                <button type="submit" className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                                <button type="submit" className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
                                   리뷰 등록
                                 </button>
                                 <button type="button" onClick={() => setReviewForm(null)}
-                                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">
+                                  className="px-4 py-2 bg-white/8 text-white/70 text-sm rounded-lg hover:bg-white/12 transition">
                                   취소
                                 </button>
                               </div>
                             </form>
                           ) : (
                             <button onClick={() => setReviewForm({ whiskey_id: w.id, rating: 5, review_text: "", taste_profile: "", nose: "", palate: "", finish_note: "", remarks: "" })}
-                              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                              className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
                               ✏️ 리뷰 작성
                             </button>
                           )
                         ) : (
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            <a href="/login" className="text-blue-600 underline">로그인</a>하고 리뷰를 남겨보세요.
+                          <p className="text-sm text-white/40">
+                            <a href="/login" className="text-indigo-400 underline">로그인</a>하고 리뷰를 남겨보세요.
                           </p>
                         )}
                       </div>
 
                       {/* 리뷰 카드들 */}
-                      <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                      <div className="divide-y divide-white/8">
                         {whiskeyReviews.length === 0 ? (
-                          <p className="px-6 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">아직 리뷰가 없습니다.</p>
+                          <p className="px-6 py-8 text-center text-white/30 text-sm">아직 리뷰가 없습니다.</p>
                         ) : (
                           whiskeyReviews.map((r) => {
                             const isReviewExpanded = expandedReview === r.id;
@@ -707,10 +712,10 @@ export default function ReviewsPage() {
                                 {editingReview?.id === r.id ? (
                                   <form onSubmit={(e) => handleEditReview(e, w.id)} className="space-y-3">
                                     <div className="flex gap-2 items-center">
-                                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">평점</span>
+                                      <span className="text-sm font-medium text-white/70">평점</span>
                                       <select value={editingReview.rating}
                                         onChange={(e) => setEditingReview({ ...editingReview, rating: parseInt(e.target.value) })}
-                                        className="px-2 py-1 border border-gray-300 rounded text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
+                                        className="glass-input px-2 py-1 rounded text-sm">
                                         {[5, 4, 3, 2, 1].map((r) => (
                                           <option key={r} value={r}>{STAR[r]} ({r}/5)</option>
                                         ))}
@@ -724,40 +729,40 @@ export default function ReviewsPage() {
                                     />
                                     <div className="grid grid-cols-2 gap-3">
                                       <div>
-                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">🌸 향 (Nose)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1">🌸 향 (Nose)</label>
                                         <input type="text" value={editingReview.nose || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, nose: e.target.value })}
                                           placeholder="예: 바닐라, 꿀, 시트러스"
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                          className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">👅 맛 (Palate)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1">👅 맛 (Palate)</label>
                                         <input type="text" value={editingReview.palate || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, palate: e.target.value })}
                                           placeholder="예: 스모키, 오크, 카라멜"
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                          className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">✨ 피니쉬 (Finish)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1">✨ 피니쉬 (Finish)</label>
                                         <input type="text" value={editingReview.finish_note || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, finish_note: e.target.value })}
                                           placeholder="예: 길고 따뜻한 여운"
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                          className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">📝 비고</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1">📝 비고</label>
                                         <input type="text" value={editingReview.remarks || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, remarks: e.target.value })}
                                           placeholder="기타 메모"
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                          className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                     </div>
                                     <div className="flex gap-2">
-                                      <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                                      <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
                                         저장
                                       </button>
                                       <button type="button" onClick={() => setEditingReview(null)}
-                                        className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">
+                                        className="px-4 py-1.5 bg-white/8 text-white/70 text-sm rounded-lg hover:bg-white/12 transition">
                                         취소
                                       </button>
                                     </div>
@@ -771,18 +776,18 @@ export default function ReviewsPage() {
                                         <div className="text-blue-500 text-sm">{STAR[r.rating]}</div>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                                        <span className="text-xs text-white/30">
                                           {new Date(r.created_at).toLocaleDateString("ko-KR")}
                                         </span>
                                         {isOwner && (
                                           <>
                                             <button
                                               onClick={() => setEditingReview({ id: r.id, rating: r.rating, review_text: r.review_text, taste_profile: r.taste_profile, nose: r.nose || "", palate: r.palate || "", finish_note: r.finish_note || "", remarks: r.remarks || "" })}
-                                              className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 transition px-2 py-1 rounded hover:bg-blue-50">
+                                              className="text-xs text-white/40 hover:text-indigo-300 transition px-2 py-1 rounded hover:bg-indigo-500/10">
                                               편집
                                             </button>
                                             <button onClick={() => handleDeleteReview(r.id, w.id)}
-                                              className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition px-2 py-1 rounded hover:bg-red-50">
+                                              className="text-xs text-white/40 hover:text-red-400 transition px-2 py-1 rounded hover:bg-red-500/10">
                                               삭제
                                             </button>
                                           </>
@@ -791,21 +796,21 @@ export default function ReviewsPage() {
                                     </div>
 
                                     {r.review_text && (
-                                      <SafeHtml html={r.review_text} className="rich-content text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-3 ml-10" />
+                                      <SafeHtml html={r.review_text} className="rich-content text-sm leading-relaxed text-white/55 mb-3 ml-10" />
                                     )}
                                     {(r.nose || r.palate || r.finish_note || r.remarks) && (
                                       <div className="ml-10 mb-2 grid grid-cols-2 gap-x-4 gap-y-1">
                                         {r.nose && (
-                                          <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">🌸 향</span> {r.nose}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">🌸 향</span> {r.nose}</p>
                                         )}
                                         {r.palate && (
-                                          <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">👅 맛</span> {r.palate}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">👅 맛</span> {r.palate}</p>
                                         )}
                                         {r.finish_note && (
-                                          <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">✨ 피니쉬</span> {r.finish_note}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">✨ 피니쉬</span> {r.finish_note}</p>
                                         )}
                                         {r.remarks && (
-                                          <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">📝 비고</span> {r.remarks}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">📝 비고</span> {r.remarks}</p>
                                         )}
                                       </div>
                                     )}
@@ -813,11 +818,11 @@ export default function ReviewsPage() {
                                     {/* 좋아요 + 댓글 */}
                                     <div className="ml-10 flex items-center gap-3 mt-1">
                                       <button onClick={() => handleLikeReview(r.id)}
-                                        className={`text-xs transition flex items-center gap-1 ${likedReviews.has(r.id) ? "text-red-500" : "text-gray-400 dark:text-gray-500 hover:text-red-400"}`}>
+                                        className={`text-xs transition flex items-center gap-1 ${likedReviews.has(r.id) ? "text-red-400" : "text-white/35 hover:text-red-400"}`}>
                                         {likedReviews.has(r.id) ? "❤️" : "🤍"} {reviewLikes[r.id] || 0}
                                       </button>
                                       <button onClick={() => handleToggleReview(r.id)}
-                                        className="text-xs text-gray-400 dark:text-gray-500 hover:text-blue-600 transition">
+                                        className="text-xs text-white/35 hover:text-indigo-300 transition">
                                         💬 댓글 {reviewComments.length > 0 ? `${reviewComments.length}개` : ""} {isReviewExpanded ? "▲" : "▼"}
                                       </button>
                                     </div>
@@ -826,22 +831,22 @@ export default function ReviewsPage() {
                                     {isReviewExpanded && (
                                       <div className="ml-10 mt-3 space-y-2">
                                         {reviewComments.length === 0 ? (
-                                          <p className="text-xs text-gray-400 dark:text-gray-500">첫 댓글을 남겨보세요!</p>
+                                          <p className="text-xs text-white/30">첫 댓글을 남겨보세요!</p>
                                         ) : (
                                           reviewComments.map((c) => (
                                             <div key={c.id} className="flex gap-2">
-                                              <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2">
+                                              <div className="flex-1 rounded-lg px-3 py-2" style={{ background: "rgba(255,255,255,0.05)" }}>
                                                 <div className="flex justify-between items-center">
                                                   <div className="flex items-center gap-2">
                                                     <UserProfilePopup userId={c.user_id} displayName={c.users?.name || "알 수 없음"} />
-                                                    <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(c.created_at).toLocaleDateString("ko-KR")}</span>
+                                                    <span className="text-xs text-white/40">{new Date(c.created_at).toLocaleDateString("ko-KR")}</span>
                                                   </div>
                                                   {(c.user_id === userId || isAdmin) && (
                                                     <button onClick={() => handleDeleteComment(c.id, r.id)}
-                                                      className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition">삭제</button>
+                                                      className="text-xs text-white/30 hover:text-red-400 transition">삭제</button>
                                                   )}
                                                 </div>
-                                                <p className="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{c.content}</p>
+                                                <p className="text-xs text-white/55 mt-0.5">{c.content}</p>
                                               </div>
                                             </div>
                                           ))
@@ -853,15 +858,15 @@ export default function ReviewsPage() {
                                               onChange={(e) => setCommentText((prev) => ({ ...prev, [r.id]: e.target.value }))}
                                               onKeyDown={(e) => { if (e.key === "Enter") handleAddComment(r.id); }}
                                               placeholder="댓글 입력..."
-                                              className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                              className="glass-input flex-1 px-3 py-1.5 rounded-lg text-xs" />
                                             <button onClick={() => handleAddComment(r.id)}
-                                              className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">
+                                              className="px-3 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">
                                               등록
                                             </button>
                                           </div>
                                         ) : (
-                                          <p className="text-xs text-gray-400 dark:text-gray-500">
-                                            <a href="/login" className="text-blue-600 underline">로그인</a>하고 댓글 달기
+                                          <p className="text-xs text-white/30">
+                                            <a href="/login" className="text-indigo-400 underline">로그인</a>하고 댓글 달기
                                           </p>
                                         )}
                                       </div>
@@ -881,6 +886,23 @@ export default function ReviewsPage() {
             </div>
           )}
         </div>
+
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-8">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+              className="px-4 py-2 rounded-lg text-sm bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition">
+              ← 이전
+            </button>
+            <span className="text-white/50 text-sm px-3">
+              {page} / {totalPages}
+            </span>
+            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+              className="px-4 py-2 rounded-lg text-sm bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition">
+              다음 →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

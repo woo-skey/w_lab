@@ -387,24 +387,24 @@ export default function MyPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
-        <p className="text-gray-500 dark:text-gray-400">로딩 중...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-white/40">로딩 중...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-12">
 
         {/* 프로필 카드 */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-800 p-8 mb-8">
+        <div className="glass-card rounded-2xl p-8 mb-8">
           <div className="flex items-center gap-6">
             {/* 아바타 */}
             <div className="relative flex-shrink-0">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-3xl font-bold cursor-pointer overflow-hidden hover:opacity-80 transition"
+                className="w-20 h-20 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 text-3xl font-bold cursor-pointer overflow-hidden hover:opacity-80 transition"
               >
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
@@ -412,7 +412,7 @@ export default function MyPage() {
                   (profile?.name || "?")[0].toUpperCase()
                 )}
               </div>
-              <div className="absolute bottom-0 right-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs cursor-pointer"
+              <div className="absolute bottom-0 right-0 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xs cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}>
                 {uploading ? "..." : "✎"}
               </div>
@@ -421,13 +421,13 @@ export default function MyPage() {
 
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{profile?.name}</h1>
+                <h1 className="text-2xl font-bold text-white">{profile?.name}</h1>
                 {profile?.is_admin && (
-                  <span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded-full">관리자</span>
+                  <span className="px-2 py-0.5 bg-indigo-500/80 text-white text-xs font-bold rounded-full">관리자</span>
                 )}
               </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">@{profile?.username}</p>
-              <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
+              <p className="text-white/40 text-sm mt-0.5">@{profile?.username}</p>
+              <p className="text-white/30 text-xs mt-1">
                 가입일: {profile?.created_at ? new Date(profile.created_at).toLocaleDateString("ko-KR") : "-"}
               </p>
               <p className="text-xs text-blue-400 mt-1 cursor-pointer hover:underline" onClick={() => fileInputRef.current?.click()}>
@@ -437,27 +437,27 @@ export default function MyPage() {
           </div>
 
           {/* 한줄소개 / 관심주류 / 최애위스키 */}
-          <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-800">
+          <div className="mt-5 pt-5 border-t border-white/8">
             {editingProfile ? (
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">한 줄 소개</label>
+                  <label className="block text-xs font-medium text-white/40 mb-1">한 줄 소개</label>
                   <input
                     type="text"
                     value={profileForm.bio}
                     onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
                     placeholder="나를 한 마디로 소개해보세요"
                     maxLength={80}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="glass-input w-full px-3 py-2 rounded-lg text-sm"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">관심 주류 카테고리</label>
+                    <label className="block text-xs font-medium text-white/40 mb-1">관심 주류 카테고리</label>
                     <select
                       value={profileForm.favorite_category}
                       onChange={(e) => setProfileForm({ ...profileForm, favorite_category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      className="glass-input w-full px-3 py-2 rounded-lg text-sm"
                     >
                       <option value="">선택</option>
                       <option>🥃 스카치 위스키</option>
@@ -473,23 +473,23 @@ export default function MyPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">최애 위스키</label>
+                    <label className="block text-xs font-medium text-white/40 mb-1">최애 위스키</label>
                     <input
                       type="text"
                       value={profileForm.favorite_whiskey}
                       onChange={(e) => setProfileForm({ ...profileForm, favorite_whiskey: e.target.value })}
                       placeholder="ex) Lagavulin 16"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      className="glass-input w-full px-3 py-2 rounded-lg text-sm"
                     />
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={handleSaveProfile} disabled={profileSaving}
-                    className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                    className="px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50">
                     {profileSaving ? "저장 중..." : "저장"}
                   </button>
                   <button onClick={() => setEditingProfile(false)}
-                    className="px-4 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                    className="px-4 py-1.5 bg-white/8 text-white/70 text-sm rounded-lg hover:bg-white/12">
                     취소
                   </button>
                 </div>
@@ -497,13 +497,13 @@ export default function MyPage() {
             ) : (
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1.5 text-sm">
-                  {profile?.bio && <p className="text-gray-700 dark:text-gray-200 italic border-l-2 border-blue-400 pl-3">{profile.bio}</p>}
-                  <div className="flex flex-wrap gap-3 text-gray-500 dark:text-gray-400 text-xs">
+                  {profile?.bio && <p className="text-white/70 italic border-l-2 border-indigo-400 pl-3">{profile.bio}</p>}
+                  <div className="flex flex-wrap gap-3 text-white/40 text-xs">
                     {profile?.favorite_category && <span>🍹 {profile.favorite_category}</span>}
                     {profile?.favorite_whiskey && <span>🥃 최애: {profile.favorite_whiskey}</span>}
                   </div>
                   {!profile?.bio && !profile?.favorite_category && !profile?.favorite_whiskey && (
-                    <p className="text-gray-400 dark:text-gray-600 text-xs">한 줄 소개와 관심 주류를 설정해보세요.</p>
+                    <p className="text-white/30 text-xs">한 줄 소개와 관심 주류를 설정해보세요.</p>
                   )}
                 </div>
                 <button
@@ -515,7 +515,7 @@ export default function MyPage() {
                     });
                     setEditingProfile(true);
                   }}
-                  className="text-xs text-blue-500 hover:text-blue-700 flex-shrink-0"
+                  className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"
                 >
                   ✎ 편집
                 </button>
@@ -524,7 +524,7 @@ export default function MyPage() {
           </div>
 
           {/* 활동 통계 */}
-          <div className="grid grid-cols-5 gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+          <div className="grid grid-cols-5 gap-4 mt-8 pt-6 border-t border-white/8">
             {[
               { label: "리뷰", count: reviews.length },
               { label: "위스키", count: whiskeys.length },
@@ -533,8 +533,8 @@ export default function MyPage() {
               { label: "일정", count: schedules.length },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="text-2xl font-bold text-blue-600">{stat.count}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{stat.label}</p>
+                <p className="text-2xl font-bold text-indigo-300">{stat.count}</p>
+                <p className="text-xs text-white/40 mt-0.5">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -545,7 +545,7 @@ export default function MyPage() {
           {tabs.map((tab) => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                activeTab === tab.id ? "bg-blue-500 text-white" : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300"
+                activeTab === tab.id ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
               }`}>
               {tab.label}
             </button>
@@ -555,50 +555,50 @@ export default function MyPage() {
         {/* 개요 탭 */}
         {activeTab === "overview" && (
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
-              <h2 className="font-bold text-gray-900 dark:text-white mb-3">최근 리뷰</h2>
-              {reviews.length === 0 ? <p className="text-gray-400 dark:text-gray-500 text-sm">작성한 리뷰가 없습니다.</p> : (
+            <div className="glass-card rounded-xl p-5">
+              <h2 className="font-bold text-white mb-3">최근 리뷰</h2>
+              {reviews.length === 0 ? <p className="text-white/30 text-sm">작성한 리뷰가 없습니다.</p> : (
                 <div className="space-y-2">
                   {reviews.slice(0, 3).map((r) => (
-                    <div key={r.id} onClick={() => router.push("/reviews")} className="flex justify-between items-center text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition">
-                      <span className="text-gray-700 dark:text-gray-300 truncate">{r.whiskeys?.name || "위스키"}</span>
-                      <span className="text-blue-500 text-xs ml-2 flex-shrink-0">{STAR[r.rating]}</span>
+                    <div key={r.id} onClick={() => router.push("/reviews")} className="flex justify-between items-center text-sm cursor-pointer hover:bg-white/5 rounded px-2 py-1 -mx-2 transition">
+                      <span className="text-white/55 truncate">{r.whiskeys?.name || "위스키"}</span>
+                      <span className="text-blue-400 text-xs ml-2 flex-shrink-0">{STAR[r.rating]}</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
-              <h2 className="font-bold text-gray-900 dark:text-white mb-3">최근 지식글</h2>
-              {articles.length === 0 ? <p className="text-gray-400 dark:text-gray-500 text-sm">작성한 글이 없습니다.</p> : (
+            <div className="glass-card rounded-xl p-5">
+              <h2 className="font-bold text-white mb-3">최근 지식글</h2>
+              {articles.length === 0 ? <p className="text-white/30 text-sm">작성한 글이 없습니다.</p> : (
                 <div className="space-y-2">
                   {articles.slice(0, 3).map((a) => (
-                    <div key={a.id} onClick={() => router.push("/articles")} className="text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition">
-                      <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded mr-2">{a.category}</span>
-                      <span className="text-gray-700 dark:text-gray-300">{a.title}</span>
+                    <div key={a.id} onClick={() => router.push("/articles")} className="text-sm cursor-pointer hover:bg-white/5 rounded px-2 py-1 -mx-2 transition">
+                      <span className="text-xs bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded mr-2">{a.category}</span>
+                      <span className="text-white/55">{a.title}</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
-              <h2 className="font-bold text-gray-900 dark:text-white mb-3">추천한 Bar</h2>
-              {bars.length === 0 ? <p className="text-gray-400 dark:text-gray-500 text-sm">추천한 바가 없습니다.</p> : (
+            <div className="glass-card rounded-xl p-5">
+              <h2 className="font-bold text-white mb-3">추천한 Bar</h2>
+              {bars.length === 0 ? <p className="text-white/30 text-sm">추천한 바가 없습니다.</p> : (
                 <div className="space-y-2">
                   {bars.slice(0, 3).map((b) => (
-                    <div key={b.id} onClick={() => router.push("/bars")} className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition">{b.bar_name}</div>
+                    <div key={b.id} onClick={() => router.push("/bars")} className="text-sm text-white/55 cursor-pointer hover:bg-white/5 rounded px-2 py-1 -mx-2 transition">{b.bar_name}</div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5">
-              <h2 className="font-bold text-gray-900 dark:text-white mb-3">만든 일정</h2>
-              {schedules.length === 0 ? <p className="text-gray-400 dark:text-gray-500 text-sm">만든 일정이 없습니다.</p> : (
+            <div className="glass-card rounded-xl p-5">
+              <h2 className="font-bold text-white mb-3">만든 일정</h2>
+              {schedules.length === 0 ? <p className="text-white/30 text-sm">만든 일정이 없습니다.</p> : (
                 <div className="space-y-2">
                   {schedules.slice(0, 3).map((s) => (
-                    <div key={s.id} onClick={() => router.push("/schedule")} className="flex justify-between items-center text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition">
-                      <span className="text-gray-700 dark:text-gray-300">{s.name}</span>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">{new Date(s.created_at).toLocaleDateString("ko-KR")}</span>
+                    <div key={s.id} onClick={() => router.push("/schedule")} className="flex justify-between items-center text-sm cursor-pointer hover:bg-white/5 rounded px-2 py-1 -mx-2 transition">
+                      <span className="text-white/55">{s.name}</span>
+                      <span className="text-xs text-white/30">{new Date(s.created_at).toLocaleDateString("ko-KR")}</span>
                     </div>
                   ))}
                 </div>
@@ -609,18 +609,18 @@ export default function MyPage() {
 
         {activeTab === "reviews" && (
           <div className="space-y-3">
-            {reviews.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500">작성한 리뷰가 없습니다.</div> : (
+            {reviews.length === 0 ? <div className="text-center py-12 text-white/30">작성한 리뷰가 없습니다.</div> : (
               reviews.map((r) => (
-                <div key={r.id} onClick={() => router.push("/reviews")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
+                <div key={r.id} onClick={() => router.push("/reviews")} className="glass-card rounded-xl p-5 cursor-pointer transition">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-bold text-gray-900 dark:text-white">{r.whiskeys?.name || "위스키"}</p>
-                      <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{r.whiskeys?.type}</span>
+                      <p className="font-bold text-white">{r.whiskeys?.name || "위스키"}</p>
+                      <span className="text-xs bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded">{r.whiskeys?.type}</span>
                     </div>
-                    <span className="text-blue-500">{STAR[r.rating]}</span>
+                    <span className="text-blue-400">{STAR[r.rating]}</span>
                   </div>
-                  {r.review_text && <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">{r.review_text}</p>}
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{new Date(r.created_at).toLocaleDateString("ko-KR")}</p>
+                  {r.review_text && <p className="text-white/55 text-sm mt-2">{r.review_text}</p>}
+                  <p className="text-xs text-white/30 mt-2">{new Date(r.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
             )}
@@ -629,15 +629,15 @@ export default function MyPage() {
 
         {activeTab === "whiskeys" && (
           <div className="grid md:grid-cols-2 gap-3">
-            {whiskeys.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500 col-span-2">추가한 위스키가 없습니다.</div> : (
+            {whiskeys.length === 0 ? <div className="text-center py-12 text-white/30 col-span-2">추가한 위스키가 없습니다.</div> : (
               whiskeys.map((w) => (
-                <div key={w.id} onClick={() => router.push("/reviews")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
+                <div key={w.id} onClick={() => router.push("/reviews")} className="glass-card rounded-xl p-5 cursor-pointer transition">
                   <div className="flex justify-between items-start">
-                    <p className="font-bold text-gray-900 dark:text-white">{w.name}</p>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{w.type}</span>
+                    <p className="font-bold text-white">{w.name}</p>
+                    <span className="text-xs bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded">{w.type}</span>
                   </div>
-                  {w.region && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">📍 {w.region}</p>}
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{new Date(w.created_at).toLocaleDateString("ko-KR")}</p>
+                  {w.region && <p className="text-sm text-white/40 mt-1">📍 {w.region}</p>}
+                  <p className="text-xs text-white/30 mt-2">{new Date(w.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
             )}
@@ -646,14 +646,14 @@ export default function MyPage() {
 
         {activeTab === "articles" && (
           <div className="space-y-3">
-            {articles.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500">작성한 글이 없습니다.</div> : (
+            {articles.length === 0 ? <div className="text-center py-12 text-white/30">작성한 글이 없습니다.</div> : (
               articles.map((a) => (
-                <div key={a.id} onClick={() => router.push("/articles")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
+                <div key={a.id} onClick={() => router.push("/articles")} className="glass-card rounded-xl p-5 cursor-pointer transition">
                   <div className="flex justify-between items-start">
-                    <p className="font-bold text-gray-900 dark:text-white">{a.title}</p>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-2 flex-shrink-0">{a.category}</span>
+                    <p className="font-bold text-white">{a.title}</p>
+                    <span className="text-xs bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded ml-2 flex-shrink-0">{a.category}</span>
                   </div>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
+                  <p className="text-xs text-white/30 mt-2">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
             )}
@@ -662,12 +662,12 @@ export default function MyPage() {
 
         {activeTab === "bars" && (
           <div className="grid md:grid-cols-2 gap-3">
-            {bars.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500 col-span-2">추천한 바가 없습니다.</div> : (
+            {bars.length === 0 ? <div className="text-center py-12 text-white/30 col-span-2">추천한 바가 없습니다.</div> : (
               bars.map((b) => (
-                <div key={b.id} onClick={() => router.push("/bars")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
-                  <p className="font-bold text-gray-900 dark:text-white">{b.bar_name}</p>
-                  {b.notes && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 break-words whitespace-pre-wrap">{b.notes}</p>}
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
+                <div key={b.id} onClick={() => router.push("/bars")} className="glass-card rounded-xl p-5 cursor-pointer transition">
+                  <p className="font-bold text-white">{b.bar_name}</p>
+                  {b.notes && <p className="text-sm text-white/40 mt-1 break-words whitespace-pre-wrap">{b.notes}</p>}
+                  <p className="text-xs text-white/30 mt-2">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
             )}
@@ -676,11 +676,11 @@ export default function MyPage() {
 
         {activeTab === "schedules" && (
           <div className="space-y-3">
-            {schedules.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500">만든 일정이 없습니다.</div> : (
+            {schedules.length === 0 ? <div className="text-center py-12 text-white/30">만든 일정이 없습니다.</div> : (
               schedules.map((s) => (
-                <div key={s.id} onClick={() => router.push("/schedule")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 flex justify-between items-center cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
-                  <p className="font-bold text-gray-900 dark:text-white">{s.name}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">{new Date(s.created_at).toLocaleDateString("ko-KR")}</p>
+                <div key={s.id} onClick={() => router.push("/schedule")} className="glass-card rounded-xl p-5 flex justify-between items-center cursor-pointer transition">
+                  <p className="font-bold text-white">{s.name}</p>
+                  <p className="text-xs text-white/30">{new Date(s.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
             )}
@@ -689,19 +689,19 @@ export default function MyPage() {
 
         {activeTab === "comments" && (
           <div className="space-y-3">
-            {userComments.length === 0 ? <div className="text-center py-12 text-gray-400 dark:text-gray-500">작성한 댓글이 없습니다.</div> : (
+            {userComments.length === 0 ? <div className="text-center py-12 text-white/30">작성한 댓글이 없습니다.</div> : (
               userComments.map((c) => (
-                <div key={c.id} onClick={() => router.push(c.source === "article" ? "/articles" : "/reviews")} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition">
+                <div key={c.id} onClick={() => router.push(c.source === "article" ? "/articles" : "/reviews")} className="glass-card rounded-xl p-5 cursor-pointer transition">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      c.source === "article" ? "bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300" : "bg-blue-100 text-blue-700"
+                      c.source === "article" ? "bg-purple-500/20 text-purple-300" : "bg-indigo-500/30 text-indigo-300"
                     }`}>
                       {c.source === "article" ? "지식글" : "리뷰"}
                     </span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 truncate">{c.target_title}</span>
+                    <span className="text-xs text-white/30 truncate">{c.target_title}</span>
                   </div>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm break-words whitespace-pre-wrap">{c.content}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{new Date(c.created_at).toLocaleDateString("ko-KR")}</p>
+                  <p className="text-white/55 text-sm break-words whitespace-pre-wrap">{c.content}</p>
+                  <p className="text-xs text-white/30 mt-2">{new Date(c.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
             )}
@@ -724,28 +724,28 @@ export default function MyPage() {
               ].map((t) => (
                 <button key={t.id} onClick={() => handleAdminSubTab(t.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    adminSubTab === t.id ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-400"
+                    adminSubTab === t.id ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
                   }`}>{t.label}</button>
               ))}
             </div>
 
             {/* 통계 */}
             {adminSubTab === "stats" && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
-                <h2 className="font-bold text-gray-900 dark:text-white mb-4 text-lg">사이트 통계</h2>
-                {adminLoading ? <p className="text-gray-400 dark:text-gray-500 text-sm">로딩 중...</p> : adminStats ? (
+              <div className="glass-card rounded-xl p-6">
+                <h2 className="font-bold text-white mb-4 text-lg">사이트 통계</h2>
+                {adminLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : adminStats ? (
                   <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
                     {[
-                      { label: "전체 유저", count: adminStats.totalUsers, color: "text-blue-600" },
-                      { label: "전체 리뷰", count: adminStats.totalReviews, color: "text-green-600" },
-                      { label: "전체 지식글", count: adminStats.totalArticles, color: "text-purple-600" },
-                      { label: "전체 Bar", count: adminStats.totalBars, color: "text-orange-500" },
-                      { label: "전체 위스키", count: adminStats.totalWhiskeys, color: "text-amber-600" },
-                      { label: "전체 일정", count: adminStats.totalSchedules, color: "text-pink-500" },
+                      { label: "전체 유저", count: adminStats.totalUsers, color: "text-indigo-300" },
+                      { label: "전체 리뷰", count: adminStats.totalReviews, color: "text-green-400" },
+                      { label: "전체 지식글", count: adminStats.totalArticles, color: "text-purple-400" },
+                      { label: "전체 Bar", count: adminStats.totalBars, color: "text-orange-300" },
+                      { label: "전체 위스키", count: adminStats.totalWhiskeys, color: "text-amber-300" },
+                      { label: "전체 일정", count: adminStats.totalSchedules, color: "text-pink-300" },
                     ].map((s) => (
-                      <div key={s.label} className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div key={s.label} className="text-center p-3 bg-indigo-500/10 rounded-lg">
                         <p className={`text-2xl font-bold ${s.color}`}>{s.count}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</p>
+                        <p className="text-xs text-white/40 mt-0.5">{s.label}</p>
                       </div>
                     ))}
                   </div>
@@ -755,37 +755,37 @@ export default function MyPage() {
 
             {/* 유저 관리 */}
             {adminSubTab === "users" && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-bold text-gray-900 dark:text-white text-lg">유저 관리</h2>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{adminUsers.length}명</span>
+                  <h2 className="font-bold text-white text-lg">유저 관리</h2>
+                  <span className="text-sm text-white/40">{adminUsers.length}명</span>
                 </div>
-                {adminLoading ? <p className="text-gray-400 dark:text-gray-500 text-sm">로딩 중...</p> : (
+                {adminLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
                     {adminUsers.map((u) => (
-                      <div key={u.id} className={`flex items-center justify-between p-4 rounded-lg border ${u.id === userId ? "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950" : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800"}`}>
+                      <div key={u.id} className={`flex items-center justify-between p-4 rounded-lg border ${u.id === userId ? "border-indigo-400/30 bg-indigo-500/10" : "border-white/8"}`} style={u.id !== userId ? { background: "rgba(255,255,255,0.03)" } : {}}>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm overflow-hidden flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-sm overflow-hidden flex-shrink-0">
                             {u.avatar_url ? <img src={u.avatar_url} alt="avatar" className="w-full h-full object-cover" /> : (u.name || "?")[0].toUpperCase()}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-900 dark:text-white text-sm">{u.name}</span>
-                              {u.is_admin && <span className="px-1.5 py-0.5 bg-blue-600 text-white text-xs rounded-full">관리자</span>}
-                              {u.id === userId && <span className="px-1.5 py-0.5 bg-gray-400 text-white text-xs rounded-full">본인</span>}
+                              <span className="font-medium text-white text-sm">{u.name}</span>
+                              {u.is_admin && <span className="px-1.5 py-0.5 bg-indigo-500/80 text-white text-xs rounded-full">관리자</span>}
+                              {u.id === userId && <span className="px-1.5 py-0.5 bg-white/20 text-white text-xs rounded-full">본인</span>}
                             </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">@{u.username}</p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">가입: {new Date(u.created_at).toLocaleDateString("ko-KR")} · 리뷰 {u.review_count} · 글 {u.article_count} · Bar {u.bar_count}</p>
+                            <p className="text-xs text-white/40">@{u.username}</p>
+                            <p className="text-xs text-white/30 mt-0.5">가입: {new Date(u.created_at).toLocaleDateString("ko-KR")} · 리뷰 {u.review_count} · 글 {u.article_count} · Bar {u.bar_count}</p>
                           </div>
                         </div>
                         {u.id !== userId && (
                           <div className="flex gap-2 flex-shrink-0">
                             <button onClick={() => handleToggleAdmin(u.id, u.is_admin)}
-                              className={`px-3 py-1.5 text-xs rounded-lg transition font-medium ${u.is_admin ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800" : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"}`}>
+                              className={`px-3 py-1.5 text-xs rounded-lg transition font-medium ${u.is_admin ? "bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30" : "bg-white/8 text-white/60 hover:bg-white/12"}`}>
                               {u.is_admin ? "관리자 해제" : "관리자 지정"}
                             </button>
                             <button onClick={() => handleDeleteUser(u.id, u.name)} disabled={deletingUserId === u.id}
-                              className="px-3 py-1.5 text-xs bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition font-medium disabled:opacity-50">
+                              className="px-3 py-1.5 text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg transition font-medium disabled:opacity-50">
                               {deletingUserId === u.id ? "삭제 중..." : "회원탈퇴"}
                             </button>
                           </div>
@@ -799,20 +799,20 @@ export default function MyPage() {
 
             {/* 공지 관리 */}
             {adminSubTab === "notices" && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-bold text-gray-900 dark:text-white text-lg">공지사항 관리</h2>
+                  <h2 className="font-bold text-white text-lg">공지사항 관리</h2>
                   <button onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                    className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
                     {showAnnouncementForm ? "취소" : "📢 공지 작성"}
                   </button>
                 </div>
 
                 {showAnnouncementForm && (
-                  <form onSubmit={handleAdminSubmitAnnouncement} className="space-y-3 mb-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-100 dark:border-blue-900">
+                  <form onSubmit={handleAdminSubmitAnnouncement} className="space-y-3 mb-6 p-4 glass-card rounded-lg border border-indigo-400/20">
                     <input value={announcementForm.title}
                       onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
-                      placeholder="공지 제목" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                      placeholder="공지 제목" className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
                     <RichTextEditor
                       value={announcementForm.content}
                       onChange={(html) => setAnnouncementForm({ ...announcementForm, content: html })}
@@ -820,23 +820,23 @@ export default function MyPage() {
                       minHeight="120px"
                     />
                     <button type="submit" disabled={announcementSubmitting}
-                      className="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition">
+                      className="px-6 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
                       {announcementSubmitting ? "등록 중..." : "등록"}
                     </button>
                   </form>
                 )}
 
-                {contentLoading ? <p className="text-gray-400 dark:text-gray-500 text-sm">로딩 중...</p> : (
+                {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
                     {allAnnouncements.length === 0 ? (
-                      <p className="text-center text-gray-400 dark:text-gray-500 text-sm py-8">등록된 공지가 없습니다.</p>
+                      <p className="text-center text-white/30 text-sm py-8">등록된 공지가 없습니다.</p>
                     ) : allAnnouncements.map((a) => (
-                      <div key={a.id} className="border border-gray-100 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                      <div key={a.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminAnnouncement?.id === a.id ? (
                           <form onSubmit={handleAdminSaveAnnouncement} className="space-y-3">
                             <input value={editingAdminAnnouncement.title}
                               onChange={(e) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, title: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
                             <RichTextEditor
                               value={editingAdminAnnouncement.content}
                               onChange={(html) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, content: html })}
@@ -844,20 +844,20 @@ export default function MyPage() {
                               minHeight="120px"
                             />
                             <div className="flex gap-2">
-                              <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">저장</button>
-                              <button type="button" onClick={() => setEditingAdminAnnouncement(null)} className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">취소</button>
+                              <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
+                              <button type="button" onClick={() => setEditingAdminAnnouncement(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-xs rounded-lg hover:bg-white/12 transition">취소</button>
                             </div>
                           </form>
                         ) : (
                           <div className="flex justify-between items-start gap-3">
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 dark:text-white text-sm">{a.title}</p>
-                              <SafeHtml html={a.content} className="rich-content text-sm leading-relaxed mt-1 line-clamp-2 text-gray-500 dark:text-gray-400" />
-                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
+                              <p className="font-medium text-white text-sm">{a.title}</p>
+                              <SafeHtml html={a.content} className="rich-content text-sm leading-relaxed mt-1 line-clamp-2 text-white/40" />
+                              <p className="text-xs text-white/30 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
-                              <button onClick={() => setEditingAdminAnnouncement(a)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
-                              <button onClick={() => handleAdminDeleteAnnouncement(a.id)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                              <button onClick={() => setEditingAdminAnnouncement(a)} className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
+                              <button onClick={() => handleAdminDeleteAnnouncement(a.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
                             </div>
                           </div>
                         )}
@@ -870,21 +870,21 @@ export default function MyPage() {
 
             {/* 지식글 관리 */}
             {adminSubTab === "articles" && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-bold text-gray-900 dark:text-white text-lg">지식글 전체 관리</h2>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{allArticles.length}개</span>
+                  <h2 className="font-bold text-white text-lg">지식글 전체 관리</h2>
+                  <span className="text-sm text-white/40">{allArticles.length}개</span>
                 </div>
-                {contentLoading ? <p className="text-gray-400 dark:text-gray-500 text-sm">로딩 중...</p> : (
+                {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
                     {allArticles.map((a) => (
-                      <div key={a.id} className="border border-gray-100 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                      <div key={a.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminArticle?.id === a.id ? (
                           <form onSubmit={handleAdminSaveArticle} className="space-y-3">
                             <input value={editingAdminArticle.title} onChange={(e) => setEditingAdminArticle({ ...editingAdminArticle, title: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
                             <select value={editingAdminArticle.category} onChange={(e) => setEditingAdminArticle({ ...editingAdminArticle, category: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
+                              className="glass-input w-full px-3 py-2 rounded-lg text-sm">
                               {["기초 지식","테이스팅","역사","문화","기타"].map((c) => <option key={c} value={c}>{c}</option>)}
                             </select>
                             <RichTextEditor
@@ -894,24 +894,24 @@ export default function MyPage() {
                               minHeight="120px"
                             />
                             <div className="flex gap-2">
-                              <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">저장</button>
-                              <button type="button" onClick={() => setEditingAdminArticle(null)} className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">취소</button>
+                              <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
+                              <button type="button" onClick={() => setEditingAdminArticle(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-xs rounded-lg hover:bg-white/12 transition">취소</button>
                             </div>
                           </form>
                         ) : (
                           <div className="flex justify-between items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{a.category}</span>
-                                <span className="text-xs text-gray-400 dark:text-gray-500">{a.users?.name || "-"}</span>
+                                <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{a.category}</span>
+                                <span className="text-xs text-white/30">{a.users?.name || "-"}</span>
                               </div>
-                              <p className="font-medium text-gray-900 dark:text-white text-sm">{a.title}</p>
-                              <SafeHtml html={a.content} className="rich-content text-sm leading-relaxed mt-1 line-clamp-2 text-gray-500 dark:text-gray-400" />
-                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
+                              <p className="font-medium text-white text-sm">{a.title}</p>
+                              <SafeHtml html={a.content} className="rich-content text-sm leading-relaxed mt-1 line-clamp-2 text-white/40" />
+                              <p className="text-xs text-white/30 mt-1">{new Date(a.created_at).toLocaleDateString("ko-KR")}</p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
-                              <button onClick={() => setEditingAdminArticle(a)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
-                              <button onClick={() => handleAdminDeleteArticle(a.id)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                              <button onClick={() => setEditingAdminArticle(a)} className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
+                              <button onClick={() => handleAdminDeleteArticle(a.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
                             </div>
                           </div>
                         )}
@@ -924,25 +924,25 @@ export default function MyPage() {
 
             {/* 리뷰 관리 */}
             {adminSubTab === "reviews" && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-bold text-gray-900 dark:text-white text-lg">리뷰 전체 관리</h2>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{allReviews.length}개</span>
+                  <h2 className="font-bold text-white text-lg">리뷰 전체 관리</h2>
+                  <span className="text-sm text-white/40">{allReviews.length}개</span>
                 </div>
-                {contentLoading ? <p className="text-gray-400 dark:text-gray-500 text-sm">로딩 중...</p> : (
+                {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
                     {allReviews.map((r) => (
-                      <div key={r.id} className="border border-gray-100 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-800 flex justify-between items-start gap-3">
+                      <div key={r.id} className="border border-white/8 rounded-lg p-4 flex justify-between items-start gap-3" style={{ background: "rgba(255,255,255,0.03)" }}>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs text-gray-400 dark:text-gray-500">{r.users?.name || "-"}</span>
-                            <span className="text-xs text-blue-500">{"★".repeat(r.rating)}</span>
+                            <span className="text-xs text-white/30">{r.users?.name || "-"}</span>
+                            <span className="text-xs text-blue-400">{"★".repeat(r.rating)}</span>
                           </div>
-                          <p className="font-medium text-gray-900 dark:text-white text-sm">{(r.whiskeys as unknown as { name: string } | null)?.name || "위스키"}</p>
-                          {r.review_text && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 break-words">{r.review_text}</p>}
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(r.created_at).toLocaleDateString("ko-KR")}</p>
+                          <p className="font-medium text-white text-sm">{(r.whiskeys as unknown as { name: string } | null)?.name || "위스키"}</p>
+                          {r.review_text && <p className="text-xs text-white/40 mt-1 break-words">{r.review_text}</p>}
+                          <p className="text-xs text-white/30 mt-1">{new Date(r.created_at).toLocaleDateString("ko-KR")}</p>
                         </div>
-                        <button onClick={() => handleAdminDeleteReview(r.id)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 transition flex-shrink-0">삭제</button>
+                        <button onClick={() => handleAdminDeleteReview(r.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition flex-shrink-0">삭제</button>
                       </div>
                     ))}
                   </div>
@@ -952,41 +952,41 @@ export default function MyPage() {
 
             {/* Bar 관리 */}
             {adminSubTab === "bars" && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-bold text-gray-900 dark:text-white text-lg">Bar 전체 관리</h2>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{allBars.length}개</span>
+                  <h2 className="font-bold text-white text-lg">Bar 전체 관리</h2>
+                  <span className="text-sm text-white/40">{allBars.length}개</span>
                 </div>
-                {contentLoading ? <p className="text-gray-400 dark:text-gray-500 text-sm">로딩 중...</p> : (
+                {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
                     {allBars.map((b) => (
-                      <div key={b.id} className="border border-gray-100 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                      <div key={b.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminBar?.id === b.id ? (
                           <form onSubmit={handleAdminSaveBar} className="space-y-3">
                             <input value={editingAdminBar.bar_name} onChange={(e) => setEditingAdminBar({ ...editingAdminBar, bar_name: e.target.value })}
-                              placeholder="Bar 이름" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              placeholder="Bar 이름" className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
                             <input value={editingAdminBar.link || ""} onChange={(e) => setEditingAdminBar({ ...editingAdminBar, link: e.target.value })}
-                              placeholder="링크" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              placeholder="링크" className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
                             <textarea value={editingAdminBar.notes || ""} rows={2} onChange={(e) => setEditingAdminBar({ ...editingAdminBar, notes: e.target.value })}
-                              placeholder="비고" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              placeholder="비고" className="glass-input w-full px-3 py-2 rounded-lg text-sm resize-none" />
                             <div className="flex gap-2">
-                              <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">저장</button>
-                              <button type="button" onClick={() => setEditingAdminBar(null)} className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">취소</button>
+                              <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
+                              <button type="button" onClick={() => setEditingAdminBar(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-xs rounded-lg hover:bg-white/12 transition">취소</button>
                             </div>
                           </form>
                         ) : (
                           <div className="flex justify-between items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs text-gray-400 dark:text-gray-500">{b.users?.name || "-"}</span>
+                                <span className="text-xs text-white/30">{b.users?.name || "-"}</span>
                               </div>
-                              <p className="font-medium text-gray-900 dark:text-white text-sm">{b.bar_name}</p>
-                              {b.notes && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 break-words">{b.notes}</p>}
-                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
+                              <p className="font-medium text-white text-sm">{b.bar_name}</p>
+                              {b.notes && <p className="text-xs text-white/40 mt-1 break-words">{b.notes}</p>}
+                              <p className="text-xs text-white/30 mt-1">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
-                              <button onClick={() => setEditingAdminBar(b)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
-                              <button onClick={() => handleAdminDeleteBar(b.id)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                              <button onClick={() => setEditingAdminBar(b)} className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
+                              <button onClick={() => handleAdminDeleteBar(b.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
                             </div>
                           </div>
                         )}
@@ -999,51 +999,51 @@ export default function MyPage() {
 
             {/* 위스키 관리 */}
             {adminSubTab === "whiskeys" && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-6">
+              <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-bold text-gray-900 dark:text-white text-lg">위스키 전체 관리</h2>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{allWhiskeys.length}개</span>
+                  <h2 className="font-bold text-white text-lg">위스키 전체 관리</h2>
+                  <span className="text-sm text-white/40">{allWhiskeys.length}개</span>
                 </div>
-                {contentLoading ? <p className="text-gray-400 dark:text-gray-500 text-sm">로딩 중...</p> : (
+                {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
                     {allWhiskeys.map((w) => (
-                      <div key={w.id} className="border border-gray-100 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                      <div key={w.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminWhiskey?.id === w.id ? (
                           <form onSubmit={handleAdminSaveWhiskey} className="space-y-3">
                             <div className="grid grid-cols-2 gap-2">
                               <input value={editingAdminWhiskey.name} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, name: e.target.value })}
-                                placeholder="이름" className="col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                placeholder="이름" className="col-span-2 glass-input px-3 py-2 rounded-lg text-sm" />
                               <select value={editingAdminWhiskey.type} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, type: e.target.value })}
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
+                                className="glass-input px-3 py-2 rounded-lg text-sm">
                                 {["Scotch","Irish","Bourbon/Rye","Etc"].map((t) => <option key={t} value={t}>{t}</option>)}
                               </select>
                               <input value={editingAdminWhiskey.region || ""} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, region: e.target.value })}
-                                placeholder="지역" className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                placeholder="지역" className="glass-input px-3 py-2 rounded-lg text-sm" />
                               <input type="number" value={editingAdminWhiskey.age || ""} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, age: parseInt(e.target.value) || 0 })}
-                                placeholder="숙성년" className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                placeholder="숙성년" className="glass-input px-3 py-2 rounded-lg text-sm" />
                               <input type="number" step="0.1" value={editingAdminWhiskey.abv || ""} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, abv: parseFloat(e.target.value) || 0 })}
-                                placeholder="도수%" className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                placeholder="도수%" className="glass-input px-3 py-2 rounded-lg text-sm" />
                             </div>
                             <div className="flex gap-2">
-                              <button type="submit" className="px-4 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">저장</button>
-                              <button type="button" onClick={() => setEditingAdminWhiskey(null)} className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">취소</button>
+                              <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
+                              <button type="button" onClick={() => setEditingAdminWhiskey(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-xs rounded-lg hover:bg-white/12 transition">취소</button>
                             </div>
                           </form>
                         ) : (
                           <div className="flex justify-between items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{w.type}</span>
-                                {w.region && <span className="text-xs text-gray-400 dark:text-gray-500">{w.region}</span>}
+                                <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{w.type}</span>
+                                {w.region && <span className="text-xs text-white/30">{w.region}</span>}
                               </div>
-                              <p className="font-medium text-gray-900 dark:text-white text-sm">{w.name}</p>
-                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                              <p className="font-medium text-white text-sm">{w.name}</p>
+                              <p className="text-xs text-white/30 mt-1">
                                 {w.age ? `${w.age}년 ` : ""}{w.abv ? `${w.abv}% ` : ""}· {new Date(w.created_at).toLocaleDateString("ko-KR")}
                               </p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
-                              <button onClick={() => setEditingAdminWhiskey(w)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
-                              <button onClick={() => handleAdminDeleteWhiskey(w.id)} className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                              <button onClick={() => setEditingAdminWhiskey(w)} className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
+                              <button onClick={() => handleAdminDeleteWhiskey(w.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
                             </div>
                           </div>
                         )}

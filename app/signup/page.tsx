@@ -105,17 +105,17 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center text-blue-900 dark:text-blue-400 mb-8">
-          위스키 연구소
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-md glass-card rounded-2xl p-8">
+        <h1 className="text-3xl font-bold text-center text-white mb-8">
+          🥃 위스키 연구소
         </h1>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">회원가입</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">회원가입</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 이름 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               이름
             </label>
             <input
@@ -123,17 +123,17 @@ export default function SignupPage() {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-2 rounded-lg"
               placeholder="이름을 입력하세요"
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.name}</p>
             )}
           </div>
 
           {/* 아이디 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               아이디
             </label>
             <div className="flex gap-2">
@@ -142,23 +142,23 @@ export default function SignupPage() {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="glass-input flex-1 px-4 py-2 rounded-lg"
                 placeholder="아이디를 입력하세요"
               />
               <button
                 type="button"
                 onClick={handleUsernameCheck}
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                className="px-4 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
               >
                 중복확인
               </button>
             </div>
             {errors.username && (
-              <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.username}</p>
             )}
             {usernameChecked && usernameAvailable && (
-              <p className="mt-1 text-sm text-green-600">
+              <p className="mt-1 text-sm text-green-400">
                 ✓ 사용 가능한 아이디입니다
               </p>
             )}
@@ -166,7 +166,7 @@ export default function SignupPage() {
 
           {/* 비밀번호 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               비밀번호
             </label>
             <input
@@ -174,17 +174,17 @@ export default function SignupPage() {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-2 rounded-lg"
               placeholder="비밀번호를 입력하세요"
             />
             {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.password}</p>
             )}
           </div>
 
           {/* 비밀번호 확인 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               비밀번호 확인
             </label>
             <input
@@ -192,18 +192,18 @@ export default function SignupPage() {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-2 rounded-lg"
               placeholder="비밀번호를 다시 입력하세요"
             />
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-red-400">
                 {errors.confirmPassword}
               </p>
             )}
           </div>
 
           {errors.submit && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
               {errors.submit}
             </div>
           )}
@@ -211,15 +211,15 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
+            className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
           >
             {loading ? "가입 중..." : "회원가입"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-gray-600 dark:text-gray-400">
+        <p className="mt-6 text-center text-white/50">
           이미 계정이 있으신가요?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline font-medium">
+          <Link href="/login" className="text-indigo-400 hover:underline font-medium">
             로그인
           </Link>
         </p>

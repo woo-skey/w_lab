@@ -19,40 +19,38 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-950">
-      <section className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-blue-900 dark:text-blue-400 mb-6">
+    <main className="min-h-screen">
+      <section className="max-w-5xl mx-auto px-4 py-20 text-center">
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6" style={{ textShadow: "0 0 40px rgba(99,102,241,0.4)" }}>
           위스키 세상에 오신 것을 환영합니다
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+        <p className="text-xl text-white/55 mb-10 max-w-2xl mx-auto">
           위스키 리뷰를 공유하고, 바를 추천하고, 친구들과 일정을 맞춰보세요.
         </p>
         {!loggedIn && (
-          <Link href="/signup" className="px-8 py-3 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-800 transition font-medium">
+          <Link href="/signup" className="px-8 py-3 border border-indigo-400/60 text-indigo-300 rounded-xl hover:bg-indigo-500/10 transition font-medium">
             가입하기
           </Link>
         )}
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 pb-16">
-        <div className="grid md:grid-cols-2 gap-8">
+      <section className="max-w-5xl mx-auto px-4 pb-16">
+        <div className="grid md:grid-cols-2 gap-6">
           {features.map((feature) => (
             <Link key={feature.href} href={feature.href}
-              className="group p-8 bg-white dark:bg-gray-900 rounded-lg shadow hover:shadow-lg transition border border-gray-100 dark:border-gray-800">
+              className="group glass-card rounded-2xl p-8 hover:bg-white/10 transition-all duration-200">
               <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition">{feature.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-indigo-300 transition">{feature.title}</h3>
+              <p className="text-white/50">{feature.description}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="bg-blue-900 dark:bg-blue-950 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-3">위스키 애호가들의 커뮤니티</h2>
-          <p className="text-blue-200 dark:text-blue-300">
-            위스키 팬들과 경험을 나누고, 새로운 위스키를 발견하세요.
-          </p>
+      <section className="max-w-5xl mx-auto px-4 pb-16">
+        <div className="glass-card rounded-2xl py-10 px-8 text-center">
+          <h2 className="text-xl font-bold text-white mb-2">위스키 애호가들의 커뮤니티</h2>
+          <p className="text-white/45">위스키 팬들과 경험을 나누고, 새로운 위스키를 발견하세요.</p>
         </div>
       </section>
     </main>

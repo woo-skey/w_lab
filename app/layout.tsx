@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
+import AppSidebar from "@/components/AppSidebar";
 import TwemojiProvider from "@/components/TwemojiProvider";
-import ThemeProvider from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "위스키 연구소",
@@ -17,16 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();` }} />
-      </head>
-      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-        <ThemeProvider>
-          <TwemojiProvider>
-            <Navigation />
-            {children}
-          </TwemojiProvider>
-        </ThemeProvider>
+      <body>
+        <TwemojiProvider>
+          <AppSidebar>{children}</AppSidebar>
+        </TwemojiProvider>
       </body>
     </html>
   );

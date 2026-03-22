@@ -47,6 +47,7 @@ export default function ArticlesPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
+  const [page, setPage] = useState(1);
   const [articleLikes, setArticleLikes] = useState<Record<string, number>>({});
   const [likedArticles, setLikedArticles] = useState<Set<string>>(new Set());
 
@@ -221,19 +222,23 @@ export default function ArticlesPage() {
     )
     .sort((a, b) => sortBy === "popular" ? (articleLikes[b.id] || 0) - (articleLikes[a.id] || 0) : 0);
 
+  const PAGE_SIZE = 10;
+  const totalPages = Math.ceil(filteredArticles.length / PAGE_SIZE);
+  const pagedArticles = filteredArticles.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">위스키 지식</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-2">위스키에 대한 다양한 정보와 지식을 공유하세요.</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-8">카테고리 탭으로 원하는 주제의 글을 찾아보세요. 글을 클릭하면 본문과 댓글이 펼쳐집니다. 새 글 작성 시 이미지도 첨부할 수 있습니다.</p>
+        <h1 className="text-4xl font-bold text-white mb-2">위스키 지식</h1>
+        <p className="text-white/55 mb-2">위스키에 대한 다양한 정보와 지식을 공유하세요.</p>
+        <p className="text-xs text-white/30 mb-8">카테고리 탭으로 원하는 주제의 글을 찾아보세요. 글을 클릭하면 본문과 댓글이 펼쳐집니다. 새 글 작성 시 이미지도 첨부할 수 있습니다.</p>
 
         {/* 카테고리 필터 */}
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map((cat) => (
             <button key={cat} onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                selectedCategory === cat ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-blue-400"
+                selectedCategory === cat ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
               }`}>{cat}</button>
           ))}
         </div>
@@ -245,12 +250,12 @@ export default function ArticlesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="글 제목 검색..."
-            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-400"
+            className="glass-input flex-1 px-4 py-2 rounded-lg text-sm"
           />
           <div className="flex gap-1">
             {(["latest", "popular"] as const).map((s) => (
-              <button key={s} onClick={() => setSortBy(s)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition ${sortBy === s ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 hover:border-blue-400"}`}>
+              <button key={s} onClick={() => { setSortBy(s); setPage(1); }}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition ${sortBy === s ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/55 border border-white/10 hover:border-indigo-400/50"}`}>
                 {s === "latest" ? "최신순" : "인기순"}
               </button>
             ))}
@@ -266,39 +271,39 @@ export default function ArticlesPage() {
                 }
                 setShowForm(!showForm);
               }}
-              className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+              className="mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition">
               {showForm ? "취소" : "✏️ 새 글 작성"}
             </button>
             {showForm && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md p-8 mb-8 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">새 글 작성</h2>
+              <div className="glass-card rounded-xl p-8 mb-8">
+                <h2 className="text-xl font-bold text-white mb-6">새 글 작성</h2>
                 <form onSubmit={handleSubmitArticle} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2 md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">제목 *</label>
+                      <label className="block text-sm font-medium text-white/70 mb-1">제목 *</label>
                       <input type="text" value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="글의 제목을 입력하세요"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                        className="glass-input w-full px-4 py-2 rounded-lg" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">카테고리</label>
+                      <label className="block text-sm font-medium text-white/70 mb-1">카테고리</label>
                       <select value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
+                        className="glass-input w-full px-4 py-2 rounded-lg">
                         {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                       </select>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">내용 *</label>
+                    <label className="block text-sm font-medium text-white/70 mb-1">내용 *</label>
                     <RichTextEditor value={formData.content} onChange={(html) => setFormData({ ...formData, content: html })} placeholder="내용을 입력하세요" minHeight="200px" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">이미지 (선택)</label>
+                    <label className="block text-sm font-medium text-white/70 mb-1">이미지 (선택)</label>
                     <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                     <button type="button" onClick={() => fileInputRef.current?.click()}
-                      className="px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:border-blue-400 hover:text-blue-500 transition w-full text-center">
+                      className="px-4 py-2 border border-dashed border-white/20 rounded-lg text-sm text-white/45 hover:border-indigo-400/50 hover:text-indigo-300 transition w-full text-center">
                       {imageFile ? imageFile.name : "📷 이미지 선택"}
                     </button>
                     {imagePreview && (
@@ -309,57 +314,57 @@ export default function ArticlesPage() {
                       </div>
                     )}
                   </div>
-                  <button type="submit" className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">글 등록</button>
+                  <button type="submit" className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">글 등록</button>
                 </form>
               </div>
             )}
           </>
         ) : (
-          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6 text-center">
-            <p className="text-blue-800 dark:text-blue-300 mb-2">글을 작성하려면 로그인이 필요합니다.</p>
-            <a href="/login" className="text-blue-600 underline font-medium">로그인하기</a>
+          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+            <p className="text-white/60 mb-2">글을 작성하려면 로그인이 필요합니다.</p>
+            <a href="/login" className="text-indigo-400 underline font-medium">로그인하기</a>
           </div>
         )}
 
         {/* 글 목록 */}
         <div className="space-y-4">
           {loading ? (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">로딩 중...</div>
+            <div className="text-center py-12 text-white/40">로딩 중...</div>
           ) : filteredArticles.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">아직 글이 없습니다.</div>
+            <div className="text-center py-12 text-white/30">아직 글이 없습니다.</div>
           ) : (
-            filteredArticles.map((article) => {
+            pagedArticles.map((article) => {
               const isExpanded = expandedId === article.id;
               const articleComments = comments[article.id] || [];
               const isOwner = (article.author_id === userId || isAdmin);
 
               return (
-                <div key={article.id} className="bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800 overflow-hidden">
+                <div key={article.id} className="glass-card rounded-xl overflow-hidden">
                   {/* 편집 모드 */}
                   {editingArticle?.id === article.id ? (
                     <div className="p-6">
                       <form onSubmit={handleEditArticle} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div className="col-span-2 md:col-span-1">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">제목</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">제목</label>
                             <input type="text" value={editingArticle.title}
                               onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                              className="glass-input w-full px-4 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">카테고리</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">카테고리</label>
                             <select value={editingArticle.category}
                               onChange={(e) => setEditingArticle({ ...editingArticle, category: e.target.value })}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500">
+                              className="glass-input w-full px-4 py-2 rounded-lg">
                               {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                             </select>
                           </div>
                         </div>
                         <RichTextEditor value={editingArticle.content} onChange={(html) => setEditingArticle({ ...editingArticle, content: html })} placeholder="내용을 입력하세요" minHeight="200px" />
                         <div className="flex gap-2">
-                          <button type="submit" className="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">저장</button>
+                          <button type="submit" className="px-6 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">저장</button>
                           <button type="button" onClick={() => setEditingArticle(null)}
-                            className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition">취소</button>
+                            className="px-6 py-2 bg-white/8 text-white/70 text-sm rounded-lg hover:bg-white/12 transition">취소</button>
                         </div>
                       </form>
                     </div>
@@ -370,63 +375,63 @@ export default function ArticlesPage() {
                         <div className="flex justify-between items-start gap-4">
                           <button onClick={() => handleToggleArticle(article.id)} className="flex-1 text-left">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xs bg-blue-100 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-full">{article.category}</span>
+                              <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{article.category}</span>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{article.title}</h3>
-                            <SafeHtml html={article.content} className="rich-content text-gray-500 dark:text-gray-400 text-sm break-words line-clamp-3" />
-                            <div className="flex gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400">
+                            <h3 className="text-lg font-bold text-white mb-1">{article.title}</h3>
+                            <SafeHtml html={article.content} className="rich-content text-white/45 text-sm break-words line-clamp-3" />
+                            <div className="flex gap-4 mt-3 text-xs text-white/40">
                               <UserProfilePopup userId={article.author_id} displayName={article.users?.name || "알 수 없음"} />
                               <span>{new Date(article.created_at).toLocaleDateString("ko-KR")}</span>
                             </div>
                           </button>
                           <div className="flex items-center gap-1 flex-shrink-0">
                             <button onClick={() => handleLikeArticle(article.id)}
-                              className={`text-sm px-2 py-1 rounded transition flex items-center gap-1 ${likedArticles.has(article.id) ? "text-red-500" : "text-gray-400 dark:text-gray-500 hover:text-red-400"}`}>
+                              className={`text-sm px-2 py-1 rounded transition flex items-center gap-1 ${likedArticles.has(article.id) ? "text-red-400" : "text-white/35 hover:text-red-400"}`}>
                               {likedArticles.has(article.id) ? "❤️" : "🤍"} {articleLikes[article.id] || 0}
                             </button>
                             {isOwner && (
                               <>
                                 <button onClick={() => { setEditingArticle(article); setExpandedId(null); }}
-                                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition">편집</button>
+                                  className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
                                 <button onClick={() => handleDeleteArticle(article.id)}
-                                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 transition">삭제</button>
+                                  className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
                               </>
                             )}
                             <button onClick={() => handleToggleArticle(article.id)}
-                              className="text-gray-400 dark:text-gray-500 text-lg px-2">{isExpanded ? "▲" : "▼"}</button>
+                              className="text-white/35 text-lg px-2">{isExpanded ? "▲" : "▼"}</button>
                           </div>
                         </div>
                       </div>
 
                       {/* 본문 + 댓글 */}
                       {isExpanded && (
-                        <div className="border-t border-gray-100 dark:border-gray-800">
-                          <div className="p-6 bg-gray-50 dark:bg-gray-800">
+                        <div className="border-t border-white/8">
+                          <div className="p-6" style={{ background: "rgba(255,255,255,0.03)" }}>
                             {article.image_url && (
                               <img src={article.image_url} alt="article" className="w-full max-h-96 object-cover rounded-lg mb-4" />
                             )}
-                            <SafeHtml html={article.content} className="rich-content text-sm leading-relaxed" />
+                            <SafeHtml html={article.content} className="rich-content text-sm leading-relaxed text-white/80" />
                           </div>
                           <div className="p-6">
-                            <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">댓글 {articleComments.length}개</h4>
+                            <h4 className="text-sm font-bold text-white/70 mb-4">댓글 {articleComments.length}개</h4>
                             <div className="space-y-3 mb-4">
                               {articleComments.length === 0 ? (
-                                <p className="text-gray-400 dark:text-gray-500 text-sm">첫 댓글을 남겨보세요!</p>
+                                <p className="text-white/30 text-sm">첫 댓글을 남겨보세요!</p>
                               ) : (
                                 articleComments.map((comment) => (
                                   <div key={comment.id} className="flex gap-3">
-                                    <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
+                                    <div className="flex-1 rounded-lg px-4 py-2" style={{ background: "rgba(255,255,255,0.05)" }}>
                                       <div className="flex justify-between items-center mb-1">
                                         <div className="flex gap-2 items-center">
                                           <UserProfilePopup userId={comment.user_id} displayName={comment.users?.name || "알 수 없음"} />
-                                          <span className="text-xs text-gray-400 dark:text-gray-500">{new Date(comment.created_at).toLocaleDateString("ko-KR")}</span>
+                                          <span className="text-xs text-white/30">{new Date(comment.created_at).toLocaleDateString("ko-KR")}</span>
                                         </div>
                                         {(comment.user_id === userId || isAdmin) && (
                                           <button onClick={() => handleDeleteComment(comment.id, article.id)}
-                                            className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition">삭제</button>
+                                            className="text-xs text-white/30 hover:text-red-400 transition">삭제</button>
                                         )}
                                       </div>
-                                      <p className="text-sm text-gray-700 dark:text-gray-300">{comment.content}</p>
+                                      <p className="text-sm text-white/75">{comment.content}</p>
                                     </div>
                                   </div>
                                 ))
@@ -438,13 +443,13 @@ export default function ArticlesPage() {
                                   onChange={(e) => setCommentText((prev) => ({ ...prev, [article.id]: e.target.value }))}
                                   onKeyDown={(e) => { if (e.key === "Enter") handleSubmitComment(article.id); }}
                                   placeholder="댓글을 입력하세요..."
-                                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500" />
+                                  className="glass-input flex-1 px-4 py-2 rounded-lg text-sm" />
                                 <button onClick={() => handleSubmitComment(article.id)}
-                                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">등록</button>
+                                  className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">등록</button>
                               </div>
                             ) : (
-                              <p className="text-sm text-gray-500 dark:text-gray-400">
-                                댓글을 달려면 <a href="/login" className="text-blue-600 underline">로그인</a>하세요.
+                              <p className="text-sm text-white/40">
+                                댓글을 달려면 <a href="/login" className="text-indigo-400 underline">로그인</a>하세요.
                               </p>
                             )}
                           </div>
@@ -457,6 +462,23 @@ export default function ArticlesPage() {
             })
           )}
         </div>
+
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-8">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+              className="px-4 py-2 rounded-lg text-sm bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition">
+              ← 이전
+            </button>
+            <span className="text-white/50 text-sm px-3">
+              {page} / {totalPages}
+            </span>
+            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+              className="px-4 py-2 rounded-lg text-sm bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition">
+              다음 →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

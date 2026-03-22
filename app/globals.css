@@ -18,6 +18,23 @@ body {
 .rich-content ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 0.75em; }
 .rich-content li { margin-bottom: 0.25em; }
 
+/* Glass morphism */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.glass-input {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.glass-input::placeholder { color: rgba(255, 255, 255, 0.3) !important; }
+.glass-input:focus { border-color: rgba(99, 102, 241, 0.7) !important; outline: none; }
+.glass-input option { background: #1c1c28; }
+
 /* 달력 카드 플립 */
 .calendar-cell { perspective: 500px; }
 .calendar-card {

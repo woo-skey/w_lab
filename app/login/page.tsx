@@ -41,16 +41,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center text-blue-900 dark:text-blue-400 mb-8">
-          위스키 연구소
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-md glass-card rounded-2xl p-8">
+        <h1 className="text-3xl font-bold text-center text-white mb-8">
+          🥃 위스키 연구소
         </h1>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">로그인</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">로그인</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               아이디
             </label>
             <input
@@ -58,13 +58,13 @@ export default function LoginPage() {
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-2 rounded-lg"
               placeholder="아이디를 입력하세요"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               비밀번호
             </label>
             <input
@@ -72,13 +72,13 @@ export default function LoginPage() {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-2 rounded-lg"
               placeholder="비밀번호를 입력하세요"
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
               {error}
             </div>
           )}
@@ -86,17 +86,17 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
+            className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
           >
             {loading ? "로그인 중..." : "로그인"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-gray-600 dark:text-gray-400">
+        <p className="mt-6 text-center text-white/50">
           계정이 없으신가요?{" "}
           <Link
             href="/signup"
-            className="text-blue-600 hover:underline font-medium"
+            className="text-indigo-400 hover:underline font-medium"
           >
             회원가입
           </Link>
