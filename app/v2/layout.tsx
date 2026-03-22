@@ -32,6 +32,12 @@ export default function V2Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setUserName(localStorage.getItem("userName") || "");
     setUserId(localStorage.getItem("userId") || "");
+    // v2에선 전역 Navigation 숨기기
+    const nav = document.querySelector("nav");
+    if (nav) nav.style.display = "none";
+    return () => {
+      if (nav) nav.style.display = "";
+    };
   }, []);
 
   const handleLogout = () => {
