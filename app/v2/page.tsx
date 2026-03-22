@@ -78,13 +78,6 @@ export default function HomeV2() {
 
         {/* 히어로 — macOS 창 스타일 */}
         <div className="mb-20 text-center">
-          {/* 창 상단 트래픽 라이트 */}
-          <div className="flex justify-center gap-2 mb-8">
-            <span className="w-3 h-3 rounded-full bg-[#FF5F57] shadow-sm" />
-            <span className="w-3 h-3 rounded-full bg-[#FFBD2E] shadow-sm" />
-            <span className="w-3 h-3 rounded-full bg-[#28C840] shadow-sm" />
-          </div>
-
           <h1
             className="text-5xl md:text-7xl font-bold mb-5 tracking-tight"
             style={{
