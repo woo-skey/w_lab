@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 interface SearchResult { id: string; title: string; subtitle?: string; icon: string; href: string; }
+interface Notification { id: string; type: string; link?: string; message: string; is_read: boolean; created_at: string; }
 
 const NAV = [
   { href: "/", icon: "⊞", label: "홈", exact: true },
@@ -35,6 +36,9 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   const doSearch = useCallback(async (q: string) => {
     if (!q.trim()) { setSearchResults([]); return; }
@@ -57,14 +61,42 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     const sync = () => {
+      const id = localStorage.getItem("userId") || "";
       setUserName(localStorage.getItem("userName") || "");
-      setUserId(localStorage.getItem("userId") || "");
+      setUserId(id);
+      if (id) fetchNotifications(id);
     };
     sync();
     window.addEventListener("storage", sync);
     window.addEventListener("auth-change", sync);
     return () => { window.removeEventListener("storage", sync); window.removeEventListener("auth-change", sync); };
   }, [pathname]);
+
+  const fetchNotifications = async (id: string) => {
+    const { data } = await supabase.from("notifications").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(20);
+    setNotifications(data || []);
+  };
+
+  const handleBellClick = async () => {
+    setShowNotifications((prev) => !prev);
+    if (!showNotifications && userId) {
+      const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
+      if (unreadIds.length > 0) {
+        await supabase.from("notifications").update({ is_read: true }).in("id", unreadIds);
+        setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setShowNotifications(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const handleLogout = () => {
     localStorage.clear();
@@ -161,6 +193,57 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
         <div className="px-3 py-4 border-t border-white/8 space-y-1" style={{ borderTopColor: "rgba(255,255,255,0.08)" }}>
           {userId ? (
             <>
+              {/* 알림 */}
+              <div className="relative" ref={notifRef}>
+                <button onClick={handleBellClick}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/45 hover:text-white/80 hover:bg-white/5 transition-colors text-left">
+                  <span className="relative w-5 text-center text-base">
+                    🔔
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold leading-none">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </span>
+                  <span>알림{unreadCount > 0 ? ` (${unreadCount})` : ""}</span>
+                </button>
+                {showNotifications && (
+                  <div className="absolute bottom-full left-0 mb-2 w-72 rounded-xl overflow-hidden z-50"
+                    style={{ background: "rgba(14,14,22,0.98)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
+                    <div className="px-4 py-3 flex justify-between items-center" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                      <span className="text-white/80 text-sm font-medium">알림</span>
+                      {notifications.length > 0 && (
+                        <button onClick={async () => { await supabase.from("notifications").delete().eq("user_id", userId); setNotifications([]); }}
+                          className="text-xs text-white/30 hover:text-red-400 transition">전체 삭제</button>
+                      )}
+                    </div>
+                    <div className="max-h-72 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <p className="text-center text-white/30 text-sm py-8">알림이 없습니다</p>
+                      ) : notifications.map((n) => (
+                        <div key={n.id}
+                          onClick={() => {
+                            const typeMap: Record<string, string> = { announcement: "/notices", review: "/reviews", review_comment: "/reviews", article_comment: "/articles", contact_reply: "/contact" };
+                            const dest = n.link || typeMap[n.type] || null;
+                            if (dest) { router.push(dest); setShowNotifications(false); }
+                          }}
+                          className="px-4 py-3 text-sm cursor-pointer transition-colors"
+                          style={{
+                            borderBottom: "1px solid rgba(255,255,255,0.05)",
+                            background: n.is_read ? "transparent" : "rgba(99,102,241,0.1)",
+                            color: n.is_read ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.85)",
+                          }}>
+                          <p className="leading-snug">{n.message}</p>
+                          <p className="text-xs text-white/25 mt-1">
+                            {new Date(n.created_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <Link href="/mypage"
                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/45 hover:text-white/80 hover:bg-white/5 transition-colors">
                 <span className="w-6 h-6 rounded-full bg-indigo-500/50 flex items-center justify-center text-xs text-white font-bold flex-shrink-0">
