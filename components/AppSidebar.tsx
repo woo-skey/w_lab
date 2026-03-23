@@ -144,6 +144,45 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const bg = isDark ? BG_DARK : BG_LIGHT;
   const sidebarStyle = isDark ? GLASS_SIDEBAR_DARK : GLASS_SIDEBAR_LIGHT;
 
+  // 테마 색상 변수
+  const T = isDark ? {
+    textPrimary: "rgba(255,255,255,0.90)",
+    textSecondary: "rgba(255,255,255,0.55)",
+    textTertiary: "rgba(255,255,255,0.35)",
+    textMuted: "rgba(255,255,255,0.22)",
+    border: "rgba(255,255,255,0.08)",
+    searchBg: "rgba(255,255,255,0.04)",
+    searchBorder: "rgba(255,255,255,0.08)",
+    navActive: "#fff",
+    navInactive: "rgba(255,255,255,0.45)",
+    notifBg: "rgba(14,14,22,0.98)",
+    notifBorder: "rgba(255,255,255,0.1)",
+    notifText: "rgba(255,255,255,0.85)",
+    notifMuted: "rgba(255,255,255,0.4)",
+    notifDivider: "rgba(255,255,255,0.05)",
+    dropdownBg: "rgba(18,18,24,0.98)",
+    dropdownBorder: "rgba(255,255,255,0.1)",
+    dropdownText: "rgba(255,255,255,0.65)",
+  } : {
+    textPrimary: "rgba(10,10,30,0.90)",
+    textSecondary: "rgba(10,10,30,0.60)",
+    textTertiary: "rgba(10,10,30,0.40)",
+    textMuted: "rgba(10,10,30,0.25)",
+    border: "rgba(0,0,0,0.08)",
+    searchBg: "rgba(0,0,0,0.04)",
+    searchBorder: "rgba(0,0,0,0.10)",
+    navActive: "rgba(10,10,30,0.95)",
+    navInactive: "rgba(10,10,30,0.55)",
+    notifBg: "rgba(255,255,255,0.97)",
+    notifBorder: "rgba(0,0,0,0.10)",
+    notifText: "rgba(10,10,30,0.85)",
+    notifMuted: "rgba(10,10,30,0.45)",
+    notifDivider: "rgba(0,0,0,0.06)",
+    dropdownBg: "rgba(250,250,255,0.98)",
+    dropdownBorder: "rgba(0,0,0,0.10)",
+    dropdownText: "rgba(10,10,30,0.70)",
+  };
+
   if (hideSidebar) {
     return (
       <div className="relative min-h-screen" style={{ background: bg, fontFamily: SF }}>
@@ -162,33 +201,35 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
         {/* 로고 */}
         <div className="px-5 pt-8 pb-4">
           <Link href="/">
-            <h1 className="text-white/90 font-bold text-base tracking-tight cursor-pointer hover:text-white transition">🥃 위스키 연구소</h1>
+            <h1 className="font-bold text-base tracking-tight cursor-pointer transition" style={{ color: T.textPrimary }}>🥃 위스키 연구소</h1>
           </Link>
         </div>
 
         {/* 검색 */}
         <div className="px-3 mb-4 relative" ref={searchRef}>
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}>
-            <span className="text-white/30 text-sm">⌕</span>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ border: `1px solid ${T.searchBorder}`, background: T.searchBg }}>
+            <span className="text-sm" style={{ color: T.textMuted }}>⌕</span>
             <input
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
               onFocus={() => setSearchOpen(true)}
               onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
               placeholder="검색..."
-              className="flex-1 bg-transparent text-white/70 placeholder-white/25 text-sm outline-none"
+              className="flex-1 bg-transparent text-sm outline-none"
+              style={{ color: T.textSecondary }}
             />
-            {searchQuery && <button onClick={() => { setSearchQuery(""); setSearchResults([]); }} className="text-white/25 hover:text-white/50 text-xs">✕</button>}
+            {searchQuery && <button onClick={() => { setSearchQuery(""); setSearchResults([]); }} className="text-xs" style={{ color: T.textMuted }}>✕</button>}
           </div>
           {searchOpen && searchResults.length > 0 && (
-            <div className="absolute top-full left-3 right-3 mt-1 rounded-xl overflow-hidden z-50" style={{ background: "rgba(18,18,24,0.98)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
+            <div className="absolute top-full left-3 right-3 mt-1 rounded-xl overflow-hidden z-50" style={{ background: T.dropdownBg, border: `1px solid ${T.dropdownBorder}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }}>
               {searchResults.map((r) => (
                 <button key={r.id + r.icon} onClick={() => { router.push(r.href); setSearchQuery(""); setSearchOpen(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm text-white/65 hover:bg-white/8 transition-colors">
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm transition-colors hover:bg-black/5"
+                  style={{ color: T.dropdownText }}>
                   <span>{r.icon}</span>
                   <div className="min-w-0">
                     <p className="truncate">{r.title}</p>
-                    {r.subtitle && <p className="text-xs text-white/30 truncate">{r.subtitle}</p>}
+                    {r.subtitle && <p className="text-xs truncate" style={{ color: T.textMuted }}>{r.subtitle}</p>}
                   </div>
                 </button>
               ))}
@@ -197,7 +238,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
         </div>
 
         <div className="px-3 mb-2">
-          <p className="text-white/20 text-xs px-2 mb-1 uppercase tracking-wider">메뉴</p>
+          <p className="text-xs px-2 mb-1 uppercase tracking-wider" style={{ color: T.textMuted }}>메뉴</p>
         </div>
 
         {/* 내비게이션 */}
@@ -208,9 +249,10 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
               <Link key={item.href} href={item.href}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150"
                 style={{
-                  color: active ? "#fff" : "rgba(255,255,255,0.45)",
-                  background: active ? "rgba(99,102,241,0.3)" : "transparent",
+                  color: active ? T.navActive : T.navInactive,
+                  background: active ? "rgba(99,102,241,0.25)" : "transparent",
                   border: active ? "1px solid rgba(99,102,241,0.3)" : "1px solid transparent",
+                  fontWeight: active ? 600 : 400,
                 }}
               >
                 <span className="text-base w-5 text-center">{item.icon}</span>
@@ -221,10 +263,11 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
         </nav>
 
         {/* 하단 유저 */}
-        <div className="px-3 py-4 border-t border-white/8 space-y-1" style={{ borderTopColor: "rgba(255,255,255,0.08)" }}>
+        <div className="px-3 py-4 space-y-1" style={{ borderTop: `1px solid ${T.border}` }}>
           {/* 다크/라이트 토글 */}
           <button onClick={toggleTheme}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/35 hover:text-white/70 hover:bg-white/5 transition-colors text-left mb-1">
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left mb-1 hover:bg-black/5"
+            style={{ color: T.textTertiary }}>
             <span className="text-base w-5 text-center">{isDark ? "☀️" : "🌙"}</span>
             <span>{isDark ? "라이트 모드" : "다크 모드"}</span>
           </button>
@@ -234,7 +277,8 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
               {/* 알림 */}
               <div className="relative" ref={notifRef}>
                 <button onClick={handleBellClick}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/45 hover:text-white/80 hover:bg-white/5 transition-colors text-left">
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left hover:bg-black/5"
+                  style={{ color: T.textSecondary }}>
                   <span className="relative w-5 text-center text-base">
                     🔔
                     {unreadCount > 0 && (
@@ -247,17 +291,17 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                 </button>
                 {showNotifications && (
                   <div className="absolute bottom-full left-0 mb-2 w-72 rounded-xl overflow-hidden z-50"
-                    style={{ background: "rgba(14,14,22,0.98)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
-                    <div className="px-4 py-3 flex justify-between items-center" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                      <span className="text-white/80 text-sm font-medium">알림</span>
+                    style={{ background: T.notifBg, border: `1px solid ${T.notifBorder}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }}>
+                    <div className="px-4 py-3 flex justify-between items-center" style={{ borderBottom: `1px solid ${T.border}` }}>
+                      <span className="text-sm font-medium" style={{ color: T.textPrimary }}>알림</span>
                       {notifications.length > 0 && (
                         <button onClick={async () => { await supabase.from("notifications").delete().eq("user_id", userId); setNotifications([]); }}
-                          className="text-xs text-white/30 hover:text-red-400 transition">전체 삭제</button>
+                          className="text-xs hover:text-red-400 transition" style={{ color: T.textMuted }}>전체 삭제</button>
                       )}
                     </div>
                     <div className="max-h-72 overflow-y-auto">
                       {notifications.length === 0 ? (
-                        <p className="text-center text-white/30 text-sm py-8">알림이 없습니다</p>
+                        <p className="text-center text-sm py-8" style={{ color: T.textMuted }}>알림이 없습니다</p>
                       ) : notifications.map((n) => (
                         <div key={n.id}
                           onClick={() => {
@@ -265,14 +309,14 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                             const dest = n.link || typeMap[n.type] || null;
                             if (dest) { router.push(dest); setShowNotifications(false); }
                           }}
-                          className="px-4 py-3 text-sm cursor-pointer transition-colors"
+                          className="px-4 py-3 text-sm cursor-pointer transition-colors hover:bg-black/5"
                           style={{
-                            borderBottom: "1px solid rgba(255,255,255,0.05)",
-                            background: n.is_read ? "transparent" : "rgba(99,102,241,0.1)",
-                            color: n.is_read ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.85)",
+                            borderBottom: `1px solid ${T.notifDivider}`,
+                            background: n.is_read ? "transparent" : "rgba(99,102,241,0.08)",
+                            color: n.is_read ? T.notifMuted : T.notifText,
                           }}>
                           <p className="leading-snug">{n.message}</p>
-                          <p className="text-xs text-white/25 mt-1">
+                          <p className="text-xs mt-1" style={{ color: T.textMuted }}>
                             {new Date(n.created_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                           </p>
                         </div>
@@ -283,21 +327,24 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
               </div>
 
               <Link href="/mypage"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/45 hover:text-white/80 hover:bg-white/5 transition-colors">
+                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors hover:bg-black/5"
+                style={{ color: T.textSecondary }}>
                 <span className="w-6 h-6 rounded-full bg-indigo-500/50 flex items-center justify-center text-xs text-white font-bold flex-shrink-0">
                   {userName.slice(0, 1).toUpperCase()}
                 </span>
                 <span className="truncate">{userName}</span>
               </Link>
               <button onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors text-left">
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:text-red-500 hover:bg-red-500/10 transition-colors text-left"
+                style={{ color: T.textTertiary }}>
                 <span className="text-base w-5 text-center">↩</span>
                 <span>로그아웃</span>
               </button>
             </>
           ) : (
             <Link href="/login"
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/45 hover:text-white/80 hover:bg-white/5 transition-colors">
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors hover:bg-black/5"
+              style={{ color: T.textSecondary }}>
               <span className="text-base w-5 text-center">→</span>
               <span>로그인</span>
             </Link>
