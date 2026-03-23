@@ -194,13 +194,31 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
 
 function Orbs() {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none select-none z-0">
-      <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-20"
-        style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)" }} />
-      <div className="absolute top-1/3 -right-60 w-[500px] h-[500px] rounded-full opacity-15"
-        style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)" }} />
-      <div className="absolute -bottom-40 left-1/3 w-[400px] h-[400px] rounded-full opacity-10"
-        style={{ background: "radial-gradient(circle, #06b6d4 0%, transparent 70%)" }} />
-    </div>
+    <>
+      <style>{`
+        @keyframes orb-float-1 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(40px, -60px) scale(1.08); }
+          66% { transform: translate(-30px, 40px) scale(0.95); }
+        }
+        @keyframes orb-float-2 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          40% { transform: translate(-50px, 50px) scale(1.1); }
+          70% { transform: translate(30px, -30px) scale(0.92); }
+        }
+        @keyframes orb-float-3 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(60px, -40px) scale(1.05); }
+        }
+      `}</style>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none select-none z-0">
+        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)", animation: "orb-float-1 18s ease-in-out infinite" }} />
+        <div className="absolute top-1/3 -right-60 w-[500px] h-[500px] rounded-full opacity-15"
+          style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)", animation: "orb-float-2 22s ease-in-out infinite" }} />
+        <div className="absolute -bottom-40 left-1/3 w-[400px] h-[400px] rounded-full opacity-10"
+          style={{ background: "radial-gradient(circle, #06b6d4 0%, transparent 70%)", animation: "orb-float-3 15s ease-in-out infinite" }} />
+      </div>
+    </>
   );
 }

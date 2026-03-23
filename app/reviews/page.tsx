@@ -81,6 +81,7 @@ export default function ReviewsPage() {
   const [page, setPage] = useState(1);
   const [reviewLikes, setReviewLikes] = useState<Record<string, number>>({});
   const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set());
+  const [userReviewedWhiskeys, setUserReviewedWhiskeys] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -91,9 +92,13 @@ export default function ReviewsPage() {
 
   const fetchWhiskeys = async () => {
     try {
-      const [{ data, error }, { data: countData }] = await Promise.all([
+      const uid = localStorage.getItem("userId");
+      const [{ data, error }, { data: countData }, { data: userRevData }] = await Promise.all([
         supabase.from("whiskeys").select("*").order("created_at", { ascending: false }),
         supabase.from("reviews").select("whiskey_id"),
+        uid
+          ? supabase.from("reviews").select("whiskey_id").eq("user_id", uid)
+          : Promise.resolve({ data: [] as { whiskey_id: string }[] }),
       ]);
       if (error) throw error;
       setWhiskeys(data || []);
@@ -102,6 +107,7 @@ export default function ReviewsPage() {
         counts[r.whiskey_id] = (counts[r.whiskey_id] || 0) + 1;
       });
       setReviewCounts(counts);
+      setUserReviewedWhiskeys(new Set((userRevData || []).map((r) => r.whiskey_id)));
     } catch (err) {
       console.error(err);
     } finally {
@@ -683,6 +689,8 @@ export default function ReviewsPage() {
                                 </button>
                               </div>
                             </form>
+                          ) : userReviewedWhiskeys.has(w.id) ? (
+                            <p className="text-sm text-white/40">이미 이 위스키에 대한 리뷰를 작성하셨습니다.</p>
                           ) : (
                             <button onClick={() => setReviewForm({ whiskey_id: w.id, rating: 5, review_text: "", taste_profile: "", nose: "", palate: "", finish_note: "", remarks: "" })}
                               className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">

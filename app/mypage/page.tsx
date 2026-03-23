@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
+import bcrypt from "bcryptjs";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
 
@@ -72,6 +73,11 @@ export default function MyPage() {
   const [editingProfile, setEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({ bio: "", favorite_category: "", favorite_whiskey: "" });
   const [profileSaving, setProfileSaving] = useState(false);
+  const [showPwChange, setShowPwChange] = useState(false);
+  const [pwForm, setPwForm] = useState({ current: "", newPw: "", confirm: "" });
+  const [pwChanging, setPwChanging] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState(false);
 
   // 관리자 전용
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
@@ -374,6 +380,32 @@ export default function MyPage() {
     setProfileSaving(false);
   };
 
+  const handleChangePassword = async () => {
+    setPwError("");
+    setPwSuccess(false);
+    if (!pwForm.current || !pwForm.newPw || !pwForm.confirm) {
+      setPwError("모든 필드를 입력해주세요."); return;
+    }
+    if (pwForm.newPw !== pwForm.confirm) {
+      setPwError("새 비밀번호가 일치하지 않습니다."); return;
+    }
+    if (pwForm.newPw.length < 6) {
+      setPwError("새 비밀번호는 6자 이상이어야 합니다."); return;
+    }
+    setPwChanging(true);
+    const { data } = await supabase.from("users").select("password_hash").eq("id", userId).single();
+    if (!data) { setPwError("사용자 정보를 불러올 수 없습니다."); setPwChanging(false); return; }
+    const match = await bcrypt.compare(pwForm.current, data.password_hash);
+    if (!match) { setPwError("현재 비밀번호가 올바르지 않습니다."); setPwChanging(false); return; }
+    const newHash = await bcrypt.hash(pwForm.newPw, 10);
+    const { error } = await supabase.from("users").update({ password_hash: newHash }).eq("id", userId);
+    if (error) { setPwError("비밀번호 변경에 실패했습니다."); setPwChanging(false); return; }
+    setPwSuccess(true);
+    setPwForm({ current: "", newPw: "", confirm: "" });
+    setTimeout(() => { setShowPwChange(false); setPwSuccess(false); }, 2000);
+    setPwChanging(false);
+  };
+
   const tabs = [
     { id: "overview", label: "개요" },
     { id: "reviews", label: `리뷰 (${reviews.length})` },
@@ -519,6 +551,39 @@ export default function MyPage() {
                 >
                   ✎ 편집
                 </button>
+              </div>
+            )}
+          </div>
+
+          {/* 비밀번호 변경 */}
+          <div className="mt-4 pt-4 border-t border-white/8">
+            <button onClick={() => { setShowPwChange(!showPwChange); setPwError(""); setPwSuccess(false); }}
+              className="text-xs text-white/40 hover:text-white/70 transition">
+              🔑 비밀번호 변경
+            </button>
+            {showPwChange && (
+              <div className="mt-3 space-y-2 max-w-sm">
+                <input type="password" placeholder="현재 비밀번호" value={pwForm.current}
+                  onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
+                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                <input type="password" placeholder="새 비밀번호 (6자 이상)" value={pwForm.newPw}
+                  onChange={(e) => setPwForm({ ...pwForm, newPw: e.target.value })}
+                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                <input type="password" placeholder="새 비밀번호 확인" value={pwForm.confirm}
+                  onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                {pwError && <p className="text-xs text-red-400">{pwError}</p>}
+                {pwSuccess && <p className="text-xs text-green-400">비밀번호가 변경되었습니다.</p>}
+                <div className="flex gap-2">
+                  <button onClick={handleChangePassword} disabled={pwChanging}
+                    className="px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
+                    {pwChanging ? "변경 중..." : "변경"}
+                  </button>
+                  <button onClick={() => setShowPwChange(false)}
+                    className="px-4 py-1.5 bg-white/8 text-white/60 text-sm rounded-lg hover:bg-white/12 transition">
+                    취소
+                  </button>
+                </div>
               </div>
             )}
           </div>
