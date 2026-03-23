@@ -27,13 +27,30 @@ export default function BarsPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingBar, setEditingBar] = useState<Bar | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [favoritedBars, setFavoritedBars] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
-    if (id) setUserId(id);
+    if (id) { setUserId(id); fetchFavorites(id); }
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchBars();
   }, []);
+
+  const fetchFavorites = async (uid: string) => {
+    const { data } = await supabase.from("bar_favorites").select("bar_id").eq("user_id", uid);
+    setFavoritedBars(new Set((data || []).map((f) => f.bar_id)));
+  };
+
+  const handleToggleFavorite = async (barId: string) => {
+    if (!userId) { alert("로그인이 필요합니다."); return; }
+    if (favoritedBars.has(barId)) {
+      await supabase.from("bar_favorites").delete().eq("bar_id", barId).eq("user_id", userId);
+      setFavoritedBars((prev) => { const n = new Set(prev); n.delete(barId); return n; });
+    } else {
+      await supabase.from("bar_favorites").insert([{ bar_id: barId, user_id: userId }]);
+      setFavoritedBars((prev) => new Set([...prev, barId]));
+    }
+  };
 
   const fetchBars = async () => {
     try {
@@ -162,14 +179,22 @@ export default function BarsPage() {
                   <>
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-white">{bar.bar_name}</h3>
-                      {(bar.user_id === userId || isAdmin) && (
-                        <div className="flex gap-1">
-                          <button onClick={() => setEditingBar(bar)}
-                            className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
-                          <button onClick={() => handleDelete(bar.id)}
-                            className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
-                        </div>
-                      )}
+                      <div className="flex gap-1 items-center">
+                        {userId && (
+                          <button onClick={() => handleToggleFavorite(bar.id)}
+                            className={`text-sm px-2 py-1 rounded transition ${favoritedBars.has(bar.id) ? "text-red-400" : "text-white/30 hover:text-red-400"}`}>
+                            {favoritedBars.has(bar.id) ? "❤️" : "🤍"}
+                          </button>
+                        )}
+                        {(bar.user_id === userId || isAdmin) && (
+                          <>
+                            <button onClick={() => setEditingBar(bar)}
+                              className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
+                            <button onClick={() => handleDelete(bar.id)}
+                              className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     {bar.link && (
                       <a href={bar.link} target="_blank" rel="noopener noreferrer"

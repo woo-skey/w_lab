@@ -69,6 +69,7 @@ export default function MyPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [uploading, setUploading] = useState(false);
   const [userComments, setUserComments] = useState<UserComment[]>([]);
+  const [favoriteBars, setFavoriteBars] = useState<{ id: string; bar_name: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [editingProfile, setEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({ bio: "", favorite_category: "", favorite_whiskey: "" });
@@ -147,6 +148,16 @@ export default function MyPage() {
       })),
     ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     setUserComments(combined);
+
+    // 즐겨찾기 Bar
+    const { data: favData } = await supabase
+      .from("bar_favorites")
+      .select("bars(id, bar_name)")
+      .eq("user_id", id);
+    if (favData) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setFavoriteBars((favData as any[]).map((f) => f.bars).filter(Boolean));
+    }
 
     setLoading(false);
   };
@@ -412,6 +423,7 @@ export default function MyPage() {
     { id: "whiskeys", label: `위스키 (${whiskeys.length})` },
     { id: "articles", label: `지식글 (${articles.length})` },
     { id: "bars", label: `Bar (${bars.length})` },
+    { id: "favorites", label: `즐겨찾기 (${favoriteBars.length})` },
     { id: "schedules", label: `일정 (${schedules.length})` },
     { id: "comments", label: `댓글 (${userComments.length})` },
     ...(profile?.is_admin ? [{ id: "admin", label: "🛡️ 관리자" }] : []),
@@ -733,6 +745,19 @@ export default function MyPage() {
                   <p className="font-bold text-white">{b.bar_name}</p>
                   {b.notes && <p className="text-sm text-white/40 mt-1 break-words whitespace-pre-wrap">{b.notes}</p>}
                   <p className="text-xs text-white/30 mt-2">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {activeTab === "favorites" && (
+          <div className="grid md:grid-cols-2 gap-3">
+            {favoriteBars.length === 0 ? <div className="text-center py-12 text-white/30 col-span-2">즐겨찾기한 바가 없습니다.</div> : (
+              favoriteBars.map((b) => (
+                <div key={b.id} onClick={() => router.push("/bars")} className="glass-card rounded-xl p-5 cursor-pointer hover:bg-white/8 transition flex items-center gap-3">
+                  <span className="text-red-400 text-lg">❤️</span>
+                  <p className="font-bold text-white">{b.bar_name}</p>
                 </div>
               ))
             )}

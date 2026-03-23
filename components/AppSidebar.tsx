@@ -100,6 +100,17 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   useEffect(() => {
+    if (!userId) return;
+    const channel = supabase
+      .channel('notifications-' + userId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + userId }, (payload) => {
+        setNotifications(prev => [payload.new as Notification, ...prev]);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [userId]);
+
+  useEffect(() => {
     const saved = localStorage.getItem("theme");
     const dark = saved !== "light";
     setIsDark(dark);

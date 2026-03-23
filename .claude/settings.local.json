@@ -9,7 +9,8 @@
       "Bash(ls \"C:\\\\Users\\\\idimu\\\\.claude\\\\projects\\\\c--Users-idimu-Desktop-w-lab\\\\memory\"\" 2>/dev/null || echo \"empty \")",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(node -e \":*)"
     ]
   }
 }

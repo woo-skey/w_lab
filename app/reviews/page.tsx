@@ -82,6 +82,7 @@ export default function ReviewsPage() {
   const [reviewLikes, setReviewLikes] = useState<Record<string, number>>({});
   const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set());
   const [userReviewedWhiskeys, setUserReviewedWhiskeys] = useState<Set<string>>(new Set());
+  const [compareList, setCompareList] = useState<string[]>([]);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -353,6 +354,7 @@ export default function ReviewsPage() {
   const pagedWhiskeys = filteredWhiskeys.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
+    <>
     <div className="min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-white mb-2">위스키 리뷰</h1>
@@ -455,21 +457,21 @@ export default function ReviewsPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">🌸 향 (Nose)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">향 (Nose)</label>
                   <input type="text" value={whiskey.nose}
                     onChange={(e) => setWhiskey({ ...whiskey, nose: e.target.value })}
                     placeholder="예: 바닐라, 꿀, 시트러스"
                     className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">👅 맛 (Palate)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">맛 (Palate)</label>
                   <input type="text" value={whiskey.palate}
                     onChange={(e) => setWhiskey({ ...whiskey, palate: e.target.value })}
                     placeholder="예: 스모키, 오크, 카라멜"
                     className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">✨ 피니쉬 (Finish)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">피니쉬 (Finish)</label>
                   <input type="text" value={whiskey.finish_note}
                     onChange={(e) => setWhiskey({ ...whiskey, finish_note: e.target.value })}
                     placeholder="예: 길고 따뜻한 여운"
@@ -620,6 +622,11 @@ export default function ReviewsPage() {
                               className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
                           </div>
                         )}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setCompareList((prev) => prev.includes(w.id) ? prev.filter((id) => id !== w.id) : prev.length < 2 ? [...prev, w.id] : prev); }}
+                          className={`text-xs px-2 py-1 rounded mt-1 transition ${compareList.includes(w.id) ? "bg-indigo-500/50 text-white" : "bg-white/5 text-white/30 hover:text-white/60"}`}>
+                          {compareList.includes(w.id) ? "비교 ✓" : "비교"}
+                        </button>
                         <button onClick={() => handleToggleWhiskey(w.id)} className="text-white/30 mt-1">{isExpanded ? "▲" : "▼"}</button>
                       </div>
                     </div>
@@ -651,28 +658,28 @@ export default function ReviewsPage() {
                               />
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <label className="block text-xs font-medium text-white/70 mb-1">🌸 향 (Nose)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1">향 (Nose)</label>
                                   <input type="text" value={reviewForm.nose}
                                     onChange={(e) => setReviewForm({ ...reviewForm, nose: e.target.value })}
                                     placeholder="예: 바닐라, 꿀, 시트러스"
                                     className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-white/70 mb-1">👅 맛 (Palate)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1">맛 (Palate)</label>
                                   <input type="text" value={reviewForm.palate}
                                     onChange={(e) => setReviewForm({ ...reviewForm, palate: e.target.value })}
                                     placeholder="예: 스모키, 오크, 카라멜"
                                     className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-white/70 mb-1">✨ 피니쉬 (Finish)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1">피니쉬 (Finish)</label>
                                   <input type="text" value={reviewForm.finish_note}
                                     onChange={(e) => setReviewForm({ ...reviewForm, finish_note: e.target.value })}
                                     placeholder="예: 길고 따뜻한 여운"
                                     className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-white/70 mb-1">📝 비고</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1">비고</label>
                                   <input type="text" value={reviewForm.remarks}
                                     onChange={(e) => setReviewForm({ ...reviewForm, remarks: e.target.value })}
                                     placeholder="기타 메모"
@@ -703,6 +710,29 @@ export default function ReviewsPage() {
                           </p>
                         )}
                       </div>
+
+                      {/* 평점 분포 */}
+                      {whiskeyReviews.length > 0 && (() => {
+                        const dist = [5, 4, 3, 2, 1].map((s) => ({ star: s, count: whiskeyReviews.filter((r) => r.rating === s).length }));
+                        const max = Math.max(...dist.map((d) => d.count), 1);
+                        return (
+                          <div className="px-6 py-4 border-b border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                            <p className="text-xs text-white/30 mb-2">평점 분포</p>
+                            <div className="space-y-1">
+                              {dist.map(({ star, count }) => (
+                                <div key={star} className="flex items-center gap-2 text-xs">
+                                  <span className="text-white/40 w-4 text-right">{star}</span>
+                                  <span className="text-yellow-400/60">★</span>
+                                  <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
+                                    <div className="h-full rounded-full bg-indigo-400/60" style={{ width: `${(count / max) * 100}%` }} />
+                                  </div>
+                                  <span className="text-white/30 w-3">{count}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })()}
 
                       {/* 리뷰 카드들 */}
                       <div className="divide-y divide-white/8">
@@ -737,28 +767,28 @@ export default function ReviewsPage() {
                                     />
                                     <div className="grid grid-cols-2 gap-3">
                                       <div>
-                                        <label className="block text-xs font-medium text-white/70 mb-1">🌸 향 (Nose)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1">향 (Nose)</label>
                                         <input type="text" value={editingReview.nose || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, nose: e.target.value })}
                                           placeholder="예: 바닐라, 꿀, 시트러스"
                                           className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-white/70 mb-1">👅 맛 (Palate)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1">맛 (Palate)</label>
                                         <input type="text" value={editingReview.palate || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, palate: e.target.value })}
                                           placeholder="예: 스모키, 오크, 카라멜"
                                           className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-white/70 mb-1">✨ 피니쉬 (Finish)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1">피니쉬 (Finish)</label>
                                         <input type="text" value={editingReview.finish_note || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, finish_note: e.target.value })}
                                           placeholder="예: 길고 따뜻한 여운"
                                           className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-white/70 mb-1">📝 비고</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1">비고</label>
                                         <input type="text" value={editingReview.remarks || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, remarks: e.target.value })}
                                           placeholder="기타 메모"
@@ -809,16 +839,16 @@ export default function ReviewsPage() {
                                     {(r.nose || r.palate || r.finish_note || r.remarks) && (
                                       <div className="ml-10 mb-2 grid grid-cols-2 gap-x-4 gap-y-1">
                                         {r.nose && (
-                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">🌸 향</span> {r.nose}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">향</span> {r.nose}</p>
                                         )}
                                         {r.palate && (
-                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">👅 맛</span> {r.palate}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">맛</span> {r.palate}</p>
                                         )}
                                         {r.finish_note && (
-                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">✨ 피니쉬</span> {r.finish_note}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">피니쉬</span> {r.finish_note}</p>
                                         )}
                                         {r.remarks && (
-                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">📝 비고</span> {r.remarks}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">비고</span> {r.remarks}</p>
                                         )}
                                       </div>
                                     )}
@@ -913,5 +943,65 @@ export default function ReviewsPage() {
         )}
       </div>
     </div>
+
+    {/* 위스키 비교 모달 */}
+    {compareList.length === 2 && (() => {
+      const w1 = whiskeys.find((w) => w.id === compareList[0]);
+      const w2 = whiskeys.find((w) => w.id === compareList[1]);
+      if (!w1 || !w2) return null;
+      const r1 = reviews[w1.id] || [];
+      const r2 = reviews[w2.id] || [];
+      const avg = (rs: typeof r1) => rs.length ? (rs.reduce((s, r) => s + r.rating, 0) / rs.length).toFixed(1) : "-";
+      const fields: { label: string; key: keyof typeof w1 }[] = [
+        { label: "타입", key: "type" },
+        { label: "지역", key: "region" },
+        { label: "숙성", key: "age" },
+        { label: "도수", key: "abv" },
+        { label: "가격", key: "price" },
+        { label: "향", key: "nose" },
+        { label: "맛", key: "palate" },
+        { label: "피니쉬", key: "finish_note" },
+      ];
+      return (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-4"
+          onClick={(e) => { if (e.target === e.currentTarget) setCompareList([]); }}>
+          <div className="glass-card rounded-2xl w-full max-w-2xl p-6 overflow-y-auto max-h-[90vh]">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-white">위스키 비교</h2>
+              <button onClick={() => setCompareList([])} className="text-white/40 hover:text-white text-xl">✕</button>
+            </div>
+            {/* 헤더 */}
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div />
+              {[w1, w2].map((w) => (
+                <div key={w.id} className="text-center">
+                  <p className="font-bold text-white text-sm">{w.name}</p>
+                  <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{w.type}</span>
+                </div>
+              ))}
+            </div>
+            {/* 평점 */}
+            <div className="grid grid-cols-3 gap-4 py-3 border-b border-white/8">
+              <p className="text-xs text-white/40 self-center">평균 평점</p>
+              {[r1, r2].map((rs, i) => (
+                <p key={i} className="text-center text-indigo-300 font-bold">★ {avg(rs)} <span className="text-xs text-white/30 font-normal">({rs.length}개)</span></p>
+              ))}
+            </div>
+            {/* 필드들 */}
+            {fields.map(({ label, key }) => (
+              <div key={key} className="grid grid-cols-3 gap-4 py-3 border-b border-white/8">
+                <p className="text-xs text-white/40 self-center">{label}</p>
+                {[w1, w2].map((w) => (
+                  <p key={w.id} className="text-center text-sm text-white/70">
+                    {w[key] ? String(w[key]) : <span className="text-white/20">-</span>}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    })()}
+    </>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 interface UserInfo {
@@ -26,6 +27,7 @@ const POPUP_WIDTH = 288; // w-72
 const POPUP_HEIGHT = 280; // 예상 높이
 
 export default function UserProfilePopup({ userId, displayName, avatarUrl }: UserProfilePopupProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<UserInfo | null>(null);
   const [reviewCount, setReviewCount] = useState(0);
@@ -154,6 +156,11 @@ export default function UserProfilePopup({ userId, displayName, avatarUrl }: Use
               <p className="text-xs text-gray-400 dark:text-gray-500">지식글</p>
             </div>
           </div>
+          <button
+            onClick={() => { setOpen(false); router.push(`/profile/${userId}`); }}
+            className="mt-3 w-full text-xs text-center text-gray-400 dark:text-gray-500 hover:text-blue-500 transition py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-800">
+            프로필 전체 보기 →
+          </button>
         </>
       ) : (
         <p className="text-center text-gray-400 text-sm py-4">정보를 불러올 수 없습니다.</p>
