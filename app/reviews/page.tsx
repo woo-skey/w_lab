@@ -478,7 +478,7 @@ export default function ReviewsPage() {
                     className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">📝 설명</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1">설명</label>
                   <input type="text" value={whiskey.tasting_notes}
                     onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
                     placeholder="기타 특징"
@@ -556,25 +556,25 @@ export default function ReviewsPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1">🌸 향</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">향</label>
                             <input type="text" value={editingWhiskey.nose || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, nose: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1">👅 맛</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">맛</label>
                             <input type="text" value={editingWhiskey.palate || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, palate: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1">✨ 피니쉬</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">피니쉬</label>
                             <input type="text" value={editingWhiskey.finish_note || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, finish_note: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1">📝 설명</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1">설명</label>
                             <input type="text" value={editingWhiskey.tasting_notes || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, tasting_notes: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
@@ -602,10 +602,10 @@ export default function ReviewsPage() {
                         </div>
                         {(w.nose || w.palate || w.finish_note || w.tasting_notes) && (
                           <div className="mt-3 space-y-2">
-                            {w.nose && <p className="text-sm text-white/55"><span className="font-semibold">🌸 향&nbsp;&nbsp;</span>{w.nose}</p>}
-                            {w.palate && <p className="text-sm text-white/55"><span className="font-semibold">👅 맛&nbsp;&nbsp;</span>{w.palate}</p>}
-                            {w.finish_note && <p className="text-sm text-white/55"><span className="font-semibold">✨ 피니쉬&nbsp;&nbsp;</span>{w.finish_note}</p>}
-                            {w.tasting_notes && <p className="text-sm text-white/55"><span className="font-semibold">📝 설명&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
+                            {w.nose && <p className="text-sm text-white/55"><span className="font-semibold">향&nbsp;&nbsp;</span>{w.nose}</p>}
+                            {w.palate && <p className="text-sm text-white/55"><span className="font-semibold">맛&nbsp;&nbsp;</span>{w.palate}</p>}
+                            {w.finish_note && <p className="text-sm text-white/55"><span className="font-semibold">피니쉬&nbsp;&nbsp;</span>{w.finish_note}</p>}
+                            {w.tasting_notes && <p className="text-sm text-white/55"><span className="font-semibold">설명&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
                           </div>
                         )}
                       </button>
