@@ -39,6 +39,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const [isDark, setIsDark] = useState(true);
 
   const doSearch = useCallback(async (q: string) => {
     if (!q.trim()) { setSearchResults([]); return; }
@@ -97,6 +98,20 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    const dark = saved !== "light";
+    setIsDark(dark);
+    document.documentElement.classList.toggle("dark", dark);
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    localStorage.setItem("theme", next ? "dark" : "light");
+    document.documentElement.classList.toggle("dark", next);
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -191,6 +206,13 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
 
         {/* 하단 유저 */}
         <div className="px-3 py-4 border-t border-white/8 space-y-1" style={{ borderTopColor: "rgba(255,255,255,0.08)" }}>
+          {/* 다크/라이트 토글 */}
+          <button onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/35 hover:text-white/70 hover:bg-white/5 transition-colors text-left mb-1">
+            <span className="text-base w-5 text-center">{isDark ? "☀️" : "🌙"}</span>
+            <span>{isDark ? "라이트 모드" : "다크 모드"}</span>
+          </button>
+
           {userId ? (
             <>
               {/* 알림 */}

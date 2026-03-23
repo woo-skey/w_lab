@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
+import UserProfilePopup from "@/components/UserProfilePopup";
 
 interface Bar {
   id: string;
@@ -178,7 +179,7 @@ export default function BarsPage() {
                       <SafeHtml html={bar.notes} className="rich-content text-sm leading-relaxed text-white/65 mb-4" />
                     )}
                     <div className="flex justify-between items-center text-xs text-white/35">
-                      <span>추천: {bar.author_name}</span>
+                      <span className="flex items-center gap-1">추천: <UserProfilePopup userId={bar.user_id} displayName={bar.author_name || "알 수 없음"} /></span>
                       <span>{new Date(bar.created_at).toLocaleDateString("ko-KR")}</span>
                     </div>
                   </>
