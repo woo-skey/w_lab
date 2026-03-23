@@ -50,6 +50,12 @@ export default function UserProfilePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
+
+  useEffect(() => {
+    const currentUserId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+    setIsOwnProfile(!!currentUserId && currentUserId === userId);
+  }, [userId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -144,6 +150,14 @@ export default function UserProfilePage() {
           <div className="flex-1 min-w-0 space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-white text-xl font-bold truncate">{user.name}</span>
+              {isOwnProfile && (
+                <button
+                  onClick={() => router.push("/mypage")}
+                  className="px-2 py-0.5 rounded-full text-xs border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition"
+                >
+                  ✎ 수정
+                </button>
+              )}
               {user.is_admin && (
                 <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   관리자

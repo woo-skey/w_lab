@@ -84,6 +84,15 @@ export default function ReviewsPage() {
   const [userReviewedWhiskeys, setUserReviewedWhiskeys] = useState<Set<string>>(new Set());
   const [compareList, setCompareList] = useState<string[]>([]);
 
+  // 비교 모달 열릴 때 리뷰 미리 fetch
+  useEffect(() => {
+    if (compareList.length === 2) {
+      compareList.forEach((id) => {
+        if (!reviews[id]) fetchReviews(id);
+      });
+    }
+  }, [compareList]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     const id = localStorage.getItem("userId");
     if (id) { setUserId(id); fetchReviewLikes(id); }
@@ -457,28 +466,28 @@ export default function ReviewsPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">향 (Nose)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>향 (Nose)</label>
                   <input type="text" value={whiskey.nose}
                     onChange={(e) => setWhiskey({ ...whiskey, nose: e.target.value })}
                     placeholder="예: 바닐라, 꿀, 시트러스"
                     className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">맛 (Palate)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛 (Palate)</label>
                   <input type="text" value={whiskey.palate}
                     onChange={(e) => setWhiskey({ ...whiskey, palate: e.target.value })}
                     placeholder="예: 스모키, 오크, 카라멜"
                     className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">피니쉬 (Finish)</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬 (Finish)</label>
                   <input type="text" value={whiskey.finish_note}
                     onChange={(e) => setWhiskey({ ...whiskey, finish_note: e.target.value })}
                     placeholder="예: 길고 따뜻한 여운"
                     className="glass-input w-full px-4 py-2 rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">설명</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>설명</label>
                   <input type="text" value={whiskey.tasting_notes}
                     onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
                     placeholder="기타 특징"
@@ -556,25 +565,25 @@ export default function ReviewsPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1">향</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>향</label>
                             <input type="text" value={editingWhiskey.nose || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, nose: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1">맛</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛</label>
                             <input type="text" value={editingWhiskey.palate || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, palate: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1">피니쉬</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬</label>
                             <input type="text" value={editingWhiskey.finish_note || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, finish_note: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1">설명</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>설명</label>
                             <input type="text" value={editingWhiskey.tasting_notes || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, tasting_notes: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
@@ -602,10 +611,10 @@ export default function ReviewsPage() {
                         </div>
                         {(w.nose || w.palate || w.finish_note || w.tasting_notes) && (
                           <div className="mt-3 space-y-2">
-                            {w.nose && <p className="text-sm text-white/55"><span className="font-semibold">향&nbsp;&nbsp;</span>{w.nose}</p>}
-                            {w.palate && <p className="text-sm text-white/55"><span className="font-semibold">맛&nbsp;&nbsp;</span>{w.palate}</p>}
-                            {w.finish_note && <p className="text-sm text-white/55"><span className="font-semibold">피니쉬&nbsp;&nbsp;</span>{w.finish_note}</p>}
-                            {w.tasting_notes && <p className="text-sm text-white/55"><span className="font-semibold">설명&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
+                            {w.nose && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>향&nbsp;&nbsp;</span>{w.nose}</p>}
+                            {w.palate && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>맛&nbsp;&nbsp;</span>{w.palate}</p>}
+                            {w.finish_note && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>피니쉬&nbsp;&nbsp;</span>{w.finish_note}</p>}
+                            {w.tasting_notes && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>설명&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
                           </div>
                         )}
                       </button>
@@ -658,28 +667,28 @@ export default function ReviewsPage() {
                               />
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <label className="block text-xs font-medium text-white/70 mb-1">향 (Nose)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>향 (Nose)</label>
                                   <input type="text" value={reviewForm.nose}
                                     onChange={(e) => setReviewForm({ ...reviewForm, nose: e.target.value })}
                                     placeholder="예: 바닐라, 꿀, 시트러스"
                                     className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-white/70 mb-1">맛 (Palate)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛 (Palate)</label>
                                   <input type="text" value={reviewForm.palate}
                                     onChange={(e) => setReviewForm({ ...reviewForm, palate: e.target.value })}
                                     placeholder="예: 스모키, 오크, 카라멜"
                                     className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-white/70 mb-1">피니쉬 (Finish)</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬 (Finish)</label>
                                   <input type="text" value={reviewForm.finish_note}
                                     onChange={(e) => setReviewForm({ ...reviewForm, finish_note: e.target.value })}
                                     placeholder="예: 길고 따뜻한 여운"
                                     className="glass-input w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-white/70 mb-1">비고</label>
+                                  <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>비고</label>
                                   <input type="text" value={reviewForm.remarks}
                                     onChange={(e) => setReviewForm({ ...reviewForm, remarks: e.target.value })}
                                     placeholder="기타 메모"
@@ -767,28 +776,28 @@ export default function ReviewsPage() {
                                     />
                                     <div className="grid grid-cols-2 gap-3">
                                       <div>
-                                        <label className="block text-xs font-medium text-white/70 mb-1">향 (Nose)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>향 (Nose)</label>
                                         <input type="text" value={editingReview.nose || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, nose: e.target.value })}
                                           placeholder="예: 바닐라, 꿀, 시트러스"
                                           className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-white/70 mb-1">맛 (Palate)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛 (Palate)</label>
                                         <input type="text" value={editingReview.palate || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, palate: e.target.value })}
                                           placeholder="예: 스모키, 오크, 카라멜"
                                           className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-white/70 mb-1">피니쉬 (Finish)</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬 (Finish)</label>
                                         <input type="text" value={editingReview.finish_note || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, finish_note: e.target.value })}
                                           placeholder="예: 길고 따뜻한 여운"
                                           className="glass-input w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
-                                        <label className="block text-xs font-medium text-white/70 mb-1">비고</label>
+                                        <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>비고</label>
                                         <input type="text" value={editingReview.remarks || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, remarks: e.target.value })}
                                           placeholder="기타 메모"
@@ -839,16 +848,16 @@ export default function ReviewsPage() {
                                     {(r.nose || r.palate || r.finish_note || r.remarks) && (
                                       <div className="ml-10 mb-2 grid grid-cols-2 gap-x-4 gap-y-1">
                                         {r.nose && (
-                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">향</span> {r.nose}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70"><span className="text-indigo-400/70 mr-1">·</span>향</span> {r.nose}</p>
                                         )}
                                         {r.palate && (
-                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">맛</span> {r.palate}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70"><span className="text-indigo-400/70 mr-1">·</span>맛</span> {r.palate}</p>
                                         )}
                                         {r.finish_note && (
-                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">피니쉬</span> {r.finish_note}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70"><span className="text-indigo-400/70 mr-1">·</span>피니쉬</span> {r.finish_note}</p>
                                         )}
                                         {r.remarks && (
-                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70">비고</span> {r.remarks}</p>
+                                          <p className="text-xs text-white/55"><span className="font-medium text-white/70"><span className="text-indigo-400/70 mr-1">·</span>비고</span> {r.remarks}</p>
                                         )}
                                       </div>
                                     )}
@@ -952,6 +961,7 @@ export default function ReviewsPage() {
       const r1 = reviews[w1.id] || [];
       const r2 = reviews[w2.id] || [];
       const avg = (rs: typeof r1) => rs.length ? (rs.reduce((s, r) => s + r.rating, 0) / rs.length).toFixed(1) : "-";
+      const TASTING_KEYS = new Set(["nose", "palate", "finish_note"]);
       const fields: { label: string; key: keyof typeof w1 }[] = [
         { label: "타입", key: "type" },
         { label: "지역", key: "region" },
@@ -990,7 +1000,9 @@ export default function ReviewsPage() {
             {/* 필드들 */}
             {fields.map(({ label, key }) => (
               <div key={key} className="grid grid-cols-3 gap-4 py-3 border-b border-white/8">
-                <p className="text-xs text-white/40 self-center">{label}</p>
+                <p className="text-xs text-white/40 self-center">
+                  {TASTING_KEYS.has(key as string) && <span className="text-indigo-400/70 mr-1">·</span>}{label}
+                </p>
                 {[w1, w2].map((w) => (
                   <p key={w.id} className="text-center text-sm text-white/70">
                     {w[key] ? String(w[key]) : <span className="text-white/20">-</span>}

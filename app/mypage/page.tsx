@@ -72,7 +72,7 @@ export default function MyPage() {
   const [favoriteBars, setFavoriteBars] = useState<{ id: string; bar_name: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [editingProfile, setEditingProfile] = useState(false);
-  const [profileForm, setProfileForm] = useState({ bio: "", favorite_category: "", favorite_whiskey: "" });
+  const [profileForm, setProfileForm] = useState({ name: "", bio: "", favorite_category: "", favorite_whiskey: "" });
   const [profileSaving, setProfileSaving] = useState(false);
   const [showPwChange, setShowPwChange] = useState(false);
   const [pwForm, setPwForm] = useState({ current: "", newPw: "", confirm: "" });
@@ -381,6 +381,7 @@ export default function MyPage() {
     if (!userId) return;
     setProfileSaving(true);
     await supabase.from("users").update({
+      name: profileForm.name || null,
       bio: profileForm.bio || null,
       favorite_category: profileForm.favorite_category || null,
       favorite_whiskey: profileForm.favorite_whiskey || null,
@@ -484,6 +485,17 @@ export default function MyPage() {
             {editingProfile ? (
               <div className="space-y-3">
                 <div>
+                  <label className="block text-xs font-medium text-white/40 mb-1">이름</label>
+                  <input
+                    type="text"
+                    value={profileForm.name}
+                    onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                    placeholder="표시될 이름"
+                    maxLength={30}
+                    className="glass-input w-full px-3 py-2 rounded-lg text-sm"
+                  />
+                </div>
+                <div>
                   <label className="block text-xs font-medium text-white/40 mb-1">한 줄 소개</label>
                   <input
                     type="text"
@@ -552,6 +564,7 @@ export default function MyPage() {
                 <button
                   onClick={() => {
                     setProfileForm({
+                      name: profile?.name || "",
                       bio: profile?.bio || "",
                       favorite_category: profile?.favorite_category || "",
                       favorite_whiskey: profile?.favorite_whiskey || "",

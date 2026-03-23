@@ -47,6 +47,8 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const bellRef = useRef<HTMLButtonElement>(null);
+  const [notifMaxH, setNotifMaxH] = useState(340);
   const [isDark, setIsDark] = useState(true);
 
   const doSearch = useCallback(async (q: string) => {
@@ -87,7 +89,12 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   };
 
   const handleBellClick = async () => {
-    setShowNotifications((prev) => !prev);
+    const next = !showNotifications;
+    if (next && bellRef.current) {
+      const rect = bellRef.current.getBoundingClientRect();
+      setNotifMaxH(Math.max(200, rect.top - 12));
+    }
+    setShowNotifications(next);
     if (!showNotifications && userId) {
       const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
       if (unreadIds.length > 0) {
@@ -276,7 +283,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
             <>
               {/* 알림 */}
               <div className="relative" ref={notifRef}>
-                <button onClick={handleBellClick}
+                <button ref={bellRef} onClick={handleBellClick}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left hover:bg-black/5"
                   style={{ color: T.textSecondary }}>
                   <span className="relative w-5 text-center text-base">
@@ -290,16 +297,16 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                   <span>알림{unreadCount > 0 ? ` (${unreadCount})` : ""}</span>
                 </button>
                 {showNotifications && (
-                  <div className="absolute bottom-full left-0 mb-2 w-72 rounded-xl overflow-hidden z-50"
-                    style={{ background: T.notifBg, border: `1px solid ${T.notifBorder}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }}>
-                    <div className="px-4 py-3 flex justify-between items-center" style={{ borderBottom: `1px solid ${T.border}` }}>
+                  <div className="absolute bottom-full left-0 mb-2 w-72 rounded-xl overflow-hidden z-50 flex flex-col"
+                    style={{ background: T.notifBg, border: `1px solid ${T.notifBorder}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", maxHeight: notifMaxH }}>
+                    <div className="px-4 py-3 flex justify-between items-center flex-shrink-0" style={{ borderBottom: `1px solid ${T.border}` }}>
                       <span className="text-sm font-medium" style={{ color: T.textPrimary }}>알림</span>
                       {notifications.length > 0 && (
                         <button onClick={async () => { await supabase.from("notifications").delete().eq("user_id", userId); setNotifications([]); }}
                           className="text-xs hover:text-red-400 transition" style={{ color: T.textMuted }}>전체 삭제</button>
                       )}
                     </div>
-                    <div className="max-h-72 overflow-y-auto">
+                    <div className="overflow-y-auto flex-1">
                       {notifications.length === 0 ? (
                         <p className="text-center text-sm py-8" style={{ color: T.textMuted }}>알림이 없습니다</p>
                       ) : notifications.map((n) => (

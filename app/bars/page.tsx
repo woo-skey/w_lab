@@ -28,6 +28,7 @@ export default function BarsPage() {
   const [editingBar, setEditingBar] = useState<Bar | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [favoritedBars, setFavoritedBars] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -132,15 +133,25 @@ export default function BarsPage() {
         <p className="text-white/55 mb-2">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
         <p className="text-xs text-white/30 mb-8">Bar 추가하기 버튼을 눌러 바 이름, 링크, 메모를 입력하면 목록에 추가됩니다. 본인이 등록한 Bar는 편집·삭제할 수 있습니다.</p>
 
-        {userId ? (
-          <button
-            onClick={() => setShowModal(true)}
-            className="mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition"
-          >
-            🍸 Bar 추가하기
-          </button>
-        ) : (
-          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+        <div className="flex gap-3 mb-6 flex-wrap items-center">
+          {userId && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition flex-shrink-0"
+            >
+              🍸 Bar 추가하기
+            </button>
+          )}
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="바 이름으로 검색..."
+            className="glass-input flex-1 min-w-[160px] px-4 py-2 rounded-lg text-sm"
+          />
+        </div>
+        {!userId && (
+          <div className="glass-card rounded-lg p-4 mb-4 text-center">
             <p className="text-white/60 mb-2">바를 추천하려면 로그인이 필요합니다.</p>
             <Link href="/login" className="text-indigo-400 underline font-medium">로그인하기</Link>
           </div>
@@ -153,7 +164,10 @@ export default function BarsPage() {
           <div className="text-center py-12 text-white/40">아직 추천된 바가 없습니다.</div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
-            {bars.map((bar) => (
+            {bars.filter((bar) => !searchQuery.trim() || bar.bar_name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && searchQuery.trim() ? (
+              <div className="col-span-2 text-center py-12 text-white/40">"{searchQuery}"에 해당하는 바가 없습니다.</div>
+            ) : null}
+            {bars.filter((bar) => !searchQuery.trim() || bar.bar_name.toLowerCase().includes(searchQuery.toLowerCase())).map((bar) => (
               <div key={bar.id} className="glass-card rounded-xl p-6 hover:bg-white/8 transition">
                 {editingBar?.id === bar.id ? (
                   <form onSubmit={handleEdit} className="space-y-3">

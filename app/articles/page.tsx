@@ -236,7 +236,7 @@ export default function ArticlesPage() {
         {/* 카테고리 필터 */}
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map((cat) => (
-            <button key={cat} onClick={() => setSelectedCategory(cat)}
+            <button key={cat} onClick={() => { setSelectedCategory(cat); setPage(1); }}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                 selectedCategory === cat ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
               }`}>{cat}</button>
@@ -248,7 +248,7 @@ export default function ArticlesPage() {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
             placeholder="글 제목 검색..."
             className="glass-input flex-1 px-4 py-2 rounded-lg text-sm"
           />
