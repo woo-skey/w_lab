@@ -16,6 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t!=='light')document.documentElement.classList.add('dark');}catch(e){}})();` }} />
+      </head>
       <body>
         <TwemojiProvider>
           <AppSidebar>{children}</AppSidebar>
