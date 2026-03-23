@@ -155,7 +155,7 @@ export default function MyPage() {
       .select("bars(id, bar_name)")
       .eq("user_id", id);
     if (favData) {
-      setFavoriteBars((favData as { bars: { id: string; bar_name: string } | null }[]).map((f) => f.bars).filter((b): b is { id: string; bar_name: string } => b !== null));
+      setFavoriteBars((favData as unknown as { bars: { id: string; bar_name: string } }[]).map((f) => f.bars).filter(Boolean) as { id: string; bar_name: string }[]);
     }
 
     setLoading(false);
