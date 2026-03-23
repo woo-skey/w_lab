@@ -155,8 +155,7 @@ export default function MyPage() {
       .select("bars(id, bar_name)")
       .eq("user_id", id);
     if (favData) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setFavoriteBars((favData as any[]).map((f) => f.bars).filter(Boolean));
+      setFavoriteBars((favData as { bars: { id: string; bar_name: string } | null }[]).map((f) => f.bars).filter((b): b is { id: string; bar_name: string } => b !== null));
     }
 
     setLoading(false);
