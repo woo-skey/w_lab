@@ -87,8 +87,8 @@ export default function UserProfilePage() {
           .order("created_at", { ascending: false }),
       ]);
 
-      setReviews((reviewsRes.data as Review[]) ?? []);
-      setArticles((articlesRes.data as Article[]) ?? []);
+      setReviews((reviewsRes.data as unknown as Review[]) ?? []);
+      setArticles((articlesRes.data as unknown as Article[]) ?? []);
       setLoading(false);
     }
 
