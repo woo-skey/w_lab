@@ -55,6 +55,46 @@ body {
 }
 .calendar-back { transform: rotateY(180deg); }
 
+/* ── 라이트 모드 오버라이드 ── */
+html:not(.dark) .glass-card {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+}
+html:not(.dark) .glass-input {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: rgba(10, 10, 30, 0.85) !important;
+}
+html:not(.dark) .glass-input::placeholder { color: rgba(10, 10, 30, 0.3) !important; }
+html:not(.dark) .glass-input option { background: #fff; color: #111; }
+
+html:not(.dark) .text-white     { color: rgba(10, 10, 30, 0.90) !important; }
+html:not(.dark) .text-white\/90 { color: rgba(10, 10, 30, 0.90) !important; }
+html:not(.dark) .text-white\/80 { color: rgba(10, 10, 30, 0.80) !important; }
+html:not(.dark) .text-white\/70 { color: rgba(10, 10, 30, 0.70) !important; }
+html:not(.dark) .text-white\/65 { color: rgba(10, 10, 30, 0.65) !important; }
+html:not(.dark) .text-white\/60 { color: rgba(10, 10, 30, 0.60) !important; }
+html:not(.dark) .text-white\/55 { color: rgba(10, 10, 30, 0.55) !important; }
+html:not(.dark) .text-white\/50 { color: rgba(10, 10, 30, 0.50) !important; }
+html:not(.dark) .text-white\/45 { color: rgba(10, 10, 30, 0.45) !important; }
+html:not(.dark) .text-white\/40 { color: rgba(10, 10, 30, 0.40) !important; }
+html:not(.dark) .text-white\/35 { color: rgba(10, 10, 30, 0.35) !important; }
+html:not(.dark) .text-white\/30 { color: rgba(10, 10, 30, 0.30) !important; }
+html:not(.dark) .text-white\/25 { color: rgba(10, 10, 30, 0.25) !important; }
+html:not(.dark) .text-white\/20 { color: rgba(10, 10, 30, 0.20) !important; }
+
+html:not(.dark) .bg-white\/5  { background-color: rgba(0,0,0,0.03) !important; }
+html:not(.dark) .bg-white\/8  { background-color: rgba(0,0,0,0.05) !important; }
+html:not(.dark) .bg-white\/10 { background-color: rgba(0,0,0,0.06) !important; }
+html:not(.dark) .bg-white\/12 { background-color: rgba(0,0,0,0.08) !important; }
+
+html:not(.dark) .border-white\/8  { border-color: rgba(0,0,0,0.07) !important; }
+html:not(.dark) .border-white\/10 { border-color: rgba(0,0,0,0.09) !important; }
+html:not(.dark) .divide-white\/8 > * + * { border-color: rgba(0,0,0,0.07) !important; }
+
+html:not(.dark) .rich-content { color: rgba(10,10,30,0.80); }
+
 img.emoji {
   height: 1em;
   width: 1em;

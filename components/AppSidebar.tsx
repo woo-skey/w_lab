@@ -19,12 +19,20 @@ const NAV = [
 ];
 
 const SF = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif";
-const GLASS_SIDEBAR = {
+const GLASS_SIDEBAR_DARK = {
   background: "rgba(255,255,255,0.04)",
   backdropFilter: "blur(40px)",
   WebkitBackdropFilter: "blur(40px)",
   borderRight: "1px solid rgba(255,255,255,0.08)",
 };
+const GLASS_SIDEBAR_LIGHT = {
+  background: "rgba(255,255,255,0.70)",
+  backdropFilter: "blur(40px)",
+  WebkitBackdropFilter: "blur(40px)",
+  borderRight: "1px solid rgba(0,0,0,0.08)",
+};
+const BG_DARK = "radial-gradient(ellipse at 20% 50%, #1a1f3c 0%, #0d0d1a 40%, #0a0a14 100%)";
+const BG_LIGHT = "radial-gradient(ellipse at 20% 50%, #dde3f8 0%, #eef1fb 40%, #f4f6ff 100%)";
 const NO_SIDEBAR_PATHS = ["/login", "/signup"];
 
 export default function AppSidebar({ children }: { children: React.ReactNode }) {
@@ -133,27 +141,24 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
 
   const hideSidebar = NO_SIDEBAR_PATHS.includes(pathname);
 
+  const bg = isDark ? BG_DARK : BG_LIGHT;
+  const sidebarStyle = isDark ? GLASS_SIDEBAR_DARK : GLASS_SIDEBAR_LIGHT;
+
   if (hideSidebar) {
     return (
-      <div className="relative min-h-screen" style={{
-        background: "radial-gradient(ellipse at 20% 50%, #1a1f3c 0%, #0d0d1a 40%, #0a0a14 100%)",
-        fontFamily: SF,
-      }}>
-        <Orbs />
+      <div className="relative min-h-screen" style={{ background: bg, fontFamily: SF }}>
+        <Orbs isDark={isDark} />
         <div className="relative z-10">{children}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen" style={{
-      background: "radial-gradient(ellipse at 20% 50%, #1a1f3c 0%, #0d0d1a 40%, #0a0a14 100%)",
-      fontFamily: SF,
-    }}>
-      <Orbs />
+    <div className="flex min-h-screen" style={{ background: bg, fontFamily: SF }}>
+      <Orbs isDark={isDark} />
 
       {/* 사이드바 */}
-      <aside className="fixed top-0 left-0 h-screen w-56 z-20 flex flex-col" style={GLASS_SIDEBAR}>
+      <aside className="fixed top-0 left-0 h-screen w-56 z-20 flex flex-col" style={sidebarStyle}>
         {/* 로고 */}
         <div className="px-5 pt-8 pb-4">
           <Link href="/">
@@ -308,7 +313,10 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   );
 }
 
-function Orbs() {
+function Orbs({ isDark }: { isDark: boolean }) {
+  const o1 = isDark ? "radial-gradient(circle, #3b82f6 0%, transparent 70%)" : "radial-gradient(circle, #6366f1 0%, transparent 70%)";
+  const o2 = isDark ? "radial-gradient(circle, #8b5cf6 0%, transparent 70%)" : "radial-gradient(circle, #a78bfa 0%, transparent 70%)";
+  const o3 = isDark ? "radial-gradient(circle, #06b6d4 0%, transparent 70%)" : "radial-gradient(circle, #38bdf8 0%, transparent 70%)";
   return (
     <>
       <style>{`
@@ -329,11 +337,11 @@ function Orbs() {
       `}</style>
       <div className="fixed inset-0 overflow-hidden pointer-events-none select-none z-0">
         <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)", animation: "orb-float-1 18s ease-in-out infinite" }} />
+          style={{ background: o1, animation: "orb-float-1 18s ease-in-out infinite" }} />
         <div className="absolute top-1/3 -right-60 w-[500px] h-[500px] rounded-full opacity-15"
-          style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)", animation: "orb-float-2 22s ease-in-out infinite" }} />
+          style={{ background: o2, animation: "orb-float-2 22s ease-in-out infinite" }} />
         <div className="absolute -bottom-40 left-1/3 w-[400px] h-[400px] rounded-full opacity-10"
-          style={{ background: "radial-gradient(circle, #06b6d4 0%, transparent 70%)", animation: "orb-float-3 15s ease-in-out infinite" }} />
+          style={{ background: o3, animation: "orb-float-3 15s ease-in-out infinite" }} />
       </div>
     </>
   );
