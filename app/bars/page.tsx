@@ -165,7 +165,7 @@ export default function BarsPage() {
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
             {bars.filter((bar) => !searchQuery.trim() || bar.bar_name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && searchQuery.trim() ? (
-              <div className="col-span-2 text-center py-12 text-white/40">"{searchQuery}"에 해당하는 바가 없습니다.</div>
+              <div className="col-span-2 text-center py-12 text-white/40">&ldquo;{searchQuery}&rdquo;에 해당하는 바가 없습니다.</div>
             ) : null}
             {bars.filter((bar) => !searchQuery.trim() || bar.bar_name.toLowerCase().includes(searchQuery.toLowerCase())).map((bar) => (
               <div key={bar.id} className="glass-card rounded-xl p-6 hover:bg-white/8 transition">
