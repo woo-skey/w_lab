@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/lib/notifications";
 
 interface Schedule {
   id: string;
@@ -224,6 +225,30 @@ export default function SchedulePage() {
     const updated = { ...selectedSchedule, confirmed_date: newDate };
     setSelectedSchedule(updated);
     setSchedules((prev) => prev.map((s) => s.id === selectedSchedule.id ? updated : s));
+
+    // 날짜 확정 시 투표한 유저들에게 알림
+    if (newDate) {
+      const formattedDate = new Date(newDate + "T00:00:00").toLocaleDateString("ko-KR", {
+        month: "long", day: "numeric", weekday: "short",
+      });
+      // 이 일정에서 투표한 유니크 유저 ID 수집 (본인 제외)
+      const { data: dateRows } = await supabase
+        .from("schedule_dates")
+        .select("id")
+        .eq("schedule_id", selectedSchedule.id);
+      if (dateRows && dateRows.length > 0) {
+        const { data: voters } = await supabase
+          .from("user_availability")
+          .select("user_id")
+          .in("schedule_date_id", dateRows.map((d) => d.id));
+        const uniqueVoterIds = [...new Set((voters || []).map((v) => v.user_id))].filter((id) => id !== userId);
+        await Promise.all(
+          uniqueVoterIds.map((uid) =>
+            createNotification(uid, "schedule", `📌 "${selectedSchedule.name}" 일정이 ${formattedDate}로 확정됐습니다.`, "/schedule")
+          )
+        );
+      }
+    }
   };
 
   // 달력 계산
