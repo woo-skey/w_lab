@@ -8,6 +8,7 @@ interface Schedule {
   name: string;
   created_by: string;
   created_at: string;
+  confirmed_date?: string | null;
 }
 
 interface AvailabilityMap {
@@ -32,6 +33,7 @@ export default function SchedulePage() {
   const [newName, setNewName] = useState("");
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   const [userDateMap, setUserDateMap] = useState<{ name: string; dates: string[] }[]>([]);
+  const [totalUsers, setTotalUsers] = useState(0);
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -42,6 +44,7 @@ export default function SchedulePage() {
     if (id) setUserId(id);
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchSchedules();
+    supabase.from("users").select("*", { count: "exact", head: true }).then(({ count }) => setTotalUsers(count || 0));
   }, []);
 
   useEffect(() => {
@@ -181,6 +184,16 @@ export default function SchedulePage() {
     }
   };
 
+  const handleConfirmDate = async (dateStr: string) => {
+    if (!selectedSchedule) return;
+    const newDate = selectedSchedule.confirmed_date === dateStr ? null : dateStr;
+    const { error } = await supabase.from("schedules").update({ confirmed_date: newDate }).eq("id", selectedSchedule.id);
+    if (error) { console.error(error); return; }
+    const updated = { ...selectedSchedule, confirmed_date: newDate };
+    setSelectedSchedule(updated);
+    setSchedules((prev) => prev.map((s) => s.id === selectedSchedule.id ? updated : s));
+  };
+
   // 달력 계산
   const firstDay = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -276,20 +289,40 @@ export default function SchedulePage() {
               <div className="glass-card rounded-xl p-4">
                 <h2 className="font-bold text-white mb-3">🏆 최다 가능 날짜</h2>
                 <div className="space-y-2">
-                  {bestDates.map(([date, info], idx) => (
-                    <div key={date} className={`px-3 py-2 rounded-lg text-sm ${
-                      idx === 0 ? "border border-indigo-400/40" : ""
-                    }`} style={{ background: idx === 0 ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.05)" }}>
-                      <p className={`font-medium ${idx === 0 ? "text-indigo-300" : "text-white/70"}`}>
-                        {new Date(date + "T00:00:00").toLocaleDateString("ko-KR", {
-                          month: "long", day: "numeric", weekday: "short"
-                        })}
-                      </p>
-                      <p className={`text-xs ${idx === 0 ? "text-indigo-400" : "text-white/40"}`}>
-                        {info.count}명 가능 {idx === 0 ? "👑" : ""}
-                      </p>
-                    </div>
-                  ))}
+                  {bestDates.map(([date, info], idx) => {
+                    const isConfirmed = selectedSchedule?.confirmed_date === date;
+                    const isCreator = selectedSchedule?.created_by === userId;
+                    return (
+                      <div key={date} className={`px-3 py-2 rounded-lg text-sm ${
+                        isConfirmed ? "border border-amber-400/50" : idx === 0 ? "border border-indigo-400/40" : ""
+                      }`} style={{ background: isConfirmed ? "rgba(234,179,8,0.15)" : idx === 0 ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.05)" }}>
+                        <div className="flex items-start justify-between gap-1">
+                          <div className="min-w-0">
+                            <p className={`font-medium truncate ${isConfirmed ? "text-amber-300" : idx === 0 ? "text-indigo-300" : "text-white/70"}`}>
+                              {new Date(date + "T00:00:00").toLocaleDateString("ko-KR", {
+                                month: "long", day: "numeric", weekday: "short"
+                              })}
+                            </p>
+                            <p className={`text-xs ${isConfirmed ? "text-amber-400" : idx === 0 ? "text-indigo-400" : "text-white/40"}`}>
+                              {isConfirmed ? "📌 확정됨" : `${info.count}명 가능${idx === 0 ? " 👑" : ""}`}
+                            </p>
+                          </div>
+                          {isCreator && (
+                            <button
+                              onClick={() => handleConfirmDate(date)}
+                              className={`flex-shrink-0 text-xs px-2 py-0.5 rounded transition ${
+                                isConfirmed
+                                  ? "bg-amber-500/20 text-amber-300 hover:bg-amber-500/30"
+                                  : "bg-white/8 text-white/40 hover:text-amber-300 hover:bg-amber-500/15"
+                              }`}
+                            >
+                              {isConfirmed ? "확정됨" : "확정"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -299,7 +332,26 @@ export default function SchedulePage() {
           <div className="lg:col-span-3">
             {selectedSchedule ? (
               <div className="glass-card rounded-xl p-6">
-                <div className="flex justify-between items-center mb-6">
+                {/* 확정 날짜 배너 */}
+                {selectedSchedule.confirmed_date && (
+                  <div className="mb-4 px-4 py-3 rounded-xl flex items-center gap-3" style={{ background: "rgba(234,179,8,0.12)", border: "1px solid rgba(234,179,8,0.3)" }}>
+                    <span className="text-amber-300 text-lg">📌</span>
+                    <div>
+                      <p className="text-amber-300 font-semibold text-sm">확정 날짜</p>
+                      <p className="text-amber-200 font-bold">
+                        {new Date(selectedSchedule.confirmed_date + "T00:00:00").toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" })}
+                      </p>
+                    </div>
+                    {selectedSchedule.created_by === userId && (
+                      <button onClick={() => handleConfirmDate(selectedSchedule.confirmed_date!)}
+                        className="ml-auto text-xs text-amber-400/60 hover:text-amber-300 px-2 py-1 rounded hover:bg-amber-500/10 transition">
+                        확정 취소
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center mb-4">
                   <div>
                     <h2 className="text-xl font-bold text-white">{selectedSchedule.name}</h2>
                     {userId && (
@@ -335,6 +387,26 @@ export default function SchedulePage() {
                   </div>
                 </div>
 
+                {/* 투표 현황 */}
+                <div className="mb-4 px-4 py-2.5 rounded-xl flex items-center gap-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-white/50 text-xs">투표 현황</span>
+                      <span className="text-white/70 text-xs font-semibold">
+                        {userDateMap.length}명 완료 {totalUsers > 0 && <span className="text-white/35">/ 전체 {totalUsers}명</span>}
+                      </span>
+                    </div>
+                    {totalUsers > 0 && (
+                      <div className="w-full h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+                        <div
+                          className="h-1.5 rounded-full transition-all duration-500"
+                          style={{ width: `${Math.min((userDateMap.length / totalUsers) * 100, 100)}%`, background: "rgba(99,102,241,0.8)" }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* 요일 헤더 */}
                 <div className="grid grid-cols-7 mb-2">
                   {DAYS.map((day, i) => (
@@ -355,6 +427,7 @@ export default function SchedulePage() {
                     const info = availabilityMap[dateStr];
                     const isMyDate = info?.isAvailable || false;
                     const count = info?.count || 0;
+                    const isConfirmed = selectedSchedule.confirmed_date === dateStr;
                     const isToday =
                       today.getFullYear() === viewYear &&
                       today.getMonth() === viewMonth &&
@@ -373,16 +446,24 @@ export default function SchedulePage() {
                         <div className="calendar-card">
                           {/* 앞면 */}
                           <div className={`calendar-front flex flex-col items-center justify-center text-sm
-                            ${isMyDate ? "bg-indigo-500 text-white font-bold" : ""}
-                            ${!isMyDate && count > 0 ? "border border-indigo-400/40" : ""}
-                            ${!isMyDate && count === 0 ? "hover:bg-white/8" : ""}
-                            ${isToday && !isMyDate ? "ring-2 ring-indigo-400/60" : ""}
-                            ${dayOfWeek === 0 && !isMyDate ? "text-red-400" : ""}
-                            ${dayOfWeek === 6 && !isMyDate ? "text-indigo-400" : ""}
+                            ${isConfirmed ? "font-bold" : ""}
+                            ${isMyDate && !isConfirmed ? "bg-indigo-500 text-white font-bold" : ""}
+                            ${!isMyDate && count > 0 && !isConfirmed ? "border border-indigo-400/40" : ""}
+                            ${!isMyDate && count === 0 && !isConfirmed ? "hover:bg-white/8" : ""}
+                            ${isToday && !isMyDate && !isConfirmed ? "ring-2 ring-indigo-400/60" : ""}
+                            ${dayOfWeek === 0 && !isMyDate && !isConfirmed ? "text-red-400" : ""}
+                            ${dayOfWeek === 6 && !isMyDate && !isConfirmed ? "text-indigo-400" : ""}
                           `}
-                          style={!isMyDate && count > 0 ? { background: "rgba(99,102,241,0.12)" } : {}}>
-                            <span className={isMyDate ? "text-white" : "text-white/80"}>{day}</span>
-                            {count > 0 && (
+                          style={
+                            isConfirmed
+                              ? { background: "rgba(234,179,8,0.25)", border: "2px solid rgba(234,179,8,0.6)" }
+                              : !isMyDate && count > 0
+                              ? { background: "rgba(99,102,241,0.12)" }
+                              : {}
+                          }>
+                            <span className={isConfirmed ? "text-amber-300" : isMyDate ? "text-white" : "text-white/80"}>{day}</span>
+                            {isConfirmed && <span className="text-xs text-amber-400">📌</span>}
+                            {!isConfirmed && count > 0 && (
                               <span className={`text-xs font-bold ${isMyDate ? "text-indigo-100" : "text-indigo-300"}`}>
                                 {count}명
                               </span>
@@ -410,7 +491,7 @@ export default function SchedulePage() {
                 </div>
 
                 {/* 범례 */}
-                <div className="flex gap-4 mt-6 pt-4 border-t border-white/8 text-xs text-white/40">
+                <div className="flex gap-4 mt-6 pt-4 border-t border-white/8 text-xs text-white/40 flex-wrap">
                   <div className="flex items-center gap-1.5">
                     <div className="w-4 h-4 rounded bg-indigo-500" />
                     <span>내가 가능한 날</span>
@@ -418,6 +499,10 @@ export default function SchedulePage() {
                   <div className="flex items-center gap-1.5">
                     <div className="w-4 h-4 rounded border border-indigo-400/40" style={{ background: "rgba(99,102,241,0.12)" }} />
                     <span>다른 사람이 가능한 날</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-4 h-4 rounded" style={{ background: "rgba(234,179,8,0.25)", border: "2px solid rgba(234,179,8,0.6)" }} />
+                    <span className="text-amber-400/60">확정 날짜</span>
                   </div>
                   {!userId && (
                     <div className="ml-auto">
