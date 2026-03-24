@@ -84,6 +84,11 @@ export default function ReviewsPage() {
   const [userReviewedWhiskeys, setUserReviewedWhiskeys] = useState<Set<string>>(new Set());
   const [compareList, setCompareList] = useState<string[]>([]);
 
+  // 카드 펼칠 때 리뷰 fetch
+  useEffect(() => {
+    if (expandedWhiskey) fetchReviews(expandedWhiskey);
+  }, [expandedWhiskey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // 비교 모달 열릴 때 리뷰 미리 fetch
   useEffect(() => {
     if (compareList.length === 2) {
@@ -216,7 +221,6 @@ export default function ReviewsPage() {
       setExpandedWhiskey(null);
     } else {
       setExpandedWhiskey(whiskeyId);
-      fetchReviews(whiskeyId);
     }
   };
 
