@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
+import { ENCYCLOPEDIA_WHISKEYS, CATEGORY_TO_TYPE } from "@/lib/encyclopediaData";
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
 import SafeHtml from "@/components/SafeHtml";
@@ -63,6 +64,8 @@ export default function ReviewsPage() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   // 위스키 추가 폼
+  const [addMode, setAddMode] = useState<"encyclopedia" | "manual">("encyclopedia");
+  const [encycSearch, setEncycSearch] = useState("");
   const [whiskey, setWhiskey] = useState({ name: "", type: "Scotch", region: "", age: "", abv: "", nose: "", palate: "", finish_note: "", tasting_notes: "", price: "" });
 
   // 리뷰 작성 폼
@@ -410,8 +413,10 @@ export default function ReviewsPage() {
         {/* 위스키 추가 버튼 */}
         {userId ? (
           <button onClick={() => {
-              if (!showAddForm && selectedType !== "전체") {
-                setWhiskey((prev) => ({ ...prev, type: selectedType }));
+              if (!showAddForm) {
+                setAddMode("encyclopedia");
+                setEncycSearch("");
+                setWhiskey({ name: "", type: selectedType !== "전체" ? selectedType : "Scotch", region: "", age: "", abv: "", nose: "", palate: "", finish_note: "", tasting_notes: "", price: "" });
               }
               setShowAddForm(!showAddForm);
             }}
@@ -427,82 +432,156 @@ export default function ReviewsPage() {
 
         {/* 위스키 추가 폼 */}
         {showAddForm && (
-          <div className="glass-card rounded-xl p-8 mb-8">
-            <h2 className="text-xl font-bold text-white mb-6">새 위스키 추가</h2>
-            <form onSubmit={handleAddWhiskey} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">이름 *</label>
-                  <input type="text" value={whiskey.name} onChange={(e) => setWhiskey({ ...whiskey, name: e.target.value })}
-                    placeholder="예: Glenmorangie 10" required
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">타입 *</label>
-                  <select value={whiskey.type} onChange={(e) => setWhiskey({ ...whiskey, type: e.target.value })}
-                    className="glass-input w-full px-4 py-2 rounded-lg">
-                    {WHISKEY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">지역</label>
-                  <input type="text" value={whiskey.region} onChange={(e) => setWhiskey({ ...whiskey, region: e.target.value })}
-                    placeholder="예: Highland"
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">숙성 (년)</label>
-                  <input type="number" value={whiskey.age} onChange={(e) => setWhiskey({ ...whiskey, age: e.target.value })}
-                    placeholder="10"
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">도수 (%)</label>
-                  <input type="number" step="0.1" value={whiskey.abv} onChange={(e) => setWhiskey({ ...whiskey, abv: e.target.value })}
-                    placeholder="43.0"
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">가격 (₩)</label>
-                  <input type="number" value={whiskey.price} onChange={(e) => setWhiskey({ ...whiskey, price: e.target.value })}
-                    placeholder="50000"
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>향 (Nose)</label>
-                  <input type="text" value={whiskey.nose}
-                    onChange={(e) => setWhiskey({ ...whiskey, nose: e.target.value })}
-                    placeholder="예: 바닐라, 꿀, 시트러스"
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛 (Palate)</label>
-                  <input type="text" value={whiskey.palate}
-                    onChange={(e) => setWhiskey({ ...whiskey, palate: e.target.value })}
-                    placeholder="예: 스모키, 오크, 카라멜"
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬 (Finish)</label>
-                  <input type="text" value={whiskey.finish_note}
-                    onChange={(e) => setWhiskey({ ...whiskey, finish_note: e.target.value })}
-                    placeholder="예: 길고 따뜻한 여운"
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>설명</label>
-                  <input type="text" value={whiskey.tasting_notes}
-                    onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
-                    placeholder="기타 특징"
-                    className="glass-input w-full px-4 py-2 rounded-lg" />
+          <div className="glass-card rounded-xl p-6 mb-8">
+            <h2 className="text-xl font-bold text-white mb-4">새 위스키 추가</h2>
+
+            {/* 탭 */}
+            <div className="flex gap-1 mb-5 p-1 bg-white/5 rounded-lg w-fit">
+              {(["encyclopedia", "manual"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setAddMode(mode)}
+                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
+                    addMode === mode ? "bg-indigo-500/80 text-white" : "text-white/50 hover:text-white/70"
+                  }`}
+                >
+                  {mode === "encyclopedia" ? "백과에서 가져오기" : "직접 입력"}
+                </button>
+              ))}
+            </div>
+
+            {/* 백과 picker */}
+            {addMode === "encyclopedia" && (
+              <div>
+                <input
+                  type="text"
+                  value={encycSearch}
+                  onChange={(e) => setEncycSearch(e.target.value)}
+                  placeholder="위스키 이름으로 검색..."
+                  className="glass-input w-full px-4 py-2 rounded-lg text-sm mb-3"
+                />
+                <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+                  {ENCYCLOPEDIA_WHISKEYS.filter((e) =>
+                    !encycSearch.trim() ||
+                    e.name.toLowerCase().includes(encycSearch.toLowerCase()) ||
+                    e.distillery.toLowerCase().includes(encycSearch.toLowerCase())
+                  ).map((entry) => (
+                    <button
+                      key={entry.id}
+                      onClick={() => {
+                        const priceNum = parseInt(entry.priceRange.replace(/[₩,]/g, "").split("–")[0]) || 0;
+                        setWhiskey({
+                          name: entry.name,
+                          type: CATEGORY_TO_TYPE[entry.category] ?? "Etc",
+                          region: `${entry.region}, ${entry.country}`,
+                          age: entry.age ? String(entry.age) : "",
+                          abv: String(entry.abv),
+                          nose: entry.nose,
+                          palate: entry.palate,
+                          finish_note: entry.finish,
+                          tasting_notes: entry.description,
+                          price: priceNum ? String(priceNum) : "",
+                        });
+                        setAddMode("manual");
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg bg-white/4 hover:bg-white/8 transition"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <p className="text-white text-sm font-medium">{entry.name}</p>
+                          <p className="text-white/40 text-xs mt-0.5">{entry.distillery} · {entry.region}, {entry.country}</p>
+                        </div>
+                        <span className="text-indigo-300 text-xs flex-shrink-0">{entry.priceRange}</span>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
-              <button type="submit" className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">
-                위스키 추가
-              </button>
-            </form>
+            )}
+
+            {/* 직접 입력 폼 */}
+            {addMode === "manual" && (
+              <form onSubmit={handleAddWhiskey} className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1">이름 *</label>
+                    <input type="text" value={whiskey.name} onChange={(e) => setWhiskey({ ...whiskey, name: e.target.value })}
+                      placeholder="예: Glenmorangie 10" required
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1">타입 *</label>
+                    <select value={whiskey.type} onChange={(e) => setWhiskey({ ...whiskey, type: e.target.value })}
+                      className="glass-input w-full px-4 py-2 rounded-lg">
+                      {WHISKEY_TYPES.filter((t) => t !== "전체").map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1">지역</label>
+                    <input type="text" value={whiskey.region} onChange={(e) => setWhiskey({ ...whiskey, region: e.target.value })}
+                      placeholder="예: Highland"
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1">숙성 (년)</label>
+                    <input type="number" value={whiskey.age} onChange={(e) => setWhiskey({ ...whiskey, age: e.target.value })}
+                      placeholder="10"
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1">도수 (%)</label>
+                    <input type="number" step="0.1" value={whiskey.abv} onChange={(e) => setWhiskey({ ...whiskey, abv: e.target.value })}
+                      placeholder="43.0"
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1">가격 (₩)</label>
+                    <input type="number" value={whiskey.price} onChange={(e) => setWhiskey({ ...whiskey, price: e.target.value })}
+                      placeholder="50000"
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>향 (Nose)</label>
+                    <input type="text" value={whiskey.nose}
+                      onChange={(e) => setWhiskey({ ...whiskey, nose: e.target.value })}
+                      placeholder="예: 바닐라, 꿀, 시트러스"
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛 (Palate)</label>
+                    <input type="text" value={whiskey.palate}
+                      onChange={(e) => setWhiskey({ ...whiskey, palate: e.target.value })}
+                      placeholder="예: 스모키, 오크, 카라멜"
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬 (Finish)</label>
+                    <input type="text" value={whiskey.finish_note}
+                      onChange={(e) => setWhiskey({ ...whiskey, finish_note: e.target.value })}
+                      placeholder="예: 길고 따뜻한 여운"
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>설명</label>
+                    <input type="text" value={whiskey.tasting_notes}
+                      onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
+                      placeholder="기타 특징"
+                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setAddMode("encyclopedia")}
+                    className="px-4 py-2 text-sm text-white/50 hover:text-white/70 bg-white/5 rounded-lg transition">
+                    ← 목록으로
+                  </button>
+                  <button type="submit" className="flex-1 py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">
+                    위스키 추가
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
 
