@@ -44,7 +44,7 @@ export default function SchedulePage() {
     if (id) setUserId(id);
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchSchedules();
-    supabase.from("users").select("*", { count: "exact", head: true }).then(({ count }) => setTotalUsers(count || 0));
+    supabase.from("users").select("*", { count: "exact", head: true }).neq("is_admin", true).then(({ count }) => setTotalUsers(count || 0));
   }, []);
 
   useEffect(() => {
@@ -62,32 +62,47 @@ export default function SchedulePage() {
 
         const { data: avail, error: availError } = await supabase
           .from("user_availability")
-          .select("schedule_date_id, user_id, users(name)")
+          .select("schedule_date_id, user_id, users(name, is_admin)")
           .in("schedule_date_id", dates.map((d) => d.id));
         if (availError) throw availError;
 
-        const map: AvailabilityMap = {};
+        // 중복 schedule_dates 처리: 같은 date의 모든 rows를 합산
+        const dateGroupMap: Record<string, { ids: string[]; avail: typeof avail }> = {};
         dates.forEach((d) => {
-          const dateAvail = avail?.filter((a) => a.schedule_date_id === d.id) || [];
-          const count = dateAvail.length;
-          const isAvailable = dateAvail.some((a) => a.user_id === userId);
-          const users = dateAvail.map((a) => (a.users as any)?.name || "알 수 없음");
-          map[d.date] = { count, isAvailable, dateId: d.id, users };
+          if (!dateGroupMap[d.date]) dateGroupMap[d.date] = { ids: [], avail: [] };
+          dateGroupMap[d.date].ids.push(d.id);
+        });
+        avail?.forEach((a) => {
+          const date = dates.find((d) => d.id === a.schedule_date_id)?.date;
+          if (date && dateGroupMap[date]) dateGroupMap[date].avail!.push(a);
+        });
+
+        const map: AvailabilityMap = {};
+        Object.entries(dateGroupMap).forEach(([date, group]) => {
+          const dateAvail = group.avail || [];
+          // 중복 user 제거 후 count
+          const uniqueUsers = [...new Map(dateAvail.map((a) => [a.user_id, a])).values()];
+          const count = uniqueUsers.length;
+          const isAvailable = uniqueUsers.some((a) => a.user_id === userId);
+          const users = uniqueUsers.map((a) => (a.users as any)?.name || "알 수 없음");
+          // dateId는 첫 번째 id 사용 (신규 삽입 시)
+          map[date] = { count, isAvailable, dateId: group.ids[0], users };
         });
         setAvailabilityMap(map);
 
-        // 유저별 날짜 맵 (관리자용)
-        const byUser: Record<string, string[]> = {};
+        // 유저별 날짜 맵 — 관리자 제외, Set으로 날짜 중복 제거
+        const byUser: Record<string, Set<string>> = {};
         avail?.forEach((a) => {
+          if ((a.users as any)?.is_admin) return; // 관리자 제외
           const name = (a.users as any)?.name || "알 수 없음";
           const date = dates.find((d) => d.id === a.schedule_date_id)?.date;
           if (!date) return;
-          if (!byUser[name]) byUser[name] = [];
-          byUser[name].push(date);
+          if (!byUser[name]) byUser[name] = new Set();
+          byUser[name].add(date);
         });
         setUserDateMap(
           Object.entries(byUser)
-            .map(([name, dates]) => ({ name, dates: dates.sort() }))
+            .map(([name, dateSet]) => ({ name, dates: [...dateSet].sort() }))
             .sort((a, b) => b.dates.length - a.dates.length)
         );
       } catch (err) {
@@ -124,29 +139,46 @@ export default function SchedulePage() {
     const existing = availabilityMap[dateStr];
 
     if (existing) {
-      // 이미 날짜가 등록된 경우 가능/불가능 토글
       if (existing.isAvailable) {
-        await supabase
-          .from("user_availability")
-          .delete()
-          .eq("schedule_date_id", existing.dateId)
-          .eq("user_id", userId);
+        // 이 날짜에 연결된 모든 schedule_dates ID에서 삭제 (중복 행 대응)
+        const { data: allDateRows } = await supabase
+          .from("schedule_dates")
+          .select("id")
+          .eq("schedule_id", selectedSchedule.id)
+          .eq("date", dateStr);
+        if (allDateRows && allDateRows.length > 0) {
+          await supabase
+            .from("user_availability")
+            .delete()
+            .in("schedule_date_id", allDateRows.map((d) => d.id))
+            .eq("user_id", userId);
+        }
       } else {
         await supabase
           .from("user_availability")
           .insert([{ schedule_date_id: existing.dateId, user_id: userId, is_available: true }]);
       }
     } else {
-      // 새 날짜 생성 후 가능 표시
-      const { data: newDate, error } = await supabase
+      // schedule_dates 행이 이미 있으면 재사용, 없으면 생성 (중복 방지)
+      const { data: existingRow } = await supabase
         .from("schedule_dates")
-        .insert([{ schedule_id: selectedSchedule.id, date: dateStr }])
-        .select()
-        .single();
-      if (error) { console.error(error); return; }
+        .select("id")
+        .eq("schedule_id", selectedSchedule.id)
+        .eq("date", dateStr)
+        .maybeSingle();
+      const dateId = existingRow?.id ?? (await (async () => {
+        const { data: newDate, error } = await supabase
+          .from("schedule_dates")
+          .insert([{ schedule_id: selectedSchedule.id, date: dateStr }])
+          .select()
+          .single();
+        if (error) { console.error(error); return null; }
+        return newDate.id;
+      })());
+      if (!dateId) return;
       await supabase
         .from("user_availability")
-        .insert([{ schedule_date_id: newDate.id, user_id: userId, is_available: true }]);
+        .insert([{ schedule_date_id: dateId, user_id: userId, is_available: true }]);
     }
 
     setSelectedSchedule({ ...selectedSchedule });
