@@ -87,9 +87,16 @@ export default function ArticlesPage() {
   const fetchArticles = async () => {
     try {
       const { data, error } = await supabase
-        .from("articles").select("*, users(name)").order("created_at", { ascending: false });
+        .from("articles").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      setArticles(data || []);
+      const rows = data || [];
+      const authorIds = [...new Set(rows.map((a) => a.author_id).filter(Boolean))];
+      let userMap: Record<string, string> = {};
+      if (authorIds.length > 0) {
+        const { data: usersData } = await supabase.from("users").select("id, name").in("id", authorIds);
+        userMap = Object.fromEntries((usersData || []).map((u) => [u.id, u.name]));
+      }
+      setArticles(rows.map((a) => ({ ...a, users: { name: userMap[a.author_id] || "알 수 없음" } })));
     } catch (err) {
       console.error(err);
     } finally {

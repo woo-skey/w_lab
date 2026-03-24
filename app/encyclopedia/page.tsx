@@ -264,15 +264,23 @@ export default function EncyclopediaPage() {
     fetchDbEntries();
   }, []);
 
+  const [deletedStaticIds, setDeletedStaticIds] = useState<Set<string>>(new Set());
+
   const fetchDbEntries = async () => {
     const { data } = await supabase.from("encyclopedia").select("*");
-    if (data) setDbEntries(data.map(dbRowToEntry));
+    if (data) {
+      const deleted = new Set(data.filter((r) => r.deleted).map((r) => r.id as string));
+      setDeletedStaticIds(deleted);
+      setDbEntries(data.filter((r) => !r.deleted).map(dbRowToEntry));
+    }
   };
 
-  // Merge: DB entries override static by id; new DB entries appended
+  // Merge: DB entries override static by id; new DB entries appended; deleted static entries hidden
   const mergedWhiskeys = (() => {
     const dbMap = new Map(dbEntries.map((e) => [e.id, e]));
-    const merged = STATIC_WHISKEYS.map((w) => dbMap.get(w.id) ?? w);
+    const merged = STATIC_WHISKEYS
+      .filter((w) => !deletedStaticIds.has(w.id))
+      .map((w) => dbMap.get(w.id) ?? w);
     const staticIds = new Set(STATIC_WHISKEYS.map((w) => w.id));
     dbEntries.filter((e) => !staticIds.has(e.id)).forEach((e) => merged.push(e));
     return merged;
@@ -343,8 +351,14 @@ export default function EncyclopediaPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("이 항목을 삭제할까요? (기본 항목이라면 수정 내용만 초기화됩니다)")) return;
-    await supabase.from("encyclopedia").delete().eq("id", id);
+    if (!confirm("이 항목을 삭제할까요?")) return;
+    const isStatic = STATIC_WHISKEYS.some((w) => w.id === id);
+    if (isStatic) {
+      // 정적 항목: tombstone upsert (deleted=true)
+      await supabase.from("encyclopedia").upsert([{ id, deleted: true }], { onConflict: "id" });
+    } else {
+      await supabase.from("encyclopedia").delete().eq("id", id);
+    }
     await fetchDbEntries();
   };
 
