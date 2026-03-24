@@ -216,7 +216,7 @@ export default function ReviewsPage() {
       setExpandedWhiskey(null);
     } else {
       setExpandedWhiskey(whiskeyId);
-      if (!reviews[whiskeyId]) fetchReviews(whiskeyId);
+      fetchReviews(whiskeyId);
     }
   };
 
@@ -277,6 +277,7 @@ export default function ReviewsPage() {
         await createNotification(w.created_by, "review", `🥃 ${userName}님이 "${w.name}"에 리뷰를 남겼습니다.`, "/reviews");
       }
       setReviewForm(null);
+      setUserReviewedWhiskeys((prev) => new Set([...prev, reviewForm.whiskey_id]));
       fetchReviews(reviewForm.whiskey_id);
     } catch (err) {
       console.error(err);
@@ -508,7 +509,7 @@ export default function ReviewsPage() {
           ) : filteredWhiskeys.length === 0 ? (
             <div className="text-center py-12 text-white/40">아직 위스키가 없습니다.</div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-4 items-start">
             {pagedWhiskeys.map((w) => {
               const isExpanded = expandedWhiskey === w.id;
               const whiskeyReviews = reviews[w.id] || [];
