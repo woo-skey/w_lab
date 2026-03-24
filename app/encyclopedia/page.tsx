@@ -352,10 +352,27 @@ export default function EncyclopediaPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("이 항목을 삭제할까요?")) return;
-    const isStatic = STATIC_WHISKEYS.some((w) => w.id === id);
-    if (isStatic) {
-      // 정적 항목: tombstone upsert (deleted=true)
-      await supabase.from("encyclopedia").upsert([{ id, deleted: true }], { onConflict: "id" });
+    const staticEntry = STATIC_WHISKEYS.find((w) => w.id === id);
+    if (staticEntry) {
+      // 정적 항목: 전체 데이터 + deleted=true로 upsert (NOT NULL 컬럼 충족)
+      await supabase.from("encyclopedia").upsert([{
+        id,
+        name: staticEntry.name,
+        distillery: staticEntry.distillery,
+        region: staticEntry.region,
+        country: staticEntry.country,
+        category: staticEntry.category,
+        age: staticEntry.age,
+        abv: staticEntry.abv,
+        nose: staticEntry.nose,
+        palate: staticEntry.palate,
+        finish: staticEntry.finish,
+        description: staticEntry.description,
+        price_range: staticEntry.priceRange,
+        difficulty: staticEntry.difficulty,
+        tags: staticEntry.tags,
+        deleted: true,
+      }], { onConflict: "id" });
     } else {
       await supabase.from("encyclopedia").delete().eq("id", id);
     }
