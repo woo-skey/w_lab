@@ -48,7 +48,6 @@ interface ReviewComment {
 }
 
 const WHISKEY_TYPES = ["전체", "Scotch", "Irish", "Bourbon/Rye", "Etc"];
-const STAR = ["", "★", "★★", "★★★", "★★★★", "★★★★★"];
 
 export default function ReviewsPage() {
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
@@ -738,8 +737,8 @@ export default function ReviewsPage() {
                                 <select value={reviewForm.rating}
                                   onChange={(e) => setReviewForm({ ...reviewForm, rating: parseInt(e.target.value) })}
                                   className="glass-input px-2 py-1 rounded text-sm">
-                                  {[5, 4, 3, 2, 1].map((r) => (
-                                    <option key={r} value={r}>{STAR[r]} ({r}/5)</option>
+                                  {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((r) => (
+                                    <option key={r} value={r}>{r}/10</option>
                                   ))}
                                 </select>
                               </div>
@@ -792,7 +791,7 @@ export default function ReviewsPage() {
                           ) : userReviewedWhiskeys.has(w.id) ? (
                             <p className="text-sm text-white/40">이미 이 위스키에 대한 리뷰를 작성하셨습니다.</p>
                           ) : (
-                            <button onClick={() => setReviewForm({ whiskey_id: w.id, rating: 5, review_text: "", taste_profile: "", nose: "", palate: "", finish_note: "", remarks: "" })}
+                            <button onClick={() => setReviewForm({ whiskey_id: w.id, rating: 7, review_text: "", taste_profile: "", nose: "", palate: "", finish_note: "", remarks: "" })}
                               className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
                               ✏️ 리뷰 작성
                             </button>
@@ -806,7 +805,7 @@ export default function ReviewsPage() {
 
                       {/* 평점 분포 */}
                       {whiskeyReviews.length > 0 && (() => {
-                        const dist = [5, 4, 3, 2, 1].map((s) => ({ star: s, count: whiskeyReviews.filter((r) => r.rating === s).length }));
+                        const dist = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((s) => ({ star: s, count: whiskeyReviews.filter((r) => r.rating === s).length }));
                         const max = Math.max(...dist.map((d) => d.count), 1);
                         return (
                           <div className="px-6 py-4 border-b border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
@@ -847,8 +846,8 @@ export default function ReviewsPage() {
                                       <select value={editingReview.rating}
                                         onChange={(e) => setEditingReview({ ...editingReview, rating: parseInt(e.target.value) })}
                                         className="glass-input px-2 py-1 rounded text-sm">
-                                        {[5, 4, 3, 2, 1].map((r) => (
-                                          <option key={r} value={r}>{STAR[r]} ({r}/5)</option>
+                                        {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((r) => (
+                                          <option key={r} value={r}>{r}/10</option>
                                         ))}
                                       </select>
                                     </div>
@@ -904,7 +903,7 @@ export default function ReviewsPage() {
                                     <div className="flex justify-between items-start mb-2">
                                       <div className="flex items-center gap-2">
                                         <UserProfilePopup userId={r.user_id} displayName={r.users?.name || "알 수 없음"} />
-                                        <div className="text-blue-500 text-sm">{STAR[r.rating]}</div>
+                                        <div className="text-blue-500 text-sm font-bold">{r.rating}/10</div>
                                       </div>
                                       <div className="flex items-center gap-2">
                                         <span className="text-xs text-white/30">
@@ -1078,7 +1077,7 @@ export default function ReviewsPage() {
             <div className="grid grid-cols-3 gap-4 py-3 border-b border-white/8">
               <p className="text-xs text-white/40 self-center">평균 평점</p>
               {[r1, r2].map((rs, i) => (
-                <p key={i} className="text-center text-indigo-300 font-bold">★ {avg(rs)} <span className="text-xs text-white/30 font-normal">({rs.length}개)</span></p>
+                <p key={i} className="text-center text-indigo-300 font-bold">{avg(rs)}/10 <span className="text-xs text-white/30 font-normal">({rs.length}개)</span></p>
               ))}
             </div>
             {/* 필드들 */}

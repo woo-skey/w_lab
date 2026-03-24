@@ -192,7 +192,7 @@ export default function BarsPage() {
                 ) : (
                   <>
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-xl font-bold text-white">{bar.bar_name}</h3>
+                      <Link href={`/bars/${bar.id}`} className="text-xl font-bold text-white hover:text-indigo-300 transition">{bar.bar_name}</Link>
                       <div className="flex gap-1 items-center">
                         {userId && (
                           <button onClick={() => handleToggleFavorite(bar.id)}

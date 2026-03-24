@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
+import { ENCYCLOPEDIA_WHISKEYS } from "@/lib/encyclopediaData";
 import bcrypt from "bcryptjs";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
@@ -33,6 +34,17 @@ interface AllReview { id: string; rating: number; review_text: string; user_id: 
 interface AllBar { id: string; bar_name: string; link: string; notes: string; user_id: string; created_at: string; users?: { name: string }; }
 interface AllWhiskey { id: string; name: string; type: string; region: string; age: number; abv: number; created_by: string; created_at: string; }
 
+interface CollectionItem {
+  id: string;
+  user_id: string;
+  status: "tried" | "wishlist";
+  whiskey_id: string | null;
+  encyclopedia_id: string | null;
+  custom_name: string | null;
+  created_at: string;
+  whiskeys?: { name: string; type: string } | null;
+}
+
 interface AdminUser {
   id: string;
   name: string;
@@ -53,8 +65,6 @@ interface AdminStats {
   totalWhiskeys: number;
   totalSchedules: number;
 }
-
-const STAR = ["", "★", "★★", "★★★", "★★★★", "★★★★★"];
 
 export default function MyPage() {
   const router = useRouter();
@@ -100,12 +110,31 @@ export default function MyPage() {
   const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
   const [announcementSubmitting, setAnnouncementSubmitting] = useState(false);
 
+  // 컬렉션
+  const [collection, setCollection] = useState<CollectionItem[]>([]);
+  const [collectionTab, setCollectionTab] = useState<"tried" | "wishlist">("tried");
+  const [showCollectionModal, setShowCollectionModal] = useState(false);
+  const [collectionAddStatus, setCollectionAddStatus] = useState<"tried" | "wishlist">("tried");
+  const [collectionAddMode, setCollectionAddMode] = useState<"encyclopedia" | "manual">("encyclopedia");
+  const [collectionSearch, setCollectionSearch] = useState("");
+  const [collectionManualName, setCollectionManualName] = useState("");
+
   useEffect(() => {
     const id = localStorage.getItem("userId");
     if (!id) { router.push("/login"); return; }
     setUserId(id);
     fetchAll(id);
+    fetchCollection(id);
   }, []);
+
+  const fetchCollection = async (uid: string) => {
+    const { data } = await supabase
+      .from("user_collection")
+      .select("*, whiskeys(name, type)")
+      .eq("user_id", uid)
+      .order("created_at", { ascending: false });
+    setCollection((data || []) as unknown as CollectionItem[]);
+  };
 
   const fetchAll = async (id: string) => {
     const [profileRes, barsRes, reviewsRes, articlesRes, schedulesRes, whiskeysRes, articleCommentsRes, reviewCommentsRes] = await Promise.allSettled([
@@ -417,8 +446,27 @@ export default function MyPage() {
     setPwChanging(false);
   };
 
+  const handleAddCollection = async (item: { whiskey_id?: string; encyclopedia_id?: string; custom_name?: string }) => {
+    if (!userId) return;
+    const payload: Record<string, string> = { user_id: userId, status: collectionAddStatus };
+    if (item.whiskey_id) payload.whiskey_id = item.whiskey_id;
+    if (item.encyclopedia_id) payload.encyclopedia_id = item.encyclopedia_id;
+    if (item.custom_name) payload.custom_name = item.custom_name;
+    await supabase.from("user_collection").upsert([payload], { onConflict: item.whiskey_id ? "user_id,whiskey_id" : item.encyclopedia_id ? "user_id,encyclopedia_id" : undefined });
+    setShowCollectionModal(false);
+    setCollectionSearch("");
+    setCollectionManualName("");
+    fetchCollection(userId);
+  };
+
+  const handleDeleteCollection = async (id: string) => {
+    await supabase.from("user_collection").delete().eq("id", id);
+    setCollection((prev) => prev.filter((c) => c.id !== id));
+  };
+
   const tabs = [
     { id: "overview", label: "개요" },
+    { id: "collection", label: `컬렉션 (${collection.length})` },
     { id: "reviews", label: `리뷰 (${reviews.length})` },
     { id: "whiskeys", label: `위스키 (${whiskeys.length})` },
     { id: "articles", label: `지식글 (${articles.length})` },
@@ -651,7 +699,7 @@ export default function MyPage() {
                   {reviews.slice(0, 3).map((r) => (
                     <div key={r.id} onClick={() => router.push("/reviews")} className="flex justify-between items-center text-sm cursor-pointer hover:bg-white/5 rounded px-2 py-1 -mx-2 transition">
                       <span className="text-white/55 truncate">{r.whiskeys?.name || "위스키"}</span>
-                      <span className="text-blue-400 text-xs ml-2 flex-shrink-0">{STAR[r.rating]}</span>
+                      <span className="text-blue-400 text-xs ml-2 flex-shrink-0">{r.rating}/10</span>
                     </div>
                   ))}
                 </div>
@@ -696,6 +744,43 @@ export default function MyPage() {
           </div>
         )}
 
+        {activeTab === "collection" && (
+          <div className="space-y-4">
+            <div className="flex gap-2 mb-4">
+              {(["tried", "wishlist"] as const).map((s) => (
+                <button key={s} onClick={() => setCollectionTab(s)}
+                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${collectionTab === s ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/50 hover:text-white/80"}`}>
+                  {s === "tried" ? `마셔봤어요 (${collection.filter((c) => c.status === "tried").length})` : `마시고 싶어요 (${collection.filter((c) => c.status === "wishlist").length})`}
+                </button>
+              ))}
+              <button onClick={() => { setCollectionAddStatus(collectionTab); setShowCollectionModal(true); }}
+                className="ml-auto px-4 py-1.5 bg-indigo-500/80 text-white rounded-lg text-sm hover:bg-indigo-500 transition">
+                + 추가
+              </button>
+            </div>
+            {collection.filter((c) => c.status === collectionTab).length === 0 ? (
+              <p className="text-white/30 text-sm text-center py-8">아직 항목이 없습니다.</p>
+            ) : (
+              <div className="space-y-2">
+                {collection.filter((c) => c.status === collectionTab).map((item) => {
+                  const name = item.whiskeys?.name || item.custom_name || item.encyclopedia_id || "알 수 없음";
+                  const type = item.whiskeys?.type || "";
+                  return (
+                    <div key={item.id} className="glass-card rounded-xl px-4 py-3 flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-medium text-sm">{name}</p>
+                        {type && <p className="text-white/40 text-xs">{type}</p>}
+                      </div>
+                      <button onClick={() => handleDeleteCollection(item.id)}
+                        className="text-xs text-white/30 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === "reviews" && (
           <div className="space-y-3">
             {reviews.length === 0 ? <div className="text-center py-12 text-white/30">작성한 리뷰가 없습니다.</div> : (
@@ -706,7 +791,7 @@ export default function MyPage() {
                       <p className="font-bold text-white">{r.whiskeys?.name || "위스키"}</p>
                       <span className="text-xs bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded">{r.whiskeys?.type}</span>
                     </div>
-                    <span className="text-blue-400">{STAR[r.rating]}</span>
+                    <span className="text-blue-400">{r.rating}/10</span>
                   </div>
                   {r.review_text && <p className="text-white/55 text-sm mt-2">{r.review_text}</p>}
                   <p className="text-xs text-white/30 mt-2">{new Date(r.created_at).toLocaleDateString("ko-KR")}</p>
@@ -1157,6 +1242,59 @@ export default function MyPage() {
             )}
           </div>
         )}
+
+      {/* 컬렉션 추가 모달 */}
+      {showCollectionModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowCollectionModal(false); }}>
+          <div className="glass-card rounded-2xl w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-white">{collectionAddStatus === "tried" ? "마셔봤어요 추가" : "마시고 싶어요 추가"}</h2>
+              <button onClick={() => setShowCollectionModal(false)} className="text-white/40 hover:text-white text-xl">×</button>
+            </div>
+            <div className="flex gap-2 mb-4">
+              {(["encyclopedia", "manual"] as const).map((m) => (
+                <button key={m} onClick={() => setCollectionAddMode(m)}
+                  className={`px-3 py-1.5 rounded-lg text-sm transition ${collectionAddMode === m ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/50"}`}>
+                  {m === "encyclopedia" ? "백과에서" : "직접 입력"}
+                </button>
+              ))}
+            </div>
+            {collectionAddMode === "encyclopedia" ? (
+              <div className="space-y-3">
+                <input type="text" value={collectionSearch}
+                  onChange={(e) => setCollectionSearch(e.target.value)}
+                  placeholder="위스키 이름으로 검색..."
+                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                  {ENCYCLOPEDIA_WHISKEYS
+                    .filter((w) => !collectionSearch.trim() || w.name.toLowerCase().includes(collectionSearch.toLowerCase()))
+                    .slice(0, 20)
+                    .map((w) => (
+                      <button key={w.id} onClick={() => handleAddCollection({ encyclopedia_id: w.id })}
+                        className="w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
+                        <p className="text-white font-medium">{w.name}</p>
+                        <p className="text-white/40 text-xs">{w.distillery} · {w.region}</p>
+                      </button>
+                    ))}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <input type="text" value={collectionManualName}
+                  onChange={(e) => setCollectionManualName(e.target.value)}
+                  placeholder="위스키 이름을 직접 입력하세요"
+                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                <button onClick={() => collectionManualName.trim() && handleAddCollection({ custom_name: collectionManualName.trim() })}
+                  disabled={!collectionManualName.trim()}
+                  className="w-full py-2 bg-indigo-500/80 text-white rounded-lg text-sm hover:bg-indigo-500 disabled:opacity-40 transition">
+                  추가하기
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       </div>
     </div>
