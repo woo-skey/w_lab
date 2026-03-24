@@ -89,20 +89,30 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     setNotifications(data || []);
   };
 
-  const handleBellClick = async () => {
+  const handleBellClick = () => {
     const next = !showNotifications;
     if (next && bellRef.current) {
       const rect = bellRef.current.getBoundingClientRect();
       setNotifMaxH(Math.max(200, rect.top - 12));
     }
     setShowNotifications(next);
-    if (!showNotifications && userId) {
-      const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
-      if (unreadIds.length > 0) {
-        await supabase.from("notifications").update({ is_read: true }).in("id", unreadIds);
-        setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      }
+  };
+
+  const handleMarkAllRead = async () => {
+    const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
+    if (unreadIds.length === 0) return;
+    await supabase.from("notifications").update({ is_read: true }).in("id", unreadIds);
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+  };
+
+  const handleNotifClick = async (n: Notification) => {
+    if (!n.is_read) {
+      await supabase.from("notifications").update({ is_read: true }).eq("id", n.id);
+      setNotifications((prev) => prev.map((item) => item.id === n.id ? { ...item, is_read: true } : item));
     }
+    const typeMap: Record<string, string> = { announcement: "/notices", review: "/reviews", review_comment: "/reviews", article_comment: "/articles", contact_reply: "/contact", schedule: "/schedule" };
+    const dest = n.link || typeMap[n.type] || null;
+    if (dest) { router.push(dest); setShowNotifications(false); }
   };
 
   useEffect(() => {
@@ -301,32 +311,37 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                   <div className="absolute bottom-full left-0 mb-2 w-72 rounded-xl overflow-hidden z-50 flex flex-col"
                     style={{ background: T.notifBg, border: `1px solid ${T.notifBorder}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", maxHeight: notifMaxH }}>
                     <div className="px-4 py-3 flex justify-between items-center flex-shrink-0" style={{ borderBottom: `1px solid ${T.border}` }}>
-                      <span className="text-sm font-medium" style={{ color: T.textPrimary }}>알림</span>
-                      {notifications.length > 0 && (
-                        <button onClick={async () => { await supabase.from("notifications").delete().eq("user_id", userId); setNotifications([]); }}
-                          className="text-xs hover:text-red-400 transition" style={{ color: T.textMuted }}>전체 삭제</button>
-                      )}
+                      <span className="text-sm font-medium" style={{ color: T.textPrimary }}>
+                        알림 {unreadCount > 0 && <span className="ml-1 px-1.5 py-0.5 bg-indigo-500/70 text-white text-[10px] rounded-full font-bold">{unreadCount}</span>}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {unreadCount > 0 && (
+                          <button onClick={handleMarkAllRead}
+                            className="text-xs hover:text-indigo-400 transition" style={{ color: T.textMuted }}>모두 읽음</button>
+                        )}
+                        {notifications.length > 0 && (
+                          <button onClick={async () => { await supabase.from("notifications").delete().eq("user_id", userId); setNotifications([]); }}
+                            className="text-xs hover:text-red-400 transition" style={{ color: T.textMuted }}>전체 삭제</button>
+                        )}
+                      </div>
                     </div>
                     <div className="overflow-y-auto flex-1">
                       {notifications.length === 0 ? (
                         <p className="text-center text-sm py-8" style={{ color: T.textMuted }}>알림이 없습니다</p>
                       ) : notifications.map((n) => (
-                        <div key={n.id}
-                          onClick={() => {
-                            const typeMap: Record<string, string> = { announcement: "/notices", review: "/reviews", review_comment: "/reviews", article_comment: "/articles", contact_reply: "/contact" };
-                            const dest = n.link || typeMap[n.type] || null;
-                            if (dest) { router.push(dest); setShowNotifications(false); }
-                          }}
-                          className="px-4 py-3 text-sm cursor-pointer transition-colors hover:bg-black/5"
+                        <div key={n.id} onClick={() => handleNotifClick(n)}
+                          className="px-4 py-3 text-sm cursor-pointer transition-colors hover:bg-black/5 flex items-start gap-3"
                           style={{
                             borderBottom: `1px solid ${T.notifDivider}`,
-                            background: n.is_read ? "transparent" : "rgba(99,102,241,0.08)",
-                            color: n.is_read ? T.notifMuted : T.notifText,
+                            background: n.is_read ? "transparent" : "rgba(99,102,241,0.07)",
                           }}>
-                          <p className="leading-snug">{n.message}</p>
-                          <p className="text-xs mt-1" style={{ color: T.textMuted }}>
-                            {new Date(n.created_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                          </p>
+                          <div className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full" style={{ background: n.is_read ? "transparent" : "rgba(99,102,241,0.9)" }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="leading-snug" style={{ color: n.is_read ? T.notifMuted : T.notifText }}>{n.message}</p>
+                            <p className="text-xs mt-1" style={{ color: T.textMuted }}>
+                              {new Date(n.created_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          </div>
                         </div>
                       ))}
                     </div>

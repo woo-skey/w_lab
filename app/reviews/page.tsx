@@ -49,6 +49,21 @@ interface ReviewComment {
 
 const WHISKEY_TYPES = ["전체", "Scotch", "Irish", "Bourbon/Rye", "Etc"];
 
+function RatingGauge({ rating, size = "md" }: { rating: number; size?: "sm" | "md" }) {
+  const color = rating >= 8 ? "#4ade80" : rating >= 5 ? "#facc15" : "#f87171";
+  const isSmall = size === "sm";
+  return (
+    <div className={`flex flex-col items-end gap-0.5 ${isSmall ? "w-14" : "w-16"}`}>
+      <span className={`font-bold leading-none ${isSmall ? "text-sm" : "text-base"}`} style={{ color }}>
+        {typeof rating === "number" ? rating.toFixed(1) : rating}/10
+      </span>
+      <div className={`w-full rounded-full overflow-hidden ${isSmall ? "h-1" : "h-1.5"}`} style={{ background: "rgba(255,255,255,0.1)" }}>
+        <div className="h-full rounded-full transition-all duration-300" style={{ width: `${(Number(rating) / 10) * 100}%`, background: color }} />
+      </div>
+    </div>
+  );
+}
+
 export default function ReviewsPage() {
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
   const [reviews, setReviews] = useState<Record<string, Review[]>>({});
@@ -732,9 +747,7 @@ export default function ReviewsPage() {
                         )}
                       </button>
                       <div className="text-right ml-4 flex-shrink-0 flex flex-col items-end gap-1">
-                        {avgRating && (
-                          <div className="text-blue-500 text-lg font-bold">★ {avgRating}</div>
-                        )}
+                        {avgRating && <RatingGauge rating={Number(avgRating)} />}
                         <div className="text-xs text-white/30">{displayCount}개 리뷰</div>
                         {(w.created_by === userId || isAdmin) && userId && (
                           <div className="flex gap-1 mt-1">
@@ -933,7 +946,7 @@ export default function ReviewsPage() {
                                     <div className="flex justify-between items-start mb-2">
                                       <div className="flex items-center gap-2">
                                         <UserProfilePopup userId={r.user_id} displayName={r.users?.name || "알 수 없음"} />
-                                        <div className="text-blue-500 text-sm font-bold">{r.rating}/10</div>
+                                        <RatingGauge rating={r.rating} size="sm" />
                                       </div>
                                       <div className="flex items-center gap-2">
                                         <span className="text-xs text-white/30">
@@ -1107,7 +1120,10 @@ export default function ReviewsPage() {
             <div className="grid grid-cols-3 gap-4 py-3 border-b border-white/8">
               <p className="text-xs text-white/40 self-center">평균 평점</p>
               {[r1, r2].map((rs, i) => (
-                <p key={i} className="text-center text-indigo-300 font-bold">{avg(rs)}/10 <span className="text-xs text-white/30 font-normal">({rs.length}개)</span></p>
+                <div key={i} className="flex flex-col items-center gap-1">
+                  {avg(rs) !== "-" ? <RatingGauge rating={Number(avg(rs))} /> : <span className="text-white/30 text-sm">-</span>}
+                  <span className="text-xs text-white/30">({rs.length}개)</span>
+                </div>
               ))}
             </div>
             {/* 필드들 */}
