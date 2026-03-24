@@ -479,7 +479,7 @@ export default function ReviewsPage() {
                           nose: entry.nose,
                           palate: entry.palate,
                           finish_note: entry.finish,
-                          tasting_notes: entry.description,
+                          tasting_notes: "",
                           price: priceNum ? String(priceNum) : "",
                         });
                         setAddMode("manual");
@@ -564,7 +564,7 @@ export default function ReviewsPage() {
                       className="glass-input w-full px-4 py-2 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>설명</label>
+                    <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>리뷰</label>
                     <input type="text" value={whiskey.tasting_notes}
                       onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
                       placeholder="기타 특징"
@@ -667,7 +667,7 @@ export default function ReviewsPage() {
                               className="glass-input w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>설명</label>
+                            <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>리뷰</label>
                             <input type="text" value={editingWhiskey.tasting_notes || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, tasting_notes: e.target.value })}
                               className="glass-input w-full px-3 py-2 rounded-lg" />
@@ -698,7 +698,7 @@ export default function ReviewsPage() {
                             {w.nose && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>향&nbsp;&nbsp;</span>{w.nose}</p>}
                             {w.palate && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>맛&nbsp;&nbsp;</span>{w.palate}</p>}
                             {w.finish_note && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>피니쉬&nbsp;&nbsp;</span>{w.finish_note}</p>}
-                            {w.tasting_notes && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>설명&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
+                            {w.tasting_notes && <p className="text-sm text-white/55"><span className="font-semibold"><span className="text-indigo-400/70 mr-1">·</span>리뷰&nbsp;&nbsp;</span>{w.tasting_notes}</p>}
                           </div>
                         )}
                       </button>

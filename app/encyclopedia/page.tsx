@@ -251,7 +251,7 @@ export default function EncyclopediaPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filters, setFilters] = useState<Record<FilterKey, string[]>>({ difficulty: [], abv: [], price: [], age: [] });
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [userId, setUserId] = useState("");
   const [dbEntries, setDbEntries] = useState<WhiskeyEntry[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editTarget, setEditTarget] = useState<WhiskeyEntry | null>(null);
@@ -260,7 +260,7 @@ export default function EncyclopediaPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setIsAdmin(localStorage.getItem("isAdmin") === "true");
+    setUserId(localStorage.getItem("userId") || "");
     fetchDbEntries();
   }, []);
 
@@ -357,7 +357,7 @@ export default function EncyclopediaPage() {
         {/* 헤더 */}
         <div className="flex items-start justify-between gap-4 mb-2">
           <h1 className="text-4xl font-bold text-white">위스키 백과</h1>
-          {isAdmin && (
+          {userId && (
             <button
               onClick={openAdd}
               className="flex-shrink-0 px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-xl hover:bg-indigo-500 transition"
@@ -495,8 +495,8 @@ export default function EncyclopediaPage() {
                         ))}
                       </div>
 
-                      {/* 관리자 버튼 */}
-                      {isAdmin && (
+                      {/* 편집/삭제 버튼 */}
+                      {userId && (
                         <div className="flex gap-2 pt-1 border-t border-white/8">
                           <button
                             onClick={(e) => { e.stopPropagation(); openEdit(w); }}
