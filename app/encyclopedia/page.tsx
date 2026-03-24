@@ -335,7 +335,8 @@ export default function EncyclopediaPage() {
       description: formData.description, price_range: formData.priceRange,
       difficulty: formData.difficulty, tags: formData.tags,
     };
-    await supabase.from("encyclopedia").upsert([payload]);
+    const { error } = await supabase.from("encyclopedia").upsert([payload], { onConflict: "id" });
+    if (error) { console.error("encyclopedia upsert error:", error); alert("저장 실패: " + error.message); setSaving(false); return; }
     await fetchDbEntries();
     setShowModal(false);
     setSaving(false);
