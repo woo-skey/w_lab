@@ -79,6 +79,7 @@ export default function ReviewsPage() {
   // 댓글
   const [commentText, setCommentText] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchDrop, setShowSearchDrop] = useState(false);
   const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
   const [page, setPage] = useState(1);
   const [reviewLikes, setReviewLikes] = useState<Record<string, number>>({});
@@ -392,13 +393,42 @@ export default function ReviewsPage() {
 
         {/* 검색 + 정렬 */}
         <div className="flex gap-3 mb-6 items-center">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="위스키 이름 검색..."
-            className="glass-input flex-1 px-4 py-2 rounded-lg text-sm"
-          />
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setPage(1); setShowSearchDrop(true); }}
+              onFocus={() => setShowSearchDrop(true)}
+              onBlur={() => setTimeout(() => setShowSearchDrop(false), 150)}
+              placeholder="위스키 이름 검색..."
+              className="glass-input w-full px-4 py-2 rounded-lg text-sm pr-8"
+            />
+            {searchQuery && (
+              <button
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => { setSearchQuery(""); setPage(1); setShowSearchDrop(false); }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 text-base leading-none"
+              >×</button>
+            )}
+            {showSearchDrop && searchQuery.trim() && (() => {
+              const suggestions = whiskeys
+                .filter((w) => w.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                .slice(0, 6);
+              if (!suggestions.length) return null;
+              return (
+                <div className="absolute top-full left-0 right-0 mt-1 glass-card rounded-xl overflow-hidden z-30 shadow-xl">
+                  {suggestions.map((w) => (
+                    <button key={w.id} onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => { setSearchQuery(w.name); setShowSearchDrop(false); setPage(1); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-white/80 hover:bg-white/8 transition border-b border-white/5 last:border-0">
+                      {w.name}
+                      <span className="text-white/35 text-xs ml-2">{w.type}</span>
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
           <div className="flex gap-1">
             {(["latest", "popular"] as const).map((s) => (
               <button key={s} onClick={() => { setSortBy(s); setPage(1); }}

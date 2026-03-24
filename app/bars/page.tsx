@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import RichTextEditor from "@/components/RichTextEditor";
@@ -18,6 +19,7 @@ interface Bar {
 }
 
 export default function BarsPage() {
+  const router = useRouter();
   const [bars, setBars] = useState<Bar[]>([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({ bar_name: "", link: "", notes: "" });
@@ -168,7 +170,8 @@ export default function BarsPage() {
               <div className="col-span-2 text-center py-12 text-white/40">&ldquo;{searchQuery}&rdquo;에 해당하는 바가 없습니다.</div>
             ) : null}
             {bars.filter((bar) => !searchQuery.trim() || bar.bar_name.toLowerCase().includes(searchQuery.toLowerCase())).map((bar) => (
-              <div key={bar.id} className="glass-card rounded-xl p-6 hover:bg-white/8 transition">
+              <div key={bar.id} className="glass-card rounded-xl p-6 hover:bg-white/8 transition cursor-pointer"
+                onClick={() => !editingBar && router.push(`/bars/${bar.id}`)}>
                 {editingBar?.id === bar.id ? (
                   <form onSubmit={handleEdit} className="space-y-3">
                     <input type="text" value={editingBar.bar_name}
@@ -192,8 +195,8 @@ export default function BarsPage() {
                 ) : (
                   <>
                     <div className="flex justify-between items-start mb-2">
-                      <Link href={`/bars/${bar.id}`} className="text-xl font-bold text-white hover:text-indigo-300 transition">{bar.bar_name}</Link>
-                      <div className="flex gap-1 items-center">
+                      <span className="text-xl font-bold text-white">{bar.bar_name}</span>
+                      <div className="flex gap-1 items-center" onClick={(e) => e.stopPropagation()}>
                         {userId && (
                           <button onClick={() => handleToggleFavorite(bar.id)}
                             className={`text-sm px-2 py-1 rounded transition ${favoritedBars.has(bar.id) ? "text-red-400" : "text-white/30 hover:text-red-400"}`}>
@@ -212,6 +215,7 @@ export default function BarsPage() {
                     </div>
                     {bar.link && (
                       <a href={bar.link} target="_blank" rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
                         className="text-indigo-400 hover:underline text-sm mb-3 block">🔗 웹사이트 방문</a>
                     )}
                     {bar.notes && (

@@ -765,14 +765,20 @@ export default function MyPage() {
                 {collection.filter((c) => c.status === collectionTab).map((item) => {
                   const name = item.whiskeys?.name || item.custom_name || item.encyclopedia_id || "알 수 없음";
                   const type = item.whiskeys?.type || "";
+                  const hasEncycLink = !!item.encyclopedia_id;
                   return (
                     <div key={item.id} className="glass-card rounded-xl px-4 py-3 flex items-center justify-between">
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <p className="text-white font-medium text-sm">{name}</p>
                         {type && <p className="text-white/40 text-xs">{type}</p>}
                       </div>
-                      <button onClick={() => handleDeleteCollection(item.id)}
-                        className="text-xs text-white/30 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {hasEncycLink && (
+                          <a href="/encyclopedia" className="text-xs text-indigo-400 hover:text-indigo-300 transition">백과 →</a>
+                        )}
+                        <button onClick={() => handleDeleteCollection(item.id)}
+                          className="text-xs text-white/30 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                      </div>
                     </div>
                   );
                 })}
