@@ -455,7 +455,7 @@ export default function EncyclopediaPage() {
 
                     {/* 기본 스펙 */}
                     <div className="flex gap-3 text-xs text-white/50 mb-3 flex-wrap">
-                      {w.age && <span className="bg-white/8 px-2 py-1 rounded-lg">{w.age}년산</span>}
+                      {w.age && <span className="bg-white/8 px-2 py-1 rounded-lg">{w.age}년</span>}
                       <span className="bg-white/8 px-2 py-1 rounded-lg">ABV {w.abv}%</span>
                       <span className="bg-indigo-500/15 text-indigo-300 px-2 py-1 rounded-lg">{w.priceRange}</span>
                     </div>
