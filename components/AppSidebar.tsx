@@ -41,6 +41,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -76,6 +77,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
       const id = localStorage.getItem("userId") || "";
       setUserName(localStorage.getItem("userName") || "");
       setUserId(id);
+      setIsAdmin(localStorage.getItem("isAdmin") === "true");
       if (id) fetchNotifications(id);
     };
     sync();
@@ -278,6 +280,19 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
               </Link>
             );
           })}
+          {isAdmin && (
+            <Link href="/admin"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150"
+              style={{
+                color: pathname.startsWith("/admin") ? T.navActive : T.navInactive,
+                background: pathname.startsWith("/admin") ? "rgba(99,102,241,0.25)" : "transparent",
+                border: pathname.startsWith("/admin") ? "1px solid rgba(99,102,241,0.3)" : "1px solid transparent",
+                fontWeight: pathname.startsWith("/admin") ? 600 : 400,
+              }}>
+              <span className="text-base w-5 text-center">🔐</span>
+              <span>회원 관리</span>
+            </Link>
+          )}
         </nav>
 
         {/* 하단 유저 */}

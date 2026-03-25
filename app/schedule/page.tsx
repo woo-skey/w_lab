@@ -30,6 +30,7 @@ export default function SchedulePage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isMember, setIsMember] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
@@ -44,8 +45,9 @@ export default function SchedulePage() {
     const id = localStorage.getItem("userId");
     if (id) setUserId(id);
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
+    setIsMember(localStorage.getItem("isMember") === "true");
     fetchSchedules();
-    supabase.from("users").select("*", { count: "exact", head: true }).neq("is_admin", true).then(({ count }) => setTotalUsers(count || 0));
+    supabase.from("users").select("*", { count: "exact", head: true }).eq("is_member", true).then(({ count }) => setTotalUsers(count || 0));
   }, []);
 
   useEffect(() => {
@@ -131,10 +133,7 @@ export default function SchedulePage() {
   };
 
   const handleToggleDate = async (dateStr: string) => {
-    if (!userId) {
-      window.location.href = "/login";
-      return;
-    }
+    if (!userId || !isMember || isAdmin) return;
     if (!selectedSchedule) return;
 
     const existing = availabilityMap[dateStr];
@@ -274,7 +273,7 @@ export default function SchedulePage() {
         <p className="text-xs text-white/30 mb-8">새 일정 만들기로 이름을 정하고, 달력에서 참여 가능한 날짜를 클릭하면 됩니다. 여러 명이 같은 일정에 참여해 날짜를 선택하면 최다 가능 날짜가 자동으로 표시됩니다.</p>
 
         {/* 새 일정 버튼 */}
-        {userId ? (
+        {userId && isMember && !isAdmin ? (
           <>
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
@@ -300,12 +299,16 @@ export default function SchedulePage() {
               </div>
             )}
           </>
-        ) : (
+        ) : !userId ? (
           <div className="glass-card rounded-lg p-4 mb-6 text-center">
             <p className="text-white/60 mb-2">일정을 만들려면 로그인이 필요합니다.</p>
             <a href="/login" className="text-indigo-400 underline font-medium text-sm">로그인하기</a>
           </div>
-        )}
+        ) : !isMember ? (
+          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+            <p className="text-white/60 text-sm">w_lab 회원만 일정을 만들고 투표할 수 있습니다.</p>
+          </div>
+        ) : null}
 
         <div className="grid lg:grid-cols-4 gap-6">
           {/* 사이드바: 일정 목록 */}
@@ -411,7 +414,7 @@ export default function SchedulePage() {
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <h2 className="text-xl font-bold text-white">{selectedSchedule.name}</h2>
-                    {userId && (
+                    {userId && isMember && !isAdmin && (
                       <p className="text-sm text-white/45 mt-1">
                         가능한 날짜를 클릭해서 체크하세요 ✓
                       </p>
@@ -497,8 +500,8 @@ export default function SchedulePage() {
                         className={`calendar-cell aspect-square ${hoveredDate === dateStr ? "flipped" : ""}`}
                         onMouseEnter={() => count > 0 && setHoveredDate(dateStr)}
                         onMouseLeave={() => setHoveredDate(null)}
-                        onClick={() => userId && handleToggleDate(dateStr)}
-                        style={{ cursor: userId ? "pointer" : "default" }}
+                        onClick={() => userId && isMember && !isAdmin && handleToggleDate(dateStr)}
+                        style={{ cursor: userId && isMember && !isAdmin ? "pointer" : "default" }}
                       >
                         <div className="calendar-card">
                           {/* 앞면 */}
@@ -561,11 +564,13 @@ export default function SchedulePage() {
                     <div className="w-4 h-4 rounded" style={{ background: "rgba(234,179,8,0.25)", border: "2px solid rgba(234,179,8,0.6)" }} />
                     <span className="text-amber-400/60">확정 날짜</span>
                   </div>
-                  {!userId && (
+                  {!userId ? (
                     <div className="ml-auto">
                       <a href="/login" className="text-indigo-400 underline">로그인하고 참여하기</a>
                     </div>
-                  )}
+                  ) : !isMember ? (
+                    <div className="ml-auto text-white/30">w_lab 회원만 투표할 수 있습니다</div>
+                  ) : null}
                 </div>
               </div>
             ) : (

@@ -56,11 +56,11 @@ export async function signup(
 export async function login(
   username: string,
   password: string
-): Promise<{ success: boolean; error?: string; userId?: string; name?: string; isAdmin?: boolean }> {
+): Promise<{ success: boolean; error?: string; userId?: string; name?: string; isAdmin?: boolean; isMember?: boolean }> {
   try {
     const { data, error } = await supabase
       .from("users")
-      .select("id, password_hash, name, is_admin")
+      .select("id, password_hash, name, is_admin, is_member")
       .eq("username", username)
       .single();
 
@@ -73,7 +73,7 @@ export async function login(
       return { success: false, error: "아이디 또는 비밀번호가 잘못되었습니다" };
     }
 
-    return { success: true, userId: data.id, name: data.name, isAdmin: data.is_admin || false };
+    return { success: true, userId: data.id, name: data.name, isAdmin: data.is_admin || false, isMember: data.is_member || false };
   } catch (error) {
     return { success: false, error: "로그인에 실패했습니다" };
   }
