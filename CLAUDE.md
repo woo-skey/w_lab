@@ -34,6 +34,54 @@
 
 ## 기술 스택
 - Next.js 15 App Router, Supabase, Tailwind CSS v3, TypeScript
-- 인증: localStorage (userId, userName, isAdmin)
+- 인증: localStorage (`userId`, `userName`, `isAdmin`, `isMember`) — Supabase JWT 아님
 - 알림: Supabase Realtime (`postgres_changes`) + `lib/notifications.ts`의 `createNotification`
 - 글로벌 레이아웃: `components/AppSidebar.tsx` (Navigation 대체)
+
+## 반드시 먼저 읽을 파일
+대화 시작 시 `FEATURES.md`를 반드시 읽을 것.
+구현된 기능 전체 목록, 주요 파일 경로, 테이블 구조, 과거 버그 이력이 정리되어 있음.
+
+## 추가된 주요 패턴 및 유의사항
+
+### 인증 localStorage 키
+| 키 | 설명 |
+|----|------|
+| `userId` | Supabase users.id (UUID) |
+| `userName` | 표시 이름 |
+| `isAdmin` | 관리자 여부 |
+| `isMember` | w_lab 회원 여부 (일정 투표·생성 권한) |
+
+로그인 후 재로그인 전까지는 `isMember`가 없을 수 있음 → 새 기능 추가 시 `localStorage.getItem("isMember") === "true"` 패턴 사용.
+
+### 일정(Schedule) 관련
+- `is_member = true` 유저만 투표·생성 가능, 관리자는 투표 불가
+- 투표 현황 총원: `is_member = true` 유저 수 기준 (`is_admin` 제외 아님)
+- 중복 `schedule_dates` 행 버그: 같은 날짜에 여러 행 생성될 수 있음
+  - 삭제 시 해당 날짜의 모든 row ID를 조회 후 일괄 삭제
+  - 생성 시 기존 row가 있으면 재사용 (`maybeSingle()` 체크)
+
+### 관리자 회원 관리 페이지
+- 경로: `/admin`
+- `isAdmin !== "true"`이면 즉시 `/`로 redirect
+- 사이드바에서 관리자에게만 🔐 회원 관리 링크 표시
+
+### 알림 읽음 처리
+- 벨 아이콘 열 때 전체 읽음 처리 안 함
+- 개별 알림 클릭 시 `is_read = true` 업데이트 + 해당 페이지 이동
+- &ldquo;모두 읽음&rdquo; 버튼으로 일괄 처리
+
+### 평점 시스템
+- 10점 만점 (과거 5점에서 변경됨)
+- `RatingGauge` 컴포넌트: 1-4 빨강, 5-7 노랑, 8-10 초록 게이지 바
+- `app/reviews/page.tsx` 내부에 인라인 정의됨
+
+### Encyclopedia(위스키 백과)
+- 정적 데이터: `lib/encyclopediaData.ts`의 `ENCYCLOPEDIA_WHISKEYS`
+- DB upsert 시 `deleted: true` 처리는 전체 컬럼 포함해서 upsert해야 함 (NOT NULL 컬럼 때문)
+- 모든 유저가 편집·추가·삭제 가능
+
+### 컬렉션
+- `user_collection` 테이블 사용
+- 위스키 백과 검색으로 추가하거나 직접 입력 가능
+- `app/mypage/page.tsx` 내 &ldquo;컬렉션&rdquo; 탭에서 관리
