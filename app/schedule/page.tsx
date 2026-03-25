@@ -391,7 +391,7 @@ export default function SchedulePage() {
           {/* 메인: 달력 */}
           <div className="lg:col-span-3">
             {selectedSchedule ? (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card rounded-xl p-3 md:p-6">
                 {/* 확정 날짜 배너 */}
                 {selectedSchedule.confirmed_date && (
                   <div className="mb-4 px-4 py-3 rounded-xl flex items-center gap-3" style={{ background: "rgba(234,179,8,0.12)", border: "1px solid rgba(234,179,8,0.3)" }}>

@@ -725,10 +725,10 @@ export default function ReviewsPage() {
                       </form>
                     </div>
                   ) : (
-                    <div className="flex items-start p-6 hover:bg-white/5 transition">
+                    <div className="flex items-start p-4 md:p-6 hover:bg-white/5 transition">
                       <button onClick={() => handleToggleWhiskey(w.id)} className="flex-1 text-left">
                         <div className="flex items-center gap-3 mb-1">
-                          <h3 className="text-xl font-bold text-white">{w.name}</h3>
+                          <h3 className="text-lg md:text-xl font-bold text-white">{w.name}</h3>
                           <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{w.type}</span>
                         </div>
                         <div className="flex flex-wrap gap-4 text-sm text-white/40 mt-1">
@@ -771,7 +771,7 @@ export default function ReviewsPage() {
                   {isExpanded && (
                     <div className="border-t border-white/8">
                       {/* 리뷰 작성 버튼 */}
-                      <div className="px-6 py-4 border-b border-white/8" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div className="px-4 py-3 md:px-6 md:py-4 border-b border-white/8" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {userId ? (
                           reviewForm?.whiskey_id === w.id ? (
                             <form onSubmit={handleAddReview} className="space-y-3">
@@ -851,7 +851,7 @@ export default function ReviewsPage() {
                         const dist = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((s) => ({ star: s, count: whiskeyReviews.filter((r) => r.rating === s).length }));
                         const max = Math.max(...dist.map((d) => d.count), 1);
                         return (
-                          <div className="px-6 py-4 border-b border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <div className="px-4 py-3 md:px-6 md:py-4 border-b border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
                             <p className="text-xs text-white/30 mb-2">평점 분포</p>
                             <div className="space-y-1">
                               {dist.map(({ star, count }) => (
@@ -880,7 +880,7 @@ export default function ReviewsPage() {
                             const isOwner = (r.user_id === userId || isAdmin);
 
                             return (
-                              <div key={r.id} className="px-6 py-4">
+                              <div key={r.id} className="px-4 py-3 md:px-6 md:py-4">
                                 {/* 편집 모드 */}
                                 {editingReview?.id === r.id ? (
                                   <form onSubmit={(e) => handleEditReview(e, w.id)} className="space-y-3">
@@ -969,10 +969,10 @@ export default function ReviewsPage() {
                                     </div>
 
                                     {r.review_text && (
-                                      <SafeHtml html={r.review_text} className="rich-content text-sm leading-relaxed text-white/55 mb-3 ml-10" />
+                                      <SafeHtml html={r.review_text} className="rich-content text-sm leading-relaxed text-white/55 mb-3 ml-0 md:ml-10" />
                                     )}
                                     {(r.nose || r.palate || r.finish_note || r.remarks) && (
-                                      <div className="ml-10 mb-2 grid grid-cols-2 gap-x-4 gap-y-1">
+                                      <div className="ml-0 md:ml-10 mb-2 grid grid-cols-2 gap-x-4 gap-y-1">
                                         {r.nose && (
                                           <p className="text-xs text-white/55"><span className="font-medium text-white/70"><span className="text-indigo-400/70 mr-1">·</span>향</span> {r.nose}</p>
                                         )}
