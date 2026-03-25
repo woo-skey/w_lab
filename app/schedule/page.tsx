@@ -47,7 +47,7 @@ export default function SchedulePage() {
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     setIsMember(localStorage.getItem("isMember") === "true");
     fetchSchedules();
-    supabase.from("users").select("*", { count: "exact", head: true }).eq("is_member", true).then(({ count }) => setTotalUsers(count || 0));
+    supabase.from("users").select("*", { count: "exact", head: true }).eq("is_member", true).neq("is_admin", true).then(({ count }) => setTotalUsers(count || 0));
   }, []);
 
   useEffect(() => {
