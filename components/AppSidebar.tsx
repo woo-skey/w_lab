@@ -19,6 +19,22 @@ const NAV = [
   { href: "/contact", icon: "✉️", label: "문의" },
 ];
 
+// 모바일 하단 탭바 (5개)
+const TAB_NAV = [
+  { href: "/", icon: "⊞", label: "홈", exact: true },
+  { href: "/reviews", icon: "⭐", label: "리뷰" },
+  { href: "/encyclopedia", icon: "📖", label: "백과" },
+  { href: "/schedule", icon: "📅", label: "일정" },
+];
+
+// 더보기 드로어 (나머지 메뉴)
+const DRAWER_NAV = [
+  { href: "/bars", icon: "🍸", label: "Bar 추천" },
+  { href: "/articles", icon: "📚", label: "지식글" },
+  { href: "/notices", icon: "📢", label: "공지" },
+  { href: "/contact", icon: "✉️", label: "문의" },
+];
+
 const SF = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif";
 const GLASS_SIDEBAR_DARK = {
   background: "rgba(255,255,255,0.04)",
@@ -52,6 +68,25 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const bellRef = useRef<HTMLButtonElement>(null);
   const [notifMaxH, setNotifMaxH] = useState(340);
   const [isDark, setIsDark] = useState(true);
+
+  // 모바일 관련 state
+  const [isMobile, setIsMobile] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [showMobileNotif, setShowMobileNotif] = useState(false);
+
+  // 모바일 감지
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // 라우트 변경 시 드로어 닫기
+  useEffect(() => {
+    setShowDrawer(false);
+    setShowMobileNotif(false);
+  }, [pathname]);
 
   const doSearch = useCallback(async (q: string) => {
     if (!q.trim()) { setSearchResults([]); return; }
@@ -114,7 +149,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     }
     const typeMap: Record<string, string> = { announcement: "/notices", review: "/reviews", review_comment: "/reviews", article_comment: "/articles", contact_reply: "/contact", schedule: "/schedule" };
     const dest = n.link || typeMap[n.type] || null;
-    if (dest) { router.push(dest); setShowNotifications(false); }
+    if (dest) { router.push(dest); setShowNotifications(false); setShowMobileNotif(false); }
   };
 
   useEffect(() => {
@@ -164,7 +199,6 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const bg = isDark ? BG_DARK : BG_LIGHT;
   const sidebarStyle = isDark ? GLASS_SIDEBAR_DARK : GLASS_SIDEBAR_LIGHT;
 
-  // 테마 색상 변수
   const T = isDark ? {
     textPrimary: "rgba(255,255,255,0.90)",
     textSecondary: "rgba(255,255,255,0.55)",
@@ -183,6 +217,9 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     dropdownBg: "rgba(18,18,24,0.98)",
     dropdownBorder: "rgba(255,255,255,0.1)",
     dropdownText: "rgba(255,255,255,0.65)",
+    tabBarBg: "rgba(12,12,20,0.97)",
+    tabBarBorder: "rgba(255,255,255,0.08)",
+    drawerBg: "rgba(14,14,22,0.98)",
   } : {
     textPrimary: "rgba(10,10,30,0.95)",
     textSecondary: "rgba(10,10,30,0.80)",
@@ -201,6 +238,9 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     dropdownBg: "rgba(250,250,255,0.98)",
     dropdownBorder: "rgba(0,0,0,0.10)",
     dropdownText: "rgba(10,10,30,0.70)",
+    tabBarBg: "rgba(255,255,255,0.95)",
+    tabBarBorder: "rgba(0,0,0,0.08)",
+    drawerBg: "rgba(250,250,255,0.98)",
   };
 
   if (hideSidebar) {
@@ -212,6 +252,224 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     );
   }
 
+  // ─── 모바일 레이아웃 ────────────────────────────────────────────
+  if (isMobile) {
+    return (
+      <div className="relative min-h-screen" style={{ background: bg, fontFamily: SF }}>
+        <Orbs isDark={isDark} />
+
+        {/* 메인 콘텐츠 — 하단 탭바 높이만큼 패딩 */}
+        <div className="relative z-10 pb-20">{children}</div>
+
+        {/* 더보기 드로어 백드롭 */}
+        {showDrawer && (
+          <div
+            className="fixed inset-0 z-30"
+            style={{ background: "rgba(0,0,0,0.45)" }}
+            onClick={() => setShowDrawer(false)}
+          />
+        )}
+
+        {/* 더보기 드로어 */}
+        <div
+          className="fixed left-0 right-0 z-40 rounded-t-2xl transition-transform duration-300"
+          style={{
+            bottom: 64,
+            background: T.drawerBg,
+            backdropFilter: "blur(40px)",
+            WebkitBackdropFilter: "blur(40px)",
+            borderTop: `1px solid ${T.tabBarBorder}`,
+            transform: showDrawer ? "translateY(0)" : "translateY(100%)",
+          }}
+        >
+          {/* 드래그 핸들 */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-10 h-1 rounded-full" style={{ background: T.textMuted }} />
+          </div>
+
+          <div className="px-4 pb-4">
+            {/* 나머지 내비 */}
+            <div className="grid grid-cols-4 gap-2 mb-4">
+              {DRAWER_NAV.map((item) => {
+                const active = pathname.startsWith(item.href);
+                return (
+                  <Link key={item.href} href={item.href}
+                    className="flex flex-col items-center gap-1 py-3 rounded-xl text-xs transition-all"
+                    style={{
+                      background: active ? "rgba(99,102,241,0.2)" : T.searchBg,
+                      color: active ? T.navActive : T.navInactive,
+                      border: active ? "1px solid rgba(99,102,241,0.3)" : `1px solid ${T.border}`,
+                    }}>
+                    <span className="text-xl">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+              {isAdmin && (
+                <Link href="/admin"
+                  className="flex flex-col items-center gap-1 py-3 rounded-xl text-xs transition-all"
+                  style={{
+                    background: pathname.startsWith("/admin") ? "rgba(99,102,241,0.2)" : T.searchBg,
+                    color: pathname.startsWith("/admin") ? T.navActive : T.navInactive,
+                    border: pathname.startsWith("/admin") ? "1px solid rgba(99,102,241,0.3)" : `1px solid ${T.border}`,
+                  }}>
+                  <span className="text-xl">🔐</span>
+                  <span>회원 관리</span>
+                </Link>
+              )}
+            </div>
+
+            <div className="h-px mb-4" style={{ background: T.border }} />
+
+            {/* 유저 영역 */}
+            <div className="space-y-1">
+              {userId ? (
+                <>
+                  {/* 알림 */}
+                  <button
+                    onClick={() => { setShowDrawer(false); setShowMobileNotif(true); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors"
+                    style={{ background: T.searchBg, color: T.textSecondary }}>
+                    <span className="relative text-base">
+                      🔔
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold leading-none">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                      )}
+                    </span>
+                    <span>알림{unreadCount > 0 ? ` (${unreadCount})` : ""}</span>
+                  </button>
+
+                  {/* 마이페이지 */}
+                  <Link href="/mypage"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors"
+                    style={{ background: T.searchBg, color: T.textSecondary }}>
+                    <span className="w-6 h-6 rounded-full bg-indigo-500/50 flex items-center justify-center text-xs text-white font-bold flex-shrink-0">
+                      {userName.slice(0, 1).toUpperCase()}
+                    </span>
+                    <span className="truncate">{userName}</span>
+                  </Link>
+
+                  {/* 테마 토글 + 로그아웃 */}
+                  <div className="flex gap-2">
+                    <button onClick={toggleTheme}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm transition-colors"
+                      style={{ background: T.searchBg, color: T.textTertiary }}>
+                      <span>{isDark ? "☀️" : "🌙"}</span>
+                      <span>{isDark ? "라이트" : "다크"}</span>
+                    </button>
+                    <button onClick={handleLogout}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm transition-colors"
+                      style={{ background: T.searchBg, color: T.textTertiary }}>
+                      <span>↩</span>
+                      <span>로그아웃</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex gap-2">
+                  <Link href="/login"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm"
+                    style={{ background: "rgba(99,102,241,0.2)", color: T.navActive, border: "1px solid rgba(99,102,241,0.3)" }}>
+                    <span>→</span><span>로그인</span>
+                  </Link>
+                  <button onClick={toggleTheme}
+                    className="flex items-center justify-center px-4 py-3 rounded-xl text-sm"
+                    style={{ background: T.searchBg, color: T.textTertiary }}>
+                    <span>{isDark ? "☀️" : "🌙"}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 하단 탭바 */}
+        <nav
+          className="fixed bottom-0 left-0 right-0 z-40 flex items-center"
+          style={{
+            height: 64,
+            background: T.tabBarBg,
+            backdropFilter: "blur(40px)",
+            WebkitBackdropFilter: "blur(40px)",
+            borderTop: `1px solid ${T.tabBarBorder}`,
+          }}
+        >
+          {TAB_NAV.map((item) => {
+            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+            return (
+              <Link key={item.href} href={item.href}
+                className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-all"
+                style={{ color: active ? "#818cf8" : T.navInactive }}>
+                <span className="text-xl leading-none">{item.icon}</span>
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+
+          {/* 더보기 탭 */}
+          <button
+            onClick={() => setShowDrawer((v) => !v)}
+            className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-all"
+            style={{ color: showDrawer ? "#818cf8" : T.navInactive }}>
+            <span className="text-xl leading-none relative">
+              ☰
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1.5 w-3.5 h-3.5 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold leading-none">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </span>
+            <span className="text-[10px] font-medium">더보기</span>
+          </button>
+        </nav>
+
+        {/* 모바일 알림 오버레이 */}
+        {showMobileNotif && (
+          <div className="fixed inset-0 z-50 flex flex-col" style={{ background: T.notifBg, fontFamily: SF }}>
+            <div className="flex items-center justify-between px-4 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${T.border}` }}>
+              <span className="text-base font-semibold" style={{ color: T.textPrimary }}>
+                알림 {unreadCount > 0 && <span className="ml-1 px-1.5 py-0.5 bg-indigo-500/70 text-white text-[10px] rounded-full font-bold">{unreadCount}</span>}
+              </span>
+              <div className="flex items-center gap-3">
+                {unreadCount > 0 && (
+                  <button onClick={handleMarkAllRead} className="text-sm" style={{ color: T.textMuted }}>모두 읽음</button>
+                )}
+                {notifications.length > 0 && (
+                  <button onClick={async () => { await supabase.from("notifications").delete().eq("user_id", userId); setNotifications([]); }}
+                    className="text-sm" style={{ color: T.textMuted }}>전체 삭제</button>
+                )}
+                <button onClick={() => setShowMobileNotif(false)} className="text-lg px-1" style={{ color: T.textSecondary }}>✕</button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <p className="text-center py-16 text-sm" style={{ color: T.textMuted }}>알림이 없습니다</p>
+              ) : notifications.map((n) => (
+                <div key={n.id} onClick={() => handleNotifClick(n)}
+                  className="px-4 py-4 flex items-start gap-3 cursor-pointer active:opacity-70 transition-opacity"
+                  style={{
+                    borderBottom: `1px solid ${T.notifDivider}`,
+                    background: n.is_read ? "transparent" : "rgba(99,102,241,0.07)",
+                  }}>
+                  <div className="mt-2 flex-shrink-0 w-2 h-2 rounded-full" style={{ background: n.is_read ? "transparent" : "rgba(99,102,241,0.9)" }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm leading-snug" style={{ color: n.is_read ? T.notifMuted : T.notifText }}>{n.message}</p>
+                    <p className="text-xs mt-1" style={{ color: T.textMuted }}>
+                      {new Date(n.created_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ─── 데스크탑 레이아웃 (기존과 동일) ──────────────────────────
   return (
     <div className="flex min-h-screen" style={{ background: bg, fontFamily: SF }}>
       <Orbs isDark={isDark} />
