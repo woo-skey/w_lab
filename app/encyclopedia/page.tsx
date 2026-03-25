@@ -384,10 +384,10 @@ export default function EncyclopediaPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
         {/* 헤더 */}
         <div className="flex items-start justify-between gap-4 mb-2">
-          <h1 className="text-4xl font-bold text-white">위스키 백과</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">위스키 백과</h1>
           {userId && (
             <button
               onClick={openAdd}

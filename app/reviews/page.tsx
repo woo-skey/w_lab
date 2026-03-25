@@ -388,8 +388,8 @@ export default function ReviewsPage() {
   return (
     <>
     <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-white mb-2">위스키 리뷰</h1>
+      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">위스키 리뷰</h1>
         <p className="text-white/55 mb-2">다양한 위스키를 평가하고 리뷰를 공유하세요.</p>
         <p className="text-xs text-white/30 mb-8">위스키 카드를 클릭하면 리뷰 목록이 펼쳐집니다. 새 위스키 추가 후 리뷰 작성 버튼으로 별점과 테이스팅 노트를 남길 수 있습니다.</p>
 
@@ -1099,9 +1099,9 @@ export default function ReviewsPage() {
         { label: "피니쉬", key: "finish_note" },
       ];
       return (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-4"
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-2 sm:px-4"
           onClick={(e) => { if (e.target === e.currentTarget) setCompareList([]); }}>
-          <div className="glass-card rounded-2xl w-full max-w-2xl p-6 overflow-y-auto max-h-[90vh]">
+          <div className="glass-card rounded-2xl w-full max-w-2xl p-4 sm:p-6 overflow-y-auto max-h-[92vh]">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-bold text-white">위스키 비교</h2>
               <button onClick={() => setCompareList([])} className="text-white/40 hover:text-white text-xl">✕</button>

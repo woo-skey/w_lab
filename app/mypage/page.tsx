@@ -487,11 +487,11 @@ export default function MyPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
 
         {/* 프로필 카드 */}
-        <div className="glass-card rounded-2xl p-8 mb-8">
-          <div className="flex items-center gap-6">
+        <div className="glass-card rounded-2xl p-5 sm:p-8 mb-8">
+          <div className="flex items-center gap-4 sm:gap-6">
             {/* 아바타 */}
             <div className="relative flex-shrink-0">
               <div
@@ -661,7 +661,7 @@ export default function MyPage() {
           </div>
 
           {/* 활동 통계 */}
-          <div className="grid grid-cols-5 gap-4 mt-8 pt-6 border-t border-white/8">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 mt-8 pt-6 border-t border-white/8">
             {[
               { label: "리뷰", count: reviews.length },
               { label: "위스키", count: whiskeys.length },

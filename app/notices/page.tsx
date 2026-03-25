@@ -91,8 +91,8 @@ export default function NoticesPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-white mb-2">공지사항</h1>
+      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">공지사항</h1>
         <p className="text-white/55 mb-2">운영진이 전달하는 공지 및 소식을 확인하세요.</p>
         <p className="text-xs text-white/30 mb-8">새로운 공지가 올라오면 알림으로 안내됩니다. 제목을 클릭하면 내용이 펼쳐집니다.</p>
 

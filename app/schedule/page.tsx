@@ -267,8 +267,8 @@ export default function SchedulePage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-white mb-2">일정 맞추기</h1>
+      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">일정 맞추기</h1>
         <p className="text-white/55 mb-2">달력에서 가능한 날을 클릭해서 멤버들과 일정을 조율하세요.</p>
         <p className="text-xs text-white/30 mb-8">새 일정 만들기로 이름을 정하고, 달력에서 참여 가능한 날짜를 클릭하면 됩니다. 여러 명이 같은 일정에 참여해 날짜를 선택하면 최다 가능 날짜가 자동으로 표시됩니다.</p>
 

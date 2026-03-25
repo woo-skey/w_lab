@@ -53,15 +53,15 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-white mb-2">관리자 — 회원 관리</h1>
+      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">관리자 — 회원 관리</h1>
         <p className="text-white/50 mb-8 text-sm">w_lab 회원 여부를 관리합니다. 회원만 일정 투표·생성이 가능합니다.</p>
 
         {loading ? (
           <div className="text-center py-12 text-white/40">로딩 중...</div>
         ) : (
-          <div className="glass-card rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="glass-card rounded-xl overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b border-white/10">
                   <th className="text-left py-3 px-4 text-white/50 font-semibold">이름</th>

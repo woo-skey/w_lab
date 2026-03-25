@@ -112,7 +112,7 @@ export default function BarDetailPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-3xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12">
         <Link href="/bars" className="text-indigo-400 hover:text-indigo-300 text-sm mb-6 inline-block">← Bar 목록으로</Link>
 
         {/* Bar 정보 */}

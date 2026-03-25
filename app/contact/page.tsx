@@ -119,8 +119,8 @@ export default function ContactPage() {
   if (isAdmin) {
     return (
       <div className="min-h-screen">
-        <div className="max-w-5xl mx-auto px-4 py-12">
-          <h1 className="text-4xl font-bold text-white mb-2">문의 관리</h1>
+        <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">문의 관리</h1>
           <p className="text-white/55 mb-2">회원들의 문의를 확인하고 답변하세요.</p>
           <p className="text-xs text-white/30 mb-8">미답변 문의에 답변을 달면 해당 유저에게 알림이 전송됩니다.</p>
 
@@ -205,8 +205,8 @@ export default function ContactPage() {
   // 일반 유저 뷰
   return (
     <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-white mb-2">문의하기</h1>
+      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">문의하기</h1>
         <p className="text-white/55 mb-2">궁금한 점이나 불편한 점을 운영진에게 직접 전달해보세요.</p>
         <p className="text-xs text-white/30 mb-8">문의를 등록하면 운영진이 검토 후 답변을 남깁니다. 본인의 문의와 답변은 이 페이지에서 확인할 수 있습니다.</p>
 
