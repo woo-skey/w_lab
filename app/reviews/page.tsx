@@ -636,7 +636,7 @@ export default function ReviewsPage() {
           ) : filteredWhiskeys.length === 0 ? (
             <div className="text-center py-12 text-white/40">아직 위스키가 없습니다.</div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-4 items-start">
+            <div className="grid grid-cols-2 gap-3 md:gap-4 items-start">
             {pagedWhiskeys.map((w) => {
               const isExpanded = expandedWhiskey === w.id;
               const whiskeyReviews = reviews[w.id] || [];

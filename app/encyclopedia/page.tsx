@@ -465,7 +465,7 @@ export default function EncyclopediaPage() {
         {filtered.length === 0 ? (
           <div className="text-center py-20 text-white/30">검색 결과가 없습니다.</div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
             {filtered.map((w) => {
               const isOpen = expandedId === w.id;
               return (
