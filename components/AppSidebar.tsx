@@ -73,6 +73,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const [isMobile, setIsMobile] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [showMobileNotif, setShowMobileNotif] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   // 모바일 감지
   useEffect(() => {
@@ -86,6 +87,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     setShowDrawer(false);
     setShowMobileNotif(false);
+    setShowMobileSearch(false);
   }, [pathname]);
 
   const doSearch = useCallback(async (q: string) => {
@@ -258,8 +260,16 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
       <div className="relative min-h-screen" style={{ background: bg, fontFamily: SF }}>
         <Orbs isDark={isDark} />
 
-        {/* 메인 콘텐츠 — 하단 탭바 높이만큼 패딩 */}
-        <div className="relative z-10 pb-20">{children}</div>
+        {/* 모바일 상단 바 */}
+        <div className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 h-12"
+          style={{ background: T.tabBarBg, borderBottom: `1px solid ${T.tabBarBorder}`, backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)" }}>
+          <Link href="/" style={{ color: T.textPrimary, fontWeight: 700, fontSize: 15 }}>🥃 위스키 연구소</Link>
+          <button onClick={() => setShowMobileSearch(true)} className="p-2 rounded-lg transition"
+            style={{ color: T.navInactive, fontSize: 18 }}>⌕</button>
+        </div>
+
+        {/* 메인 콘텐츠 — 상단 바 + 하단 탭바 높이만큼 패딩 */}
+        <div className="relative z-10 pt-12 pb-20">{children}</div>
 
         {/* 더보기 드로어 백드롭 */}
         {showDrawer && (
@@ -424,6 +434,66 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
             <span className="text-[10px] font-medium">더보기</span>
           </button>
         </nav>
+
+        {/* 모바일 검색 오버레이 */}
+        {showMobileSearch && (
+          <div className="fixed inset-0 z-50 flex flex-col" style={{ background: T.drawerBg, fontFamily: SF }}>
+            {/* 검색 입력 */}
+            <div className="flex items-center gap-3 px-4 h-14 flex-shrink-0" style={{ borderBottom: `1px solid ${T.border}` }}>
+              <span style={{ color: T.textMuted, fontSize: 20 }}>⌕</span>
+              <input
+                autoFocus
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); }}
+                placeholder="위스키, Bar, 지식글 검색..."
+                className="flex-1 bg-transparent text-base outline-none"
+                style={{ color: T.textSecondary }}
+              />
+              {searchQuery && (
+                <button onClick={() => { setSearchQuery(""); setSearchResults([]); }}
+                  style={{ color: T.textMuted, fontSize: 18 }}>✕</button>
+              )}
+              <button onClick={() => { setShowMobileSearch(false); setSearchQuery(""); setSearchResults([]); }}
+                className="text-sm px-2 py-1 rounded-lg ml-1"
+                style={{ color: T.textSecondary }}>취소</button>
+            </div>
+
+            {/* 결과 목록 */}
+            <div className="flex-1 overflow-y-auto">
+              {searchResults.length > 0 ? (
+                searchResults.map((r) => (
+                  <button key={r.id + r.icon}
+                    onClick={() => { router.push(r.href); setShowMobileSearch(false); setSearchQuery(""); setSearchResults([]); }}
+                    className="w-full flex items-center gap-3 px-4 py-4 text-left transition active:opacity-70"
+                    style={{ borderBottom: `1px solid ${T.border}`, color: T.dropdownText }}>
+                    <span className="text-2xl w-8 text-center">{r.icon}</span>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{r.title}</p>
+                      {r.subtitle && <p className="text-sm truncate" style={{ color: T.textMuted }}>{r.subtitle}</p>}
+                    </div>
+                  </button>
+                ))
+              ) : searchQuery ? (
+                <p className="text-center py-16 text-sm" style={{ color: T.textMuted }}>검색 결과가 없습니다</p>
+              ) : (
+                <div className="px-4 py-5">
+                  <p className="text-xs uppercase tracking-wider mb-3" style={{ color: T.textMuted }}>빠른 이동</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[...TAB_NAV, ...DRAWER_NAV].map((item) => (
+                      <button key={item.href}
+                        onClick={() => { router.push(item.href); setShowMobileSearch(false); }}
+                        className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-left transition active:opacity-70"
+                        style={{ background: T.searchBg, color: T.textSecondary, border: `1px solid ${T.border}` }}>
+                        <span className="text-xl">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* 모바일 알림 오버레이 */}
         {showMobileNotif && (

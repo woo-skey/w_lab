@@ -95,6 +95,31 @@ html:not(.dark) .divide-white\/8 > * + * { border-color: rgba(0,0,0,0.07) !impor
 
 html:not(.dark) .rich-content { color: rgba(10,10,30,0.80); }
 
+/* 스켈레톤 로딩 shimmer */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.11) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+html:not(.dark) .skeleton {
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0.05) 25%,
+    rgba(0,0,0,0.11) 50%,
+    rgba(0,0,0,0.05) 75%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
 img.emoji {
   height: 1em;
   width: 1em;

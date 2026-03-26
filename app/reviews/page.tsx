@@ -632,7 +632,16 @@ export default function ReviewsPage() {
         {/* 위스키 목록 */}
         <div>
           {loading ? (
-            <div className="text-center py-12 text-white/40">로딩 중...</div>
+            <div className="grid grid-cols-2 gap-3 md:gap-4 items-start">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="glass-card rounded-xl p-4 space-y-3">
+                  <div className="skeleton h-5 w-3/4 rounded" />
+                  <div className="skeleton h-3 w-1/3 rounded" />
+                  <div className="skeleton h-3 w-full rounded mt-1" />
+                  <div className="skeleton h-3 w-2/3 rounded" />
+                </div>
+              ))}
+            </div>
           ) : filteredWhiskeys.length === 0 ? (
             <div className="text-center py-12 text-white/40">아직 위스키가 없습니다.</div>
           ) : (

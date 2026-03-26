@@ -161,7 +161,16 @@ export default function BarsPage() {
 
         {/* 바 목록 */}
         {loading ? (
-          <div className="text-center py-12 text-white/40">로딩 중...</div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="glass-card rounded-xl p-6 space-y-3">
+                <div className="skeleton h-5 w-2/3 rounded" />
+                <div className="skeleton h-3 w-1/2 rounded" />
+                <div className="skeleton h-3 w-full rounded mt-1" />
+                <div className="skeleton h-3 w-3/4 rounded" />
+              </div>
+            ))}
+          </div>
         ) : bars.length === 0 ? (
           <div className="text-center py-12 text-white/40">아직 추천된 바가 없습니다.</div>
         ) : (

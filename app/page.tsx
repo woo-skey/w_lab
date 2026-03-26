@@ -137,7 +137,14 @@ export default function Home() {
               <Link href="/reviews" className="text-xs text-indigo-400 hover:text-indigo-300 transition">전체 보기 →</Link>
             </div>
             {loading ? (
-              <div className="glass-card rounded-2xl p-6 text-center text-white/30 text-sm">로딩 중...</div>
+              <div className="glass-card rounded-2xl p-4 space-y-3">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="skeleton h-4 flex-1 rounded" />
+                    <div className="skeleton h-4 w-10 rounded" />
+                  </div>
+                ))}
+              </div>
             ) : recentReviews.length === 0 ? (
               <div className="glass-card rounded-2xl p-6 text-center text-white/30 text-sm">아직 리뷰가 없습니다.</div>
             ) : (
@@ -165,7 +172,15 @@ export default function Home() {
               <Link href="/reviews" className="text-xs text-indigo-400 hover:text-indigo-300 transition">전체 보기 →</Link>
             </div>
             {loading ? (
-              <div className="glass-card rounded-2xl p-6 text-center text-white/30 text-sm">로딩 중...</div>
+              <div className="glass-card rounded-2xl p-4 space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="skeleton w-6 h-6 rounded-full flex-shrink-0" />
+                    <div className="skeleton h-4 flex-1 rounded" />
+                    <div className="skeleton h-4 w-12 rounded" />
+                  </div>
+                ))}
+              </div>
             ) : topWhiskeys.length === 0 ? (
               <div className="glass-card rounded-2xl p-6 text-center text-white/30 text-sm">아직 평점 데이터가 없습니다.</div>
             ) : (
