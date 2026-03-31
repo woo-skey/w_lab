@@ -172,11 +172,11 @@ export default function Home() {
       <div className="nr-shell max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-16 lg:pb-20">
         <section className="nr-reveal" style={{ animationDelay: "0ms" }}>
           <p className="nr-kicker">Nocturne Reserve</p>
-          <h1 className="nr-display mt-3">
+          <h1 className={`nr-display mt-3 ${loggedIn ? "nr-display--member" : ""}`}>
             {loggedIn ? (
               <>
-                <span className="nr-display-line">{heroUser}님을 위한</span>
-                <span className="nr-display-line">오늘의 위스키 저널</span>
+                <span className="nr-display-line nr-display-line-fixed">{heroUser}님을 위한</span>
+                <span className="nr-display-line nr-display-line-fixed">오늘의 위스키 저널</span>
               </>
             ) : (
               "위스키를 더 깊고 우아하게 기록하는 커뮤니티"
@@ -438,6 +438,15 @@ export default function Home() {
 
         .nr-display-line {
           display: block;
+        }
+
+        .nr-display-line-fixed {
+          white-space: nowrap;
+          word-break: keep-all;
+        }
+
+        .nr-display--member {
+          max-width: none;
         }
 
         .nr-body {
@@ -723,6 +732,10 @@ export default function Home() {
           .nr-display {
             max-width: 100%;
             font-size: clamp(1.75rem, 8.5vw, 2.35rem);
+          }
+
+          .nr-display--member {
+            font-size: clamp(1.38rem, 6.2vw, 2.06rem);
           }
 
           .nr-body {
