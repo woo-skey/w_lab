@@ -52,6 +52,7 @@ interface AdminUser {
   username: string;
   created_at: string;
   is_admin: boolean;
+  is_member: boolean;
   avatar_url?: string;
   review_count?: number;
   article_count?: number;
@@ -96,6 +97,7 @@ export default function MyPage() {
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [adminLoading, setAdminLoading] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [memberUpdatingId, setMemberUpdatingId] = useState<string | null>(null);
   const [adminSubTab, setAdminSubTab] = useState("stats");
   const [allArticles, setAllArticles] = useState<AllArticle[]>([]);
   const [allReviews, setAllReviews] = useState<AllReview[]>([]);
@@ -196,7 +198,7 @@ export default function MyPage() {
     setAdminLoading(true);
     try {
       const [usersRes, reviewsRes, articlesRes, barsRes, whiskeysRes, schedulesRes] = await Promise.allSettled([
-        supabase.from("users").select("id, name, username, created_at, is_admin, avatar_url").order("created_at", { ascending: false }),
+        supabase.from("users").select("id, name, username, created_at, is_admin, is_member, avatar_url").order("created_at", { ascending: false }),
         supabase.from("reviews").select("id, user_id"),
         supabase.from("articles").select("id, author_id"),
         supabase.from("bars").select("id, user_id"),
@@ -379,6 +381,21 @@ export default function MyPage() {
       setAdminUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, is_admin: !currentAdmin } : u));
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleToggleMember = async (targetId: string, currentMember: boolean, isTargetAdmin: boolean) => {
+    if (isTargetAdmin) { alert("관리자 계정은 w_lab 회원 토글이 불가합니다."); return; }
+    setMemberUpdatingId(targetId);
+    try {
+      const { error } = await supabase.from("users").update({ is_member: !currentMember }).eq("id", targetId);
+      if (error) throw error;
+      setAdminUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, is_member: !currentMember } : u));
+    } catch (err) {
+      console.error(err);
+      alert("w_lab 회원 상태 변경에 실패했습니다.");
+    } finally {
+      setMemberUpdatingId(null);
     }
   };
 
@@ -992,6 +1009,11 @@ export default function MyPage() {
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-white text-sm">{u.name}</span>
                               {u.is_admin && <span className="px-1.5 py-0.5 bg-indigo-500/80 text-white text-xs rounded-full">관리자</span>}
+                              {u.is_member ? (
+                                <span className="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-xs rounded-full">w_lab 회원</span>
+                              ) : (
+                                <span className="px-1.5 py-0.5 bg-white/10 text-white/45 text-xs rounded-full">비회원</span>
+                              )}
                               {u.id === userId && <span className="px-1.5 py-0.5 bg-white/20 text-white text-xs rounded-full">본인</span>}
                             </div>
                             <p className="text-xs text-white/40">@{u.username}</p>
@@ -1000,6 +1022,12 @@ export default function MyPage() {
                         </div>
                         {u.id !== userId && (
                           <div className="flex gap-2 flex-shrink-0">
+                            <button onClick={() => handleToggleMember(u.id, u.is_member, u.is_admin)}
+                              disabled={memberUpdatingId === u.id || u.is_admin}
+                              title={u.is_admin ? "관리자 계정은 회원 토글 불가" : undefined}
+                              className={`px-3 py-1.5 text-xs rounded-lg transition font-medium disabled:opacity-40 disabled:cursor-not-allowed ${u.is_member ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30" : "bg-white/8 text-white/60 hover:bg-white/12"}`}>
+                              {memberUpdatingId === u.id ? "변경 중..." : u.is_member ? "회원 해제" : "회원 지정"}
+                            </button>
                             <button onClick={() => handleToggleAdmin(u.id, u.is_admin)}
                               className={`px-3 py-1.5 text-xs rounded-lg transition font-medium ${u.is_admin ? "bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30" : "bg-white/8 text-white/60 hover:bg-white/12"}`}>
                               {u.is_admin ? "관리자 해제" : "관리자 지정"}
