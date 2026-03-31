@@ -50,6 +50,16 @@ function formatDateShort(date: string) {
   });
 }
 
+function getScheduleCountdown(date: string) {
+  const target = new Date(`${date}T00:00:00`);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return "종료됨";
+  if (diffDays === 0) return "D-DAY";
+  return `D-${diffDays}`;
+}
+
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
@@ -154,19 +164,30 @@ export default function Home() {
     { label: "등록 위스키", value: metrics.totalWhiskeys },
   ];
 
+  const scheduleCountdown = confirmedSchedule ? getScheduleCountdown(confirmedSchedule.confirmed_date) : null;
+  const heroUser = userName || "멤버";
+
   return (
     <main className="nr-home min-h-screen">
       <div className="nr-shell max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-16 lg:pb-20">
         <section className="nr-reveal" style={{ animationDelay: "0ms" }}>
           <p className="nr-kicker">Nocturne Reserve</p>
           <h1 className="nr-display mt-3">
-            {loggedIn
-              ? `${userName || "멤버"}님을 위한 오늘의 위스키 저널`
-              : "위스키를 더 깊고 우아하게 기록하는 커뮤니티"}
+            {loggedIn ? (
+              <>
+                <span className="nr-display-line">{heroUser}님을 위한</span>
+                <span className="nr-display-line">오늘의 위스키 저널</span>
+              </>
+            ) : (
+              "위스키를 더 깊고 우아하게 기록하는 커뮤니티"
+            )}
           </h1>
           <p className="nr-body mt-4">
             취향을 남기고, 평점을 읽고, 다음 모임의 한 잔을 함께 고르세요. 데이터는 선명하게,
             분위기는 절제된 럭셔리로 정리했습니다.
+          </p>
+          <p className="nr-caption mt-4">
+            오늘의 아카이브: 기록은 더 단단하게, 탐색은 더 가볍게.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -302,10 +323,15 @@ export default function Home() {
             {loading ? (
               <div className="nr-skeleton h-24 rounded-xl" aria-label="일정 로딩 중" />
             ) : confirmedSchedule ? (
-              <div className="rounded-xl border border-[#d8b77a]/30 bg-[#d8b77a]/8 p-4">
-                <p className="text-[0.72rem] tracking-[0.14em] uppercase text-[#d8b77a]/85">Confirmed</p>
-                <p className="mt-2 text-[1.06rem] leading-snug text-[#f2ece1] font-semibold">{confirmedSchedule.name}</p>
-                <p className="mt-1 text-sm text-[#ddd0b6]/75">
+              <div className="nr-schedule-card">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="nr-schedule-kicker">Confirmed</p>
+                  <span className="nr-schedule-badge">
+                    {scheduleCountdown}
+                  </span>
+                </div>
+                <p className="nr-schedule-title mt-2">{confirmedSchedule.name}</p>
+                <p className="nr-schedule-date mt-1">
                   {new Date(confirmedSchedule.confirmed_date + "T00:00:00").toLocaleDateString("ko-KR", {
                     year: "numeric",
                     month: "long",
@@ -361,7 +387,7 @@ export default function Home() {
                 <p className="nr-quick-eyebrow">{item.eyebrow}</p>
                 <p className="nr-quick-title mt-2">{item.title}</p>
                 <p className="nr-quick-desc mt-2">{item.description}</p>
-                <span className="nr-quick-arrow mt-4 inline-block">자세히 보기</span>
+                <span className="nr-quick-arrow mt-4 inline-block">열기 →</span>
               </Link>
             ))}
           </div>
@@ -371,6 +397,7 @@ export default function Home() {
       <style jsx>{`
         .nr-home {
           position: relative;
+          color: #e8dfce;
           background:
             radial-gradient(1100px 600px at 8% -8%, rgba(122, 95, 54, 0.22), transparent 62%),
             radial-gradient(760px 420px at 95% 0%, rgba(60, 76, 126, 0.28), transparent 60%),
@@ -409,12 +436,23 @@ export default function Home() {
           text-wrap: balance;
         }
 
+        .nr-display-line {
+          display: block;
+        }
+
         .nr-body {
           font-family: "Pretendard Variable", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
           color: rgba(235, 227, 213, 0.74);
           font-size: clamp(0.98rem, 1.4vw, 1.12rem);
           line-height: 1.72;
           max-width: 42rem;
+        }
+
+        .nr-caption {
+          color: rgba(201, 183, 148, 0.78);
+          font-size: 0.82rem;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
         }
 
         .nr-btn-primary,
@@ -530,6 +568,10 @@ export default function Home() {
           color: rgba(210, 200, 180, 0.62);
           font-size: 0.79rem;
           line-height: 1.45;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
 
         .nr-meta {
@@ -570,6 +612,41 @@ export default function Home() {
           color: rgba(215, 202, 177, 0.68);
           font-size: 0.86rem;
           line-height: 1.6;
+        }
+
+        .nr-schedule-card {
+          border-radius: 0.86rem;
+          border: 1px solid rgba(216, 183, 122, 0.3);
+          background: rgba(216, 183, 122, 0.08);
+          padding: 1rem;
+        }
+
+        .nr-schedule-kicker {
+          color: rgba(216, 183, 122, 0.9);
+          font-size: 0.72rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .nr-schedule-badge {
+          border-radius: 9999px;
+          border: 1px solid rgba(216, 183, 122, 0.35);
+          color: #e7c98f;
+          padding: 0.14rem 0.5rem;
+          font-size: 0.68rem;
+          font-weight: 600;
+        }
+
+        .nr-schedule-title {
+          color: #f2ece1;
+          font-size: 1.06rem;
+          line-height: 1.34;
+          font-weight: 600;
+        }
+
+        .nr-schedule-date {
+          color: rgba(221, 208, 182, 0.8);
+          font-size: 0.86rem;
         }
 
         .nr-quick-card {
@@ -640,6 +717,115 @@ export default function Home() {
             border-top: 0;
             border-left: 1px solid rgba(216, 183, 122, 0.14);
           }
+        }
+
+        @media (max-width: 640px) {
+          .nr-display {
+            max-width: 100%;
+            font-size: clamp(1.75rem, 8.5vw, 2.35rem);
+          }
+
+          .nr-body {
+            font-size: 0.95rem;
+            line-height: 1.64;
+          }
+
+          .nr-caption {
+            font-size: 0.74rem;
+            letter-spacing: 0.05em;
+          }
+        }
+
+        :global(html:not(.dark) .nr-home) {
+          color: #2a3040;
+          background:
+            radial-gradient(1200px 620px at 8% -10%, rgba(186, 148, 80, 0.22), transparent 60%),
+            radial-gradient(760px 420px at 95% 0%, rgba(99, 114, 162, 0.18), transparent 60%),
+            linear-gradient(165deg, #edf0f7 0%, #f6f7fb 46%, #f3f0ea 100%);
+        }
+
+        :global(html:not(.dark) .nr-home::before) {
+          background: linear-gradient(0deg, rgba(245, 241, 232, 0.58) 0%, rgba(245, 241, 232, 0) 36%);
+        }
+
+        :global(html:not(.dark) .nr-display) {
+          color: #2b3144;
+        }
+
+        :global(html:not(.dark) .nr-body) {
+          color: rgba(40, 45, 60, 0.72);
+        }
+
+        :global(html:not(.dark) .nr-caption) {
+          color: rgba(133, 101, 53, 0.82);
+        }
+
+        :global(html:not(.dark) .nr-card) {
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.65));
+          border-color: rgba(142, 114, 66, 0.2);
+          box-shadow: 0 8px 28px rgba(18, 25, 46, 0.09);
+        }
+
+        :global(html:not(.dark) .nr-card:hover) {
+          border-color: rgba(142, 114, 66, 0.34);
+          box-shadow: 0 14px 34px rgba(18, 25, 46, 0.12);
+        }
+
+        :global(html:not(.dark) .nr-section-title),
+        :global(html:not(.dark) .nr-item-title),
+        :global(html:not(.dark) .nr-quick-title),
+        :global(html:not(.dark) .nr-metric-value) {
+          color: rgba(38, 46, 63, 0.92);
+        }
+
+        :global(html:not(.dark) .nr-item-sub),
+        :global(html:not(.dark) .nr-quick-desc),
+        :global(html:not(.dark) .nr-meta) {
+          color: rgba(42, 49, 67, 0.62);
+        }
+
+        :global(html:not(.dark) .nr-section-link),
+        :global(html:not(.dark) .nr-quick-arrow),
+        :global(html:not(.dark) .nr-score) {
+          color: rgba(141, 109, 52, 0.92);
+        }
+
+        :global(html:not(.dark) .nr-empty) {
+          border-color: rgba(141, 109, 52, 0.26);
+          background: rgba(141, 109, 52, 0.06);
+          color: rgba(52, 58, 74, 0.72);
+        }
+
+        :global(html:not(.dark) .nr-rank) {
+          border-color: rgba(141, 109, 52, 0.4);
+          color: rgba(141, 109, 52, 0.95);
+        }
+
+        :global(html:not(.dark) .nr-list-item) {
+          border-color: rgba(141, 109, 52, 0.14);
+          background: linear-gradient(140deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.5));
+        }
+
+        :global(html:not(.dark) .nr-schedule-card) {
+          border-color: rgba(141, 109, 52, 0.25);
+          background: rgba(141, 109, 52, 0.08);
+        }
+
+        :global(html:not(.dark) .nr-schedule-kicker) {
+          color: rgba(141, 109, 52, 0.9);
+        }
+
+        :global(html:not(.dark) .nr-schedule-badge) {
+          border-color: rgba(141, 109, 52, 0.32);
+          color: rgba(125, 94, 44, 0.95);
+        }
+
+        :global(html:not(.dark) .nr-schedule-title) {
+          color: rgba(37, 44, 59, 0.9);
+        }
+
+        :global(html:not(.dark) .nr-schedule-date) {
+          color: rgba(48, 55, 72, 0.78);
         }
 
         @media (prefers-reduced-motion: reduce) {
