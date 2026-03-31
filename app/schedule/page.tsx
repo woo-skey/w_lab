@@ -35,7 +35,7 @@ export default function SchedulePage() {
   const [newName, setNewName] = useState("");
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   const [userDateMap, setUserDateMap] = useState<{ name: string; dates: string[] }[]>([]);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalMembersExcludingAdmin, setTotalMembersExcludingAdmin] = useState(0);
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -47,7 +47,12 @@ export default function SchedulePage() {
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     setIsMember(localStorage.getItem("isMember") === "true");
     fetchSchedules();
-    supabase.from("users").select("*", { count: "exact", head: true }).eq("is_member", true).neq("is_admin", true).then(({ count }) => setTotalUsers(count || 0));
+    supabase
+      .from("users")
+      .select("*", { count: "exact", head: true })
+      .eq("is_member", true)
+      .neq("is_admin", true)
+      .then(({ count }) => setTotalMembersExcludingAdmin(count || 0));
   }, []);
 
   useEffect(() => {
@@ -306,7 +311,7 @@ export default function SchedulePage() {
           </div>
         ) : !isMember ? (
           <div className="glass-card rounded-lg p-4 mb-6 text-center">
-            <p className="text-white/60 text-sm">w_lab 회원만 일정을 만들고 투표할 수 있습니다.</p>
+            <p className="text-white/60 text-sm">w_lab 일반 회원(관리자 제외)만 일정을 만들고 투표할 수 있습니다.</p>
           </div>
         ) : null}
 
@@ -453,14 +458,14 @@ export default function SchedulePage() {
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-white/50 text-xs">투표 현황</span>
                       <span className="text-white/70 text-xs font-semibold">
-                        {userDateMap.length}명 완료 {totalUsers > 0 && <span className="text-white/35">/ 전체 {totalUsers}명</span>}
+                        {userDateMap.length}명 완료 {totalMembersExcludingAdmin > 0 && <span className="text-white/35">/ 전체 {totalMembersExcludingAdmin}명 (관리자 제외)</span>}
                       </span>
                     </div>
-                    {totalUsers > 0 && (
+                    {totalMembersExcludingAdmin > 0 && (
                       <div className="w-full h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
                         <div
                           className="h-1.5 rounded-full transition-all duration-500"
-                          style={{ width: `${Math.min((userDateMap.length / totalUsers) * 100, 100)}%`, background: "rgba(99,102,241,0.8)" }}
+                          style={{ width: `${Math.min((userDateMap.length / totalMembersExcludingAdmin) * 100, 100)}%`, background: "rgba(99,102,241,0.8)" }}
                         />
                       </div>
                     )}
@@ -569,7 +574,7 @@ export default function SchedulePage() {
                       <a href="/login" className="text-indigo-400 underline">로그인하고 참여하기</a>
                     </div>
                   ) : !isMember ? (
-                    <div className="ml-auto text-white/30">w_lab 회원만 투표할 수 있습니다</div>
+                    <div className="ml-auto text-white/30">w_lab 일반 회원(관리자 제외)만 투표할 수 있습니다</div>
                   ) : null}
                 </div>
               </div>

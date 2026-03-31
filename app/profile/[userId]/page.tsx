@@ -30,7 +30,12 @@ interface Article {
   created_at: string;
 }
 
-const STAR = ["", "★", "★★", "★★★", "★★★★", "★★★★★"];
+function formatRating(value: number) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "-/10";
+  const clamped = Math.min(10, Math.max(0, n));
+  return `${clamped}/10`;
+}
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("ko-KR", {
@@ -225,7 +230,7 @@ export default function UserProfilePage() {
                   <div className="text-white/40 text-xs mt-0.5">{formatDate(review.created_at)}</div>
                 </div>
                 <div className="text-amber-400 text-sm font-medium flex-shrink-0">
-                  {STAR[review.rating] ?? review.rating}
+                  {formatRating(review.rating)}
                 </div>
               </li>
             ))}

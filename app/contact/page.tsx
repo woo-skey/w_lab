@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/lib/notifications";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
 
@@ -90,14 +91,24 @@ export default function ContactPage() {
     if (!reply) return;
     setReplying(inquiryId);
     try {
+      const targetInquiry = allInquiries.find((i) => i.id === inquiryId) || null;
+      const repliedAt = new Date().toISOString();
       const { error } = await supabase.from("inquiries").update({
-        reply, status: "answered", replied_at: new Date().toISOString(),
+        reply, status: "answered", replied_at: repliedAt,
       }).eq("id", inquiryId);
       if (error) throw error;
       setAllInquiries((prev) => prev.map((i) =>
-        i.id === inquiryId ? { ...i, reply, status: "answered", replied_at: new Date().toISOString() } : i
+        i.id === inquiryId ? { ...i, reply, status: "answered", replied_at: repliedAt } : i
       ));
       setReplyText((prev) => ({ ...prev, [inquiryId]: "" }));
+      if (targetInquiry?.user_id && targetInquiry.user_id !== userId) {
+        await createNotification(
+          targetInquiry.user_id,
+          "contact_reply",
+          `문의 "${targetInquiry.title}"에 답변이 등록됐습니다.`,
+          "/contact"
+        );
+      }
     } catch (err) {
       console.error(err);
     } finally {

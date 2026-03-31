@@ -68,9 +68,28 @@ interface AdminStats {
   totalSchedules: number;
 }
 
+const USER_TAB_IDS = [
+  "overview",
+  "collection",
+  "reviews",
+  "whiskeys",
+  "articles",
+  "bars",
+  "favorites",
+  "schedules",
+  "comments",
+] as const;
+
+const ADMIN_SUB_TAB_IDS = ["stats", "users", "notices", "reviews", "articles", "bars", "whiskeys", "schedules"] as const;
+const ADMIN_CONTENT_SUB_TAB_IDS = ["notices", "reviews", "articles", "bars", "whiskeys", "schedules"] as const;
+
+type AdminSubTab = typeof ADMIN_SUB_TAB_IDS[number];
+
 export default function MyPage() {
   const router = useRouter();
   const [userId, setUserId] = useState("");
+  const [requestedTab, setRequestedTab] = useState<string | null>(null);
+  const [requestedSubTab, setRequestedSubTab] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [bars, setBars] = useState<Bar[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -98,7 +117,10 @@ export default function MyPage() {
   const [adminLoading, setAdminLoading] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [memberUpdatingId, setMemberUpdatingId] = useState<string | null>(null);
-  const [adminSubTab, setAdminSubTab] = useState("stats");
+  const [adminSubTab, setAdminSubTab] = useState<AdminSubTab>("stats");
+  const [adminSearchQuery, setAdminSearchQuery] = useState("");
+  const [adminSortOrder, setAdminSortOrder] = useState<"latest" | "oldest">("latest");
+  const [adminStatusFilter, setAdminStatusFilter] = useState("all");
   const [allArticles, setAllArticles] = useState<AllArticle[]>([]);
   const [allReviews, setAllReviews] = useState<AllReview[]>([]);
   const [allBars, setAllBars] = useState<AllBar[]>([]);
@@ -130,6 +152,38 @@ export default function MyPage() {
     fetchAll(id);
     fetchCollection(id);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setRequestedTab(params.get("tab"));
+    setRequestedSubTab(params.get("sub"));
+  }, []);
+
+  useEffect(() => {
+    setAdminSearchQuery("");
+    setAdminSortOrder("latest");
+    setAdminStatusFilter("all");
+  }, [adminSubTab]);
+
+  useEffect(() => {
+    if (!requestedTab) return;
+
+    if (requestedTab === "admin") {
+      if (!profile?.is_admin) return;
+      setActiveTab("admin");
+
+      if (requestedSubTab && (ADMIN_SUB_TAB_IDS as readonly string[]).includes(requestedSubTab)) {
+        const nextSub = requestedSubTab as AdminSubTab;
+        setAdminSubTab(nextSub);
+      }
+      return;
+    }
+
+    if ((USER_TAB_IDS as readonly string[]).includes(requestedTab)) {
+      setActiveTab(requestedTab);
+    }
+  }, [profile?.is_admin, requestedSubTab, requestedTab]);
 
   const fetchCollection = async (uid: string) => {
     const { data } = await supabase
@@ -283,9 +337,15 @@ export default function MyPage() {
     }
   };
 
-  const handleAdminSubTab = (tab: string) => {
+  useEffect(() => {
+    if (activeTab !== "admin") return;
+    if (!(ADMIN_CONTENT_SUB_TAB_IDS as readonly string[]).includes(adminSubTab)) return;
+    fetchAdminContent(adminSubTab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, adminSubTab]);
+
+  const handleAdminSubTab = (tab: AdminSubTab) => {
     setAdminSubTab(tab);
-    if (["notices", "articles", "reviews", "bars", "whiskeys", "schedules"].includes(tab)) fetchAdminContent(tab);
   };
 
   const handleAdminSubmitAnnouncement = async (e: React.FormEvent) => {
@@ -519,6 +579,58 @@ export default function MyPage() {
     { id: "comments", label: `댓글 (${userComments.length})` },
     ...(profile?.is_admin ? [{ id: "admin", label: "🛡️ 관리자" }] : []),
   ];
+
+  const normalizedQuery = adminSearchQuery.trim().toLowerCase();
+  const hasAdminQuery = normalizedQuery.length > 0;
+  const sortFactor = adminSortOrder === "latest" ? -1 : 1;
+
+  const matchesAdminQuery = (...values: Array<string | null | undefined>) => {
+    if (!hasAdminQuery) return true;
+    return values.some((value) => (value || "").toLowerCase().includes(normalizedQuery));
+  };
+
+  const sortByCreatedAt = <T extends { created_at: string }>(items: T[]) => {
+    return [...items].sort((a, b) => (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * sortFactor);
+  };
+
+  const visibleAnnouncements = sortByCreatedAt(
+    allAnnouncements.filter((a) => matchesAdminQuery(a.title, a.content, a.author_name))
+  );
+  const visibleArticles = sortByCreatedAt(
+    allArticles.filter((a) => matchesAdminQuery(a.title, a.content, a.category, a.author_name, a.users?.name))
+  );
+  const visibleReviews = sortByCreatedAt(
+    allReviews.filter((r) => matchesAdminQuery(r.review_text, r.users?.name, (r.whiskeys as unknown as { name: string } | null)?.name))
+  );
+  const visibleBars = sortByCreatedAt(
+    allBars.filter((b) => matchesAdminQuery(b.bar_name, b.notes, b.author_name, b.users?.name))
+  );
+  const visibleWhiskeys = sortByCreatedAt(
+    allWhiskeys.filter((w) => matchesAdminQuery(w.name, w.type, w.region))
+  );
+  const visibleSchedules = sortByCreatedAt(
+    allSchedules
+      .filter((s) => {
+        if (adminStatusFilter === "confirmed") return !!s.confirmed_date;
+        if (adminStatusFilter === "unconfirmed") return !s.confirmed_date;
+        return true;
+      })
+      .filter((s) => matchesAdminQuery(s.name, s.creator_name))
+  );
+
+  const adminSearchPlaceholderMap: Record<AdminSubTab, string> = {
+    stats: "검색",
+    users: "이 탭에서는 검색을 지원하지 않습니다",
+    notices: "공지 제목/내용 검색",
+    reviews: "리뷰 내용/작성자/위스키 검색",
+    articles: "지식글 제목/내용/작성자 검색",
+    bars: "Bar 이름/노트/작성자 검색",
+    whiskeys: "위스키 이름/타입/지역 검색",
+    schedules: "일정명/작성자 검색",
+  };
+
+  const showAdminListControls = (ADMIN_CONTENT_SUB_TAB_IDS as readonly string[]).includes(adminSubTab);
+  const showAdminStatusFilter = adminSubTab === "schedules";
 
   if (loading) {
     return (
@@ -889,7 +1001,7 @@ export default function MyPage() {
               bars.map((b) => (
                 <div key={b.id} onClick={() => router.push("/bars")} className="glass-card rounded-xl p-5 cursor-pointer transition">
                   <p className="font-bold text-white">{b.bar_name}</p>
-                  {b.notes && <p className="text-sm text-white/40 mt-1 break-words whitespace-pre-wrap">{b.notes}</p>}
+                  {b.notes && <SafeHtml html={b.notes} className="rich-content text-sm leading-relaxed mt-1 line-clamp-3 text-white/40" />}
                   <p className="text-xs text-white/30 mt-2">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
               ))
@@ -959,12 +1071,55 @@ export default function MyPage() {
                 { id: "whiskeys", label: "🥃 위스키" },
                 { id: "schedules", label: "📅 일정" },
               ].map((t) => (
-                <button key={t.id} onClick={() => handleAdminSubTab(t.id)}
+                <button key={t.id} onClick={() => handleAdminSubTab(t.id as AdminSubTab)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                     adminSubTab === t.id ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
                   }`}>{t.label}</button>
               ))}
             </div>
+
+            {showAdminListControls && (
+              <div className="glass-card rounded-xl p-4 border border-white/10">
+                <div className="flex flex-col md:flex-row gap-2 md:items-center">
+                  <input
+                    value={adminSearchQuery}
+                    onChange={(e) => setAdminSearchQuery(e.target.value)}
+                    placeholder={adminSearchPlaceholderMap[adminSubTab]}
+                    className="glass-input flex-1 px-3 py-2 rounded-lg text-sm"
+                  />
+                  <select
+                    value={adminSortOrder}
+                    onChange={(e) => setAdminSortOrder(e.target.value as "latest" | "oldest")}
+                    className="glass-input md:w-36 px-3 py-2 rounded-lg text-sm"
+                  >
+                    <option value="latest">최신순</option>
+                    <option value="oldest">오래된순</option>
+                  </select>
+                  {showAdminStatusFilter && (
+                    <select
+                      value={adminStatusFilter}
+                      onChange={(e) => setAdminStatusFilter(e.target.value)}
+                      className="glass-input md:w-36 px-3 py-2 rounded-lg text-sm"
+                    >
+                      <option value="all">전체 상태</option>
+                      <option value="confirmed">확정</option>
+                      <option value="unconfirmed">미확정</option>
+                    </select>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAdminSearchQuery("");
+                      setAdminSortOrder("latest");
+                      setAdminStatusFilter("all");
+                    }}
+                    className="px-3 py-2 rounded-lg text-sm bg-white/8 text-white/70 hover:bg-white/12 transition"
+                  >
+                    초기화
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* 통계 */}
             {adminSubTab === "stats" && (
@@ -1049,7 +1204,12 @@ export default function MyPage() {
             {adminSubTab === "notices" && (
               <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-bold text-white text-lg">공지사항 관리</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-bold text-white text-lg">공지사항 관리</h2>
+                    <span className="text-sm text-white/40">
+                      {visibleAnnouncements.length}{visibleAnnouncements.length !== allAnnouncements.length ? ` / ${allAnnouncements.length}` : ""}개
+                    </span>
+                  </div>
                   <button onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
                     className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
                     {showAnnouncementForm ? "취소" : "📢 공지 작성"}
@@ -1076,9 +1236,11 @@ export default function MyPage() {
 
                 {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
-                    {allAnnouncements.length === 0 ? (
-                      <p className="text-center text-white/30 text-sm py-8">등록된 공지가 없습니다.</p>
-                    ) : allAnnouncements.map((a) => (
+                    {visibleAnnouncements.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">
+                        {hasAdminQuery ? "조건에 맞는 공지가 없습니다." : "등록된 공지가 없습니다."}
+                      </p>
+                    ) : visibleAnnouncements.map((a) => (
                       <div key={a.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminAnnouncement?.id === a.id ? (
                           <form onSubmit={handleAdminSaveAnnouncement} className="space-y-3">
@@ -1105,7 +1267,7 @@ export default function MyPage() {
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
                               <button onClick={() => setEditingAdminAnnouncement(a)} className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
-                              <button onClick={() => handleAdminDeleteAnnouncement(a.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                              <button onClick={() => handleAdminDeleteAnnouncement(a.id)} className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition">삭제</button>
                             </div>
                           </div>
                         )}
@@ -1121,13 +1283,17 @@ export default function MyPage() {
               <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">지식글 전체 관리</h2>
-                  <span className="text-sm text-white/40">{allArticles.length}개</span>
+                  <span className="text-sm text-white/40">
+                    {visibleArticles.length}{visibleArticles.length !== allArticles.length ? ` / ${allArticles.length}` : ""}개
+                  </span>
                 </div>
                 {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
-                    {allArticles.length === 0 ? (
-                      <p className="text-center text-white/30 text-sm py-8">등록된 지식글이 없습니다.</p>
-                    ) : allArticles.map((a) => (
+                    {visibleArticles.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">
+                        {hasAdminQuery ? "조건에 맞는 지식글이 없습니다." : "등록된 지식글이 없습니다."}
+                      </p>
+                    ) : visibleArticles.map((a) => (
                       <div key={a.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminArticle?.id === a.id ? (
                           <form onSubmit={handleAdminSaveArticle} className="space-y-3">
@@ -1161,7 +1327,7 @@ export default function MyPage() {
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
                               <button onClick={() => setEditingAdminArticle(a)} className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
-                              <button onClick={() => handleAdminDeleteArticle(a.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                              <button onClick={() => handleAdminDeleteArticle(a.id)} className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition">삭제</button>
                             </div>
                           </div>
                         )}
@@ -1177,11 +1343,17 @@ export default function MyPage() {
               <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">리뷰 전체 관리</h2>
-                  <span className="text-sm text-white/40">{allReviews.length}개</span>
+                  <span className="text-sm text-white/40">
+                    {visibleReviews.length}{visibleReviews.length !== allReviews.length ? ` / ${allReviews.length}` : ""}개
+                  </span>
                 </div>
                 {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
-                    {allReviews.map((r) => (
+                    {visibleReviews.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">
+                        {hasAdminQuery ? "조건에 맞는 리뷰가 없습니다." : "등록된 리뷰가 없습니다."}
+                      </p>
+                    ) : visibleReviews.map((r) => (
                       <div key={r.id} className="border border-white/8 rounded-lg p-4 flex justify-between items-start gap-3" style={{ background: "rgba(255,255,255,0.03)" }}>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -1192,7 +1364,7 @@ export default function MyPage() {
                           {r.review_text && <p className="text-xs text-white/40 mt-1 break-words">{r.review_text}</p>}
                           <p className="text-xs text-white/30 mt-1">{new Date(r.created_at).toLocaleDateString("ko-KR")}</p>
                         </div>
-                        <button onClick={() => handleAdminDeleteReview(r.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition flex-shrink-0">삭제</button>
+                        <button onClick={() => handleAdminDeleteReview(r.id)} className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition flex-shrink-0">삭제</button>
                       </div>
                     ))}
                   </div>
@@ -1205,13 +1377,17 @@ export default function MyPage() {
               <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">Bar 전체 관리</h2>
-                  <span className="text-sm text-white/40">{allBars.length}개</span>
+                  <span className="text-sm text-white/40">
+                    {visibleBars.length}{visibleBars.length !== allBars.length ? ` / ${allBars.length}` : ""}개
+                  </span>
                 </div>
                 {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
-                    {allBars.length === 0 ? (
-                      <p className="text-center text-white/30 text-sm py-8">등록된 Bar가 없습니다.</p>
-                    ) : allBars.map((b) => (
+                    {visibleBars.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">
+                        {hasAdminQuery ? "조건에 맞는 Bar가 없습니다." : "등록된 Bar가 없습니다."}
+                      </p>
+                    ) : visibleBars.map((b) => (
                       <div key={b.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminBar?.id === b.id ? (
                           <form onSubmit={handleAdminSaveBar} className="space-y-3">
@@ -1233,12 +1409,12 @@ export default function MyPage() {
                                 <span className="text-xs text-white/30">{b.author_name || b.users?.name || "-"}</span>
                               </div>
                               <p className="font-medium text-white text-sm">{b.bar_name}</p>
-                              {b.notes && <p className="text-xs text-white/40 mt-1 break-words">{b.notes}</p>}
+                              {b.notes && <SafeHtml html={b.notes} className="rich-content text-xs leading-relaxed mt-1 line-clamp-3 text-white/40" />}
                               <p className="text-xs text-white/30 mt-1">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
                               <button onClick={() => setEditingAdminBar(b)} className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
-                              <button onClick={() => handleAdminDeleteBar(b.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                              <button onClick={() => handleAdminDeleteBar(b.id)} className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition">삭제</button>
                             </div>
                           </div>
                         )}
@@ -1254,11 +1430,17 @@ export default function MyPage() {
               <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">위스키 전체 관리</h2>
-                  <span className="text-sm text-white/40">{allWhiskeys.length}개</span>
+                  <span className="text-sm text-white/40">
+                    {visibleWhiskeys.length}{visibleWhiskeys.length !== allWhiskeys.length ? ` / ${allWhiskeys.length}` : ""}개
+                  </span>
                 </div>
                 {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
-                    {allWhiskeys.map((w) => (
+                    {visibleWhiskeys.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">
+                        {hasAdminQuery ? "조건에 맞는 위스키가 없습니다." : "등록된 위스키가 없습니다."}
+                      </p>
+                    ) : visibleWhiskeys.map((w) => (
                       <div key={w.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminWhiskey?.id === w.id ? (
                           <form onSubmit={handleAdminSaveWhiskey} className="space-y-3">
@@ -1295,7 +1477,7 @@ export default function MyPage() {
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
                               <button onClick={() => setEditingAdminWhiskey(w)} className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
-                              <button onClick={() => handleAdminDeleteWhiskey(w.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                              <button onClick={() => handleAdminDeleteWhiskey(w.id)} className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition">삭제</button>
                             </div>
                           </div>
                         )}
@@ -1311,13 +1493,17 @@ export default function MyPage() {
               <div className="glass-card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">일정 전체 관리</h2>
-                  <span className="text-sm text-white/40">{allSchedules.length}개</span>
+                  <span className="text-sm text-white/40">
+                    {visibleSchedules.length}{visibleSchedules.length !== allSchedules.length ? ` / ${allSchedules.length}` : ""}개
+                  </span>
                 </div>
                 {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
-                    {allSchedules.length === 0 ? (
-                      <p className="text-center text-white/30 text-sm py-8">등록된 일정이 없습니다.</p>
-                    ) : allSchedules.map((s) => (
+                    {visibleSchedules.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">
+                        {hasAdminQuery || adminStatusFilter !== "all" ? "조건에 맞는 일정이 없습니다." : "등록된 일정이 없습니다."}
+                      </p>
+                    ) : visibleSchedules.map((s) => (
                       <div key={s.id} className="border border-white/8 rounded-lg p-4 flex justify-between items-start gap-3" style={{ background: "rgba(255,255,255,0.03)" }}>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -1330,7 +1516,7 @@ export default function MyPage() {
                             {s.confirmed_date ? ` · 확정: ${new Date(s.confirmed_date + "T00:00:00").toLocaleDateString("ko-KR")}` : ""}
                           </p>
                         </div>
-                        <button onClick={() => handleAdminDeleteSchedule(s.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition flex-shrink-0">삭제</button>
+                        <button onClick={() => handleAdminDeleteSchedule(s.id)} className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition flex-shrink-0">삭제</button>
                       </div>
                     ))}
                   </div>
