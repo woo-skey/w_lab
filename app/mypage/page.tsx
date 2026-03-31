@@ -29,10 +29,11 @@ interface Whiskey { id: string; name: string; type: string; region: string; crea
 interface UserComment { id: string; content: string; created_at: string; source: "article" | "review"; target_title?: string; }
 
 interface AllAnnouncement { id: string; title: string; content: string; author_id: string; author_name?: string; created_at: string; }
-interface AllArticle { id: string; title: string; content: string; category: string; author_id: string; created_at: string; users?: { name: string }; }
+interface AllArticle { id: string; title: string; content: string; category: string; author_id: string; created_at: string; author_name?: string; users?: { name: string }; }
 interface AllReview { id: string; rating: number; review_text: string; user_id: string; created_at: string; users?: { name: string }; whiskeys?: { name: string }; }
-interface AllBar { id: string; bar_name: string; link: string; notes: string; user_id: string; created_at: string; users?: { name: string }; }
+interface AllBar { id: string; bar_name: string; link: string; notes: string; user_id: string; created_at: string; author_name?: string; users?: { name: string }; }
 interface AllWhiskey { id: string; name: string; type: string; region: string; age: number; abv: number; created_by: string; created_at: string; }
+interface AllSchedule { id: string; name: string; created_by: string; created_at: string; confirmed_date?: string | null; creator_name?: string; }
 
 interface CollectionItem {
   id: string;
@@ -100,6 +101,7 @@ export default function MyPage() {
   const [allReviews, setAllReviews] = useState<AllReview[]>([]);
   const [allBars, setAllBars] = useState<AllBar[]>([]);
   const [allWhiskeys, setAllWhiskeys] = useState<AllWhiskey[]>([]);
+  const [allSchedules, setAllSchedules] = useState<AllSchedule[]>([]);
   const [contentLoading, setContentLoading] = useState(false);
   const [editingAdminArticle, setEditingAdminArticle] = useState<AllArticle | null>(null);
   const [editingAdminBar, setEditingAdminBar] = useState<AllBar | null>(null);
@@ -241,21 +243,36 @@ export default function MyPage() {
   const fetchAdminContent = async (tab: string) => {
     setContentLoading(true);
     try {
+      const getUserNameMap = async (ids: string[]) => {
+        if (ids.length === 0) return {} as Record<string, string>;
+        const { data } = await supabase.from("users").select("id, name").in("id", ids);
+        return Object.fromEntries((data || []).map((u) => [u.id, u.name])) as Record<string, string>;
+      };
+
       if (tab === "notices") {
         const { data } = await supabase.from("announcements").select("*").order("created_at", { ascending: false });
         setAllAnnouncements(data || []);
       } else if (tab === "articles") {
-        const { data } = await supabase.from("articles").select("*, users(name)").order("created_at", { ascending: false });
-        setAllArticles(data || []);
+        const { data } = await supabase.from("articles").select("*").order("created_at", { ascending: false });
+        const rows = (data || []) as AllArticle[];
+        const userNameMap = await getUserNameMap([...new Set(rows.map((a) => a.author_id).filter(Boolean))]);
+        setAllArticles(rows.map((a) => ({ ...a, author_name: userNameMap[a.author_id] || "알 수 없음" })));
       } else if (tab === "reviews") {
         const { data } = await supabase.from("reviews").select("*, users(name), whiskeys(name)").order("created_at", { ascending: false });
         setAllReviews((data || []) as unknown as AllReview[]);
       } else if (tab === "bars") {
-        const { data } = await supabase.from("bars").select("*, users(name)").order("created_at", { ascending: false });
-        setAllBars(data || []);
+        const { data } = await supabase.from("bars").select("*").order("created_at", { ascending: false });
+        const rows = (data || []) as AllBar[];
+        const userNameMap = await getUserNameMap([...new Set(rows.map((b) => b.user_id).filter(Boolean))]);
+        setAllBars(rows.map((b) => ({ ...b, author_name: userNameMap[b.user_id] || "알 수 없음" })));
       } else if (tab === "whiskeys") {
         const { data } = await supabase.from("whiskeys").select("*").order("created_at", { ascending: false });
         setAllWhiskeys(data || []);
+      } else if (tab === "schedules") {
+        const { data } = await supabase.from("schedules").select("*").order("created_at", { ascending: false });
+        const rows = (data || []) as AllSchedule[];
+        const userNameMap = await getUserNameMap([...new Set(rows.map((s) => s.created_by).filter(Boolean))]);
+        setAllSchedules(rows.map((s) => ({ ...s, creator_name: userNameMap[s.created_by] || "알 수 없음" })));
       }
     } catch (err) {
       console.error(err);
@@ -266,7 +283,7 @@ export default function MyPage() {
 
   const handleAdminSubTab = (tab: string) => {
     setAdminSubTab(tab);
-    if (["notices", "articles", "reviews", "bars", "whiskeys"].includes(tab)) fetchAdminContent(tab);
+    if (["notices", "articles", "reviews", "bars", "whiskeys", "schedules"].includes(tab)) fetchAdminContent(tab);
   };
 
   const handleAdminSubmitAnnouncement = async (e: React.FormEvent) => {
@@ -336,6 +353,15 @@ export default function MyPage() {
     if (!confirm("이 위스키를 삭제할까요? 관련 리뷰도 삭제됩니다.")) return;
     await supabase.from("whiskeys").delete().eq("id", id);
     setAllWhiskeys((prev) => prev.filter((w) => w.id !== id));
+  };
+  const handleAdminDeleteSchedule = async (id: string) => {
+    if (!confirm("이 일정을 삭제할까요?")) return;
+    await supabase.from("schedules").delete().eq("id", id);
+    setAllSchedules((prev) => prev.filter((s) => s.id !== id));
+    setSchedules((prev) => prev.filter((s) => s.id !== id));
+    if (adminStats) {
+      setAdminStats({ ...adminStats, totalSchedules: Math.max(adminStats.totalSchedules - 1, 0) });
+    }
   };
   const handleAdminSaveWhiskey = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -910,10 +936,11 @@ export default function MyPage() {
                 { id: "stats", label: "📊 통계" },
                 { id: "users", label: "👥 유저 관리" },
                 { id: "notices", label: "📢 공지" },
-                { id: "articles", label: "📚 지식글" },
                 { id: "reviews", label: "⭐ 리뷰" },
+                { id: "articles", label: "📚 지식글" },
                 { id: "bars", label: "🍸 Bar" },
                 { id: "whiskeys", label: "🥃 위스키" },
+                { id: "schedules", label: "📅 일정" },
               ].map((t) => (
                 <button key={t.id} onClick={() => handleAdminSubTab(t.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
@@ -1070,7 +1097,9 @@ export default function MyPage() {
                 </div>
                 {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
-                    {allArticles.map((a) => (
+                    {allArticles.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">등록된 지식글이 없습니다.</p>
+                    ) : allArticles.map((a) => (
                       <div key={a.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminArticle?.id === a.id ? (
                           <form onSubmit={handleAdminSaveArticle} className="space-y-3">
@@ -1096,7 +1125,7 @@ export default function MyPage() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{a.category}</span>
-                                <span className="text-xs text-white/30">{a.users?.name || "-"}</span>
+                                <span className="text-xs text-white/30">{a.author_name || a.users?.name || "-"}</span>
                               </div>
                               <p className="font-medium text-white text-sm">{a.title}</p>
                               <SafeHtml html={a.content} className="rich-content text-sm leading-relaxed mt-1 line-clamp-2 text-white/40" />
@@ -1152,7 +1181,9 @@ export default function MyPage() {
                 </div>
                 {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
-                    {allBars.map((b) => (
+                    {allBars.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">등록된 Bar가 없습니다.</p>
+                    ) : allBars.map((b) => (
                       <div key={b.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
                         {editingAdminBar?.id === b.id ? (
                           <form onSubmit={handleAdminSaveBar} className="space-y-3">
@@ -1171,7 +1202,7 @@ export default function MyPage() {
                           <div className="flex justify-between items-start gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs text-white/30">{b.users?.name || "-"}</span>
+                                <span className="text-xs text-white/30">{b.author_name || b.users?.name || "-"}</span>
                               </div>
                               <p className="font-medium text-white text-sm">{b.bar_name}</p>
                               {b.notes && <p className="text-xs text-white/40 mt-1 break-words">{b.notes}</p>}
@@ -1240,6 +1271,38 @@ export default function MyPage() {
                             </div>
                           </div>
                         )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 일정 관리 */}
+            {adminSubTab === "schedules" && (
+              <div className="glass-card rounded-xl p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="font-bold text-white text-lg">일정 전체 관리</h2>
+                  <span className="text-sm text-white/40">{allSchedules.length}개</span>
+                </div>
+                {contentLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
+                  <div className="space-y-3">
+                    {allSchedules.length === 0 ? (
+                      <p className="text-center text-white/30 text-sm py-8">등록된 일정이 없습니다.</p>
+                    ) : allSchedules.map((s) => (
+                      <div key={s.id} className="border border-white/8 rounded-lg p-4 flex justify-between items-start gap-3" style={{ background: "rgba(255,255,255,0.03)" }}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs text-white/30">{s.creator_name || "-"}</span>
+                            {s.confirmed_date ? <span className="text-xs text-amber-300">확정</span> : <span className="text-xs text-white/30">미확정</span>}
+                          </div>
+                          <p className="font-medium text-white text-sm">{s.name}</p>
+                          <p className="text-xs text-white/30 mt-1">
+                            생성: {new Date(s.created_at).toLocaleDateString("ko-KR")}
+                            {s.confirmed_date ? ` · 확정: ${new Date(s.confirmed_date + "T00:00:00").toLocaleDateString("ko-KR")}` : ""}
+                          </p>
+                        </div>
+                        <button onClick={() => handleAdminDeleteSchedule(s.id)} className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition flex-shrink-0">삭제</button>
                       </div>
                     ))}
                   </div>
