@@ -634,18 +634,18 @@ export default function MyPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="tone min-h-screen flex items-center justify-center">
         <p className="text-white/40">로딩 중...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+    <div className="tone min-h-screen">
+      <div className="tone-wrap max-w-4xl mx-auto px-4 py-8 md:py-12">
 
         {/* 프로필 카드 */}
-        <div className="glass-card rounded-2xl p-5 sm:p-8 mb-8">
+        <div className="glass-card card rounded-2xl p-5 sm:p-8 mb-8">
           <div className="flex items-center gap-4 sm:gap-6">
             {/* 아바타 */}
             <div className="relative flex-shrink-0">
@@ -668,9 +668,9 @@ export default function MyPage() {
 
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-2xl font-bold text-white">{profile?.name}</h1>
+                <h1 className="section-title text-2xl font-bold text-white">{profile?.name}</h1>
                 {profile?.is_admin && (
-                  <span className="px-2 py-0.5 bg-indigo-500/80 text-white text-xs font-bold rounded-full">관리자</span>
+                  <span className="chip px-2 py-0.5 bg-indigo-500/80 text-white text-xs font-bold rounded-full">관리자</span>
                 )}
               </div>
               <p className="text-white/40 text-sm mt-0.5">@{profile?.username}</p>
@@ -695,7 +695,7 @@ export default function MyPage() {
                     onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
                     placeholder="표시될 이름"
                     maxLength={30}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm"
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -706,7 +706,7 @@ export default function MyPage() {
                     onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
                     placeholder="나를 한 마디로 소개해보세요"
                     maxLength={80}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm"
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -715,7 +715,7 @@ export default function MyPage() {
                     <select
                       value={profileForm.favorite_category}
                       onChange={(e) => setProfileForm({ ...profileForm, favorite_category: e.target.value })}
-                      className="glass-input w-full px-3 py-2 rounded-lg text-sm"
+                      className="glass-input surface w-full px-3 py-2 rounded-lg text-sm"
                     >
                       <option value="">선택</option>
                       <option>🥃 스카치 위스키</option>
@@ -737,13 +737,13 @@ export default function MyPage() {
                       value={profileForm.favorite_whiskey}
                       onChange={(e) => setProfileForm({ ...profileForm, favorite_whiskey: e.target.value })}
                       placeholder="ex) Lagavulin 16"
-                      className="glass-input w-full px-3 py-2 rounded-lg text-sm"
+                      className="glass-input surface w-full px-3 py-2 rounded-lg text-sm"
                     />
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={handleSaveProfile} disabled={profileSaving}
-                    className="px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50">
+                    className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50">
                     {profileSaving ? "저장 중..." : "저장"}
                   </button>
                   <button onClick={() => setEditingProfile(false)}
@@ -792,18 +792,18 @@ export default function MyPage() {
               <div className="mt-3 space-y-2 max-w-sm">
                 <input type="password" placeholder="현재 비밀번호" value={pwForm.current}
                   onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 <input type="password" placeholder="새 비밀번호 (6자 이상)" value={pwForm.newPw}
                   onChange={(e) => setPwForm({ ...pwForm, newPw: e.target.value })}
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 <input type="password" placeholder="새 비밀번호 확인" value={pwForm.confirm}
                   onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 {pwError && <p className="text-xs text-red-400">{pwError}</p>}
                 {pwSuccess && <p className="text-xs text-green-400">비밀번호가 변경되었습니다.</p>}
                 <div className="flex gap-2">
                   <button onClick={handleChangePassword} disabled={pwChanging}
-                    className="px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
+                    className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
                     {pwChanging ? "변경 중..." : "변경"}
                   </button>
                   <button onClick={() => setShowPwChange(false)}
@@ -837,7 +837,7 @@ export default function MyPage() {
           {tabs.map((tab) => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                activeTab === tab.id ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
+                activeTab === tab.id ? "chip bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
               }`}>
               {tab.label}
             </button>
@@ -847,7 +847,7 @@ export default function MyPage() {
         {/* 개요 탭 */}
         {activeTab === "overview" && (
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="glass-card rounded-xl p-5">
+            <div className="glass-card card rounded-xl p-5">
               <h2 className="font-bold text-white mb-3">최근 리뷰</h2>
               {reviews.length === 0 ? <p className="text-white/30 text-sm">작성한 리뷰가 없습니다.</p> : (
                 <div className="space-y-2">
@@ -860,7 +860,7 @@ export default function MyPage() {
                 </div>
               )}
             </div>
-            <div className="glass-card rounded-xl p-5">
+            <div className="glass-card card rounded-xl p-5">
               <h2 className="font-bold text-white mb-3">최근 지식글</h2>
               {articles.length === 0 ? <p className="text-white/30 text-sm">작성한 글이 없습니다.</p> : (
                 <div className="space-y-2">
@@ -873,7 +873,7 @@ export default function MyPage() {
                 </div>
               )}
             </div>
-            <div className="glass-card rounded-xl p-5">
+            <div className="glass-card card rounded-xl p-5">
               <h2 className="font-bold text-white mb-3">추천한 Bar</h2>
               {bars.length === 0 ? <p className="text-white/30 text-sm">추천한 바가 없습니다.</p> : (
                 <div className="space-y-2">
@@ -883,7 +883,7 @@ export default function MyPage() {
                 </div>
               )}
             </div>
-            <div className="glass-card rounded-xl p-5">
+            <div className="glass-card card rounded-xl p-5">
               <h2 className="font-bold text-white mb-3">만든 일정</h2>
               {schedules.length === 0 ? <p className="text-white/30 text-sm">만든 일정이 없습니다.</p> : (
                 <div className="space-y-2">
@@ -904,12 +904,12 @@ export default function MyPage() {
             <div className="flex gap-2 mb-4">
               {(["tried", "wishlist"] as const).map((s) => (
                 <button key={s} onClick={() => setCollectionTab(s)}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${collectionTab === s ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/50 hover:text-white/80"}`}>
+                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${collectionTab === s ? "chip bg-indigo-500/80 text-white" : "bg-white/5 text-white/50 hover:text-white/80"}`}>
                   {s === "tried" ? `마셔봤어요 (${collection.filter((c) => c.status === "tried").length})` : `마시고 싶어요 (${collection.filter((c) => c.status === "wishlist").length})`}
                 </button>
               ))}
               <button onClick={() => { setCollectionAddStatus(collectionTab); setShowCollectionModal(true); }}
-                className="ml-auto px-4 py-1.5 bg-indigo-500/80 text-white rounded-lg text-sm hover:bg-indigo-500 transition">
+                className="cta ml-auto px-4 py-1.5 bg-indigo-500/80 text-white rounded-lg text-sm hover:bg-indigo-500 transition">
                 + 추가
               </button>
             </div>
@@ -922,7 +922,7 @@ export default function MyPage() {
                   const type = item.whiskeys?.type || "";
                   const hasEncycLink = !!item.encyclopedia_id;
                   return (
-                    <div key={item.id} className="glass-card rounded-xl px-4 py-3 flex items-center justify-between">
+                    <div key={item.id} className="glass-card card rounded-xl px-4 py-3 flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-medium text-sm">{name}</p>
                         {type && <p className="text-white/40 text-xs">{type}</p>}
@@ -946,7 +946,7 @@ export default function MyPage() {
           <div className="space-y-3">
             {reviews.length === 0 ? <div className="text-center py-12 text-white/30">작성한 리뷰가 없습니다.</div> : (
               reviews.map((r) => (
-                <div key={r.id} onClick={() => router.push("/reviews")} className="glass-card rounded-xl p-5 cursor-pointer transition">
+                <div key={r.id} onClick={() => router.push("/reviews")} className="glass-card card rounded-xl p-5 cursor-pointer transition">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-bold text-white">{r.whiskeys?.name || "위스키"}</p>
@@ -966,7 +966,7 @@ export default function MyPage() {
           <div className="grid md:grid-cols-2 gap-3">
             {whiskeys.length === 0 ? <div className="text-center py-12 text-white/30 col-span-2">추가한 위스키가 없습니다.</div> : (
               whiskeys.map((w) => (
-                <div key={w.id} onClick={() => router.push("/reviews")} className="glass-card rounded-xl p-5 cursor-pointer transition">
+                <div key={w.id} onClick={() => router.push("/reviews")} className="glass-card card rounded-xl p-5 cursor-pointer transition">
                   <div className="flex justify-between items-start">
                     <p className="font-bold text-white">{w.name}</p>
                     <span className="text-xs bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded">{w.type}</span>
@@ -983,7 +983,7 @@ export default function MyPage() {
           <div className="space-y-3">
             {articles.length === 0 ? <div className="text-center py-12 text-white/30">작성한 글이 없습니다.</div> : (
               articles.map((a) => (
-                <div key={a.id} onClick={() => router.push("/articles")} className="glass-card rounded-xl p-5 cursor-pointer transition">
+                <div key={a.id} onClick={() => router.push("/articles")} className="glass-card card rounded-xl p-5 cursor-pointer transition">
                   <div className="flex justify-between items-start">
                     <p className="font-bold text-white">{a.title}</p>
                     <span className="text-xs bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded ml-2 flex-shrink-0">{a.category}</span>
@@ -999,7 +999,7 @@ export default function MyPage() {
           <div className="grid md:grid-cols-2 gap-3">
             {bars.length === 0 ? <div className="text-center py-12 text-white/30 col-span-2">추천한 바가 없습니다.</div> : (
               bars.map((b) => (
-                <div key={b.id} onClick={() => router.push("/bars")} className="glass-card rounded-xl p-5 cursor-pointer transition">
+                <div key={b.id} onClick={() => router.push("/bars")} className="glass-card card rounded-xl p-5 cursor-pointer transition">
                   <p className="font-bold text-white">{b.bar_name}</p>
                   {b.notes && <SafeHtml html={b.notes} className="rich-content text-sm leading-relaxed mt-1 line-clamp-3 text-white/40" />}
                   <p className="text-xs text-white/30 mt-2">{new Date(b.created_at).toLocaleDateString("ko-KR")}</p>
@@ -1013,7 +1013,7 @@ export default function MyPage() {
           <div className="grid md:grid-cols-2 gap-3">
             {favoriteBars.length === 0 ? <div className="text-center py-12 text-white/30 col-span-2">즐겨찾기한 바가 없습니다.</div> : (
               favoriteBars.map((b) => (
-                <div key={b.id} onClick={() => router.push("/bars")} className="glass-card rounded-xl p-5 cursor-pointer hover:bg-white/8 transition flex items-center gap-3">
+                <div key={b.id} onClick={() => router.push("/bars")} className="glass-card card rounded-xl p-5 cursor-pointer hover:bg-white/8 transition flex items-center gap-3">
                   <span className="text-red-400 text-lg">❤️</span>
                   <p className="font-bold text-white">{b.bar_name}</p>
                 </div>
@@ -1026,7 +1026,7 @@ export default function MyPage() {
           <div className="space-y-3">
             {schedules.length === 0 ? <div className="text-center py-12 text-white/30">만든 일정이 없습니다.</div> : (
               schedules.map((s) => (
-                <div key={s.id} onClick={() => router.push("/schedule")} className="glass-card rounded-xl p-5 flex justify-between items-center cursor-pointer transition">
+                <div key={s.id} onClick={() => router.push("/schedule")} className="glass-card card rounded-xl p-5 flex justify-between items-center cursor-pointer transition">
                   <p className="font-bold text-white">{s.name}</p>
                   <p className="text-xs text-white/30">{new Date(s.created_at).toLocaleDateString("ko-KR")}</p>
                 </div>
@@ -1039,7 +1039,7 @@ export default function MyPage() {
           <div className="space-y-3">
             {userComments.length === 0 ? <div className="text-center py-12 text-white/30">작성한 댓글이 없습니다.</div> : (
               userComments.map((c) => (
-                <div key={c.id} onClick={() => router.push(c.source === "article" ? "/articles" : "/reviews")} className="glass-card rounded-xl p-5 cursor-pointer transition">
+                <div key={c.id} onClick={() => router.push(c.source === "article" ? "/articles" : "/reviews")} className="glass-card card rounded-xl p-5 cursor-pointer transition">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                       c.source === "article" ? "bg-purple-500/20 text-purple-300" : "bg-indigo-500/30 text-indigo-300"
@@ -1073,24 +1073,24 @@ export default function MyPage() {
               ].map((t) => (
                 <button key={t.id} onClick={() => handleAdminSubTab(t.id as AdminSubTab)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    adminSubTab === t.id ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
+                    adminSubTab === t.id ? "chip bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
                   }`}>{t.label}</button>
               ))}
             </div>
 
             {showAdminListControls && (
-              <div className="glass-card rounded-xl p-4 border border-white/10">
+              <div className="glass-card card rounded-xl p-4 border border-white/10">
                 <div className="flex flex-col md:flex-row gap-2 md:items-center">
                   <input
                     value={adminSearchQuery}
                     onChange={(e) => setAdminSearchQuery(e.target.value)}
                     placeholder={adminSearchPlaceholderMap[adminSubTab]}
-                    className="glass-input flex-1 px-3 py-2 rounded-lg text-sm"
+                    className="glass-input surface flex-1 px-3 py-2 rounded-lg text-sm"
                   />
                   <select
                     value={adminSortOrder}
                     onChange={(e) => setAdminSortOrder(e.target.value as "latest" | "oldest")}
-                    className="glass-input md:w-36 px-3 py-2 rounded-lg text-sm"
+                    className="glass-input surface md:w-36 px-3 py-2 rounded-lg text-sm"
                   >
                     <option value="latest">최신순</option>
                     <option value="oldest">오래된순</option>
@@ -1099,7 +1099,7 @@ export default function MyPage() {
                     <select
                       value={adminStatusFilter}
                       onChange={(e) => setAdminStatusFilter(e.target.value)}
-                      className="glass-input md:w-36 px-3 py-2 rounded-lg text-sm"
+                      className="glass-input surface md:w-36 px-3 py-2 rounded-lg text-sm"
                     >
                       <option value="all">전체 상태</option>
                       <option value="confirmed">확정</option>
@@ -1123,7 +1123,7 @@ export default function MyPage() {
 
             {/* 통계 */}
             {adminSubTab === "stats" && (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card card rounded-xl p-6">
                 <h2 className="font-bold text-white mb-4 text-lg">사이트 통계</h2>
                 {adminLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : adminStats ? (
                   <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
@@ -1147,7 +1147,7 @@ export default function MyPage() {
 
             {/* 유저 관리 */}
             {adminSubTab === "users" && (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">유저 관리</h2>
                   <span className="text-sm text-white/40">{adminUsers.length}명</span>
@@ -1202,7 +1202,7 @@ export default function MyPage() {
 
             {/* 공지 관리 */}
             {adminSubTab === "notices" && (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center gap-2">
                     <h2 className="font-bold text-white text-lg">공지사항 관리</h2>
@@ -1211,16 +1211,16 @@ export default function MyPage() {
                     </span>
                   </div>
                   <button onClick={() => setShowAnnouncementForm(!showAnnouncementForm)}
-                    className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
+                    className="cta px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
                     {showAnnouncementForm ? "취소" : "📢 공지 작성"}
                   </button>
                 </div>
 
                 {showAnnouncementForm && (
-                  <form onSubmit={handleAdminSubmitAnnouncement} className="space-y-3 mb-6 p-4 glass-card rounded-lg border border-indigo-400/20">
+                  <form onSubmit={handleAdminSubmitAnnouncement} className="space-y-3 mb-6 p-4 glass-card card rounded-lg border border-indigo-400/20">
                     <input value={announcementForm.title}
                       onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
-                      placeholder="공지 제목" className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                      placeholder="공지 제목" className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                     <RichTextEditor
                       value={announcementForm.content}
                       onChange={(html) => setAnnouncementForm({ ...announcementForm, content: html })}
@@ -1228,7 +1228,7 @@ export default function MyPage() {
                       minHeight="120px"
                     />
                     <button type="submit" disabled={announcementSubmitting}
-                      className="px-6 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
+                      className="cta px-6 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
                       {announcementSubmitting ? "등록 중..." : "등록"}
                     </button>
                   </form>
@@ -1246,7 +1246,7 @@ export default function MyPage() {
                           <form onSubmit={handleAdminSaveAnnouncement} className="space-y-3">
                             <input value={editingAdminAnnouncement.title}
                               onChange={(e) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, title: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                             <RichTextEditor
                               value={editingAdminAnnouncement.content}
                               onChange={(html) => setEditingAdminAnnouncement({ ...editingAdminAnnouncement, content: html })}
@@ -1254,7 +1254,7 @@ export default function MyPage() {
                               minHeight="120px"
                             />
                             <div className="flex gap-2">
-                              <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
+                              <button type="submit" className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
                               <button type="button" onClick={() => setEditingAdminAnnouncement(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-xs rounded-lg hover:bg-white/12 transition">취소</button>
                             </div>
                           </form>
@@ -1280,7 +1280,7 @@ export default function MyPage() {
 
             {/* 지식글 관리 */}
             {adminSubTab === "articles" && (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">지식글 전체 관리</h2>
                   <span className="text-sm text-white/40">
@@ -1298,9 +1298,9 @@ export default function MyPage() {
                         {editingAdminArticle?.id === a.id ? (
                           <form onSubmit={handleAdminSaveArticle} className="space-y-3">
                             <input value={editingAdminArticle.title} onChange={(e) => setEditingAdminArticle({ ...editingAdminArticle, title: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                             <select value={editingAdminArticle.category} onChange={(e) => setEditingAdminArticle({ ...editingAdminArticle, category: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg text-sm">
+                              className="glass-input surface w-full px-3 py-2 rounded-lg text-sm">
                               {["기초 지식","테이스팅","역사","문화","기타"].map((c) => <option key={c} value={c}>{c}</option>)}
                             </select>
                             <RichTextEditor
@@ -1310,7 +1310,7 @@ export default function MyPage() {
                               minHeight="120px"
                             />
                             <div className="flex gap-2">
-                              <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
+                              <button type="submit" className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
                               <button type="button" onClick={() => setEditingAdminArticle(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-xs rounded-lg hover:bg-white/12 transition">취소</button>
                             </div>
                           </form>
@@ -1340,7 +1340,7 @@ export default function MyPage() {
 
             {/* 리뷰 관리 */}
             {adminSubTab === "reviews" && (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">리뷰 전체 관리</h2>
                   <span className="text-sm text-white/40">
@@ -1374,7 +1374,7 @@ export default function MyPage() {
 
             {/* Bar 관리 */}
             {adminSubTab === "bars" && (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">Bar 전체 관리</h2>
                   <span className="text-sm text-white/40">
@@ -1392,13 +1392,13 @@ export default function MyPage() {
                         {editingAdminBar?.id === b.id ? (
                           <form onSubmit={handleAdminSaveBar} className="space-y-3">
                             <input value={editingAdminBar.bar_name} onChange={(e) => setEditingAdminBar({ ...editingAdminBar, bar_name: e.target.value })}
-                              placeholder="Bar 이름" className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                              placeholder="Bar 이름" className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                             <input value={editingAdminBar.link || ""} onChange={(e) => setEditingAdminBar({ ...editingAdminBar, link: e.target.value })}
-                              placeholder="링크" className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                              placeholder="링크" className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                             <textarea value={editingAdminBar.notes || ""} rows={2} onChange={(e) => setEditingAdminBar({ ...editingAdminBar, notes: e.target.value })}
-                              placeholder="비고" className="glass-input w-full px-3 py-2 rounded-lg text-sm resize-none" />
+                              placeholder="비고" className="glass-input surface w-full px-3 py-2 rounded-lg text-sm resize-none" />
                             <div className="flex gap-2">
-                              <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
+                              <button type="submit" className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
                               <button type="button" onClick={() => setEditingAdminBar(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-xs rounded-lg hover:bg-white/12 transition">취소</button>
                             </div>
                           </form>
@@ -1427,7 +1427,7 @@ export default function MyPage() {
 
             {/* 위스키 관리 */}
             {adminSubTab === "whiskeys" && (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">위스키 전체 관리</h2>
                   <span className="text-sm text-white/40">
@@ -1446,20 +1446,20 @@ export default function MyPage() {
                           <form onSubmit={handleAdminSaveWhiskey} className="space-y-3">
                             <div className="grid grid-cols-2 gap-2">
                               <input value={editingAdminWhiskey.name} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, name: e.target.value })}
-                                placeholder="이름" className="col-span-2 glass-input px-3 py-2 rounded-lg text-sm" />
+                                placeholder="이름" className="col-span-2 glass-input surface px-3 py-2 rounded-lg text-sm" />
                               <select value={editingAdminWhiskey.type} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, type: e.target.value })}
-                                className="glass-input px-3 py-2 rounded-lg text-sm">
+                                className="glass-input surface px-3 py-2 rounded-lg text-sm">
                                 {["Scotch","Irish","Bourbon/Rye","Etc"].map((t) => <option key={t} value={t}>{t}</option>)}
                               </select>
                               <input value={editingAdminWhiskey.region || ""} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, region: e.target.value })}
-                                placeholder="지역" className="glass-input px-3 py-2 rounded-lg text-sm" />
+                                placeholder="지역" className="glass-input surface px-3 py-2 rounded-lg text-sm" />
                               <input type="number" value={editingAdminWhiskey.age || ""} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, age: parseInt(e.target.value) || 0 })}
-                                placeholder="숙성년" className="glass-input px-3 py-2 rounded-lg text-sm" />
+                                placeholder="숙성년" className="glass-input surface px-3 py-2 rounded-lg text-sm" />
                               <input type="number" step="0.1" value={editingAdminWhiskey.abv || ""} onChange={(e) => setEditingAdminWhiskey({ ...editingAdminWhiskey, abv: parseFloat(e.target.value) || 0 })}
-                                placeholder="도수%" className="glass-input px-3 py-2 rounded-lg text-sm" />
+                                placeholder="도수%" className="glass-input surface px-3 py-2 rounded-lg text-sm" />
                             </div>
                             <div className="flex gap-2">
-                              <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
+                              <button type="submit" className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">저장</button>
                               <button type="button" onClick={() => setEditingAdminWhiskey(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-xs rounded-lg hover:bg-white/12 transition">취소</button>
                             </div>
                           </form>
@@ -1490,7 +1490,7 @@ export default function MyPage() {
 
             {/* 일정 관리 */}
             {adminSubTab === "schedules" && (
-              <div className="glass-card rounded-xl p-6">
+              <div className="glass-card card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">일정 전체 관리</h2>
                   <span className="text-sm text-white/40">
@@ -1530,7 +1530,7 @@ export default function MyPage() {
       {showCollectionModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4"
           onClick={(e) => { if (e.target === e.currentTarget) setShowCollectionModal(false); }}>
-          <div className="glass-card rounded-2xl w-full max-w-md p-6">
+          <div className="glass-card card rounded-2xl w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-white">{collectionAddStatus === "tried" ? "마셔봤어요 추가" : "마시고 싶어요 추가"}</h2>
               <button onClick={() => setShowCollectionModal(false)} className="text-white/40 hover:text-white text-xl">×</button>
@@ -1538,7 +1538,7 @@ export default function MyPage() {
             <div className="flex gap-2 mb-4">
               {(["encyclopedia", "manual"] as const).map((m) => (
                 <button key={m} onClick={() => setCollectionAddMode(m)}
-                  className={`px-3 py-1.5 rounded-lg text-sm transition ${collectionAddMode === m ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/50"}`}>
+                  className={`px-3 py-1.5 rounded-lg text-sm transition ${collectionAddMode === m ? "chip bg-indigo-500/80 text-white" : "bg-white/5 text-white/50"}`}>
                   {m === "encyclopedia" ? "백과에서" : "직접 입력"}
                 </button>
               ))}
@@ -1548,7 +1548,7 @@ export default function MyPage() {
                 <input type="text" value={collectionSearch}
                   onChange={(e) => setCollectionSearch(e.target.value)}
                   placeholder="위스키 이름으로 검색..."
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 <div className="space-y-1.5 max-h-60 overflow-y-auto">
                   {ENCYCLOPEDIA_WHISKEYS
                     .filter((w) => !collectionSearch.trim() || w.name.toLowerCase().includes(collectionSearch.toLowerCase()))
@@ -1567,10 +1567,10 @@ export default function MyPage() {
                 <input type="text" value={collectionManualName}
                   onChange={(e) => setCollectionManualName(e.target.value)}
                   placeholder="위스키 이름을 직접 입력하세요"
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 <button onClick={() => collectionManualName.trim() && handleAddCollection({ custom_name: collectionManualName.trim() })}
                   disabled={!collectionManualName.trim()}
-                  className="w-full py-2 bg-indigo-500/80 text-white rounded-lg text-sm hover:bg-indigo-500 disabled:opacity-40 transition">
+                  className="cta w-full py-2 bg-indigo-500/80 text-white rounded-lg text-sm hover:bg-indigo-500 disabled:opacity-40 transition">
                   추가하기
                 </button>
               </div>

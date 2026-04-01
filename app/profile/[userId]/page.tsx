@@ -108,7 +108,7 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="tone min-h-screen flex items-center justify-center">
         <div className="text-white/60 text-lg animate-pulse">불러오는 중...</div>
       </div>
     );
@@ -116,7 +116,7 @@ export default function UserProfilePage() {
 
   if (notFound || !user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <div className="tone min-h-screen flex flex-col items-center justify-center gap-4">
         <div className="text-white text-xl font-semibold">사용자를 찾을 수 없습니다</div>
         <button
           onClick={() => router.back()}
@@ -131,9 +131,10 @@ export default function UserProfilePage() {
   const initials = user.name ? user.name.charAt(0).toUpperCase() : "?";
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
+    <div className="tone min-h-screen">
+      <div className="tone-wrap max-w-3xl mx-auto px-4 py-10 space-y-6">
       {/* Profile Card */}
-      <div className="glass-card p-6 space-y-5">
+      <div className="glass-card card p-6 space-y-5">
         {/* Avatar + basic info */}
         <div className="flex items-center gap-5">
           {/* Avatar */}
@@ -187,13 +188,13 @@ export default function UserProfilePage() {
         {(user.favorite_category || user.favorite_whiskey) && (
           <div className="flex flex-wrap gap-2">
             {user.favorite_category && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm">
+              <div className="chip flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm">
                 <span className="text-white/40 text-xs">선호 카테고리</span>
                 <span className="text-white font-medium">{user.favorite_category}</span>
               </div>
             )}
             {user.favorite_whiskey && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm">
+              <div className="chip flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm">
                 <span className="text-white/40 text-xs">최애 위스키</span>
                 <span className="text-white font-medium">{user.favorite_whiskey}</span>
               </div>
@@ -215,10 +216,10 @@ export default function UserProfilePage() {
       </div>
 
       {/* Reviews Section */}
-      <div className="glass-card p-6 space-y-4">
+      <div className="glass-card card p-6 space-y-4">
         <h2 className="text-white font-semibold text-base">작성한 리뷰</h2>
         {reviews.length === 0 ? (
-          <div className="text-white/40 text-sm py-4 text-center">작성한 리뷰가 없습니다.</div>
+          <div className="empty text-white/40 text-sm py-4 text-center">작성한 리뷰가 없습니다.</div>
         ) : (
           <ul className="divide-y divide-white/10">
             {reviews.map((review) => (
@@ -239,10 +240,10 @@ export default function UserProfilePage() {
       </div>
 
       {/* Articles Section */}
-      <div className="glass-card p-6 space-y-4">
+      <div className="glass-card card p-6 space-y-4">
         <h2 className="text-white font-semibold text-base">작성한 지식글</h2>
         {articles.length === 0 ? (
-          <div className="text-white/40 text-sm py-4 text-center">작성한 지식글이 없습니다.</div>
+          <div className="empty text-white/40 text-sm py-4 text-center">작성한 지식글이 없습니다.</div>
         ) : (
           <ul className="divide-y divide-white/10">
             {articles.map((article) => (
@@ -252,7 +253,7 @@ export default function UserProfilePage() {
                   <div className="text-white/40 text-xs mt-0.5">{formatDate(article.created_at)}</div>
                 </div>
                 {article.category && (
-                  <span className="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 text-white/60">
+                  <span className="chip flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 text-white/60">
                     {article.category}
                   </span>
                 )}
@@ -260,6 +261,7 @@ export default function UserProfilePage() {
             ))}
           </ul>
         )}
+      </div>
       </div>
     </div>
   );

@@ -105,9 +105,9 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md glass-card rounded-2xl p-8">
-        <h1 className="text-3xl font-bold text-center text-white mb-8">
+    <div className="tone min-h-screen flex items-center justify-center px-4">
+      <div className="tone-wrap w-full max-w-md glass-card card rounded-2xl p-8">
+        <h1 className="section-title text-3xl font-bold text-center text-white mb-8">
           🥃 위스키 연구소
         </h1>
         <h2 className="text-2xl font-bold text-white mb-6">회원가입</h2>
@@ -123,7 +123,7 @@ export default function SignupPage() {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="glass-input w-full px-4 py-2 rounded-lg"
+              className="glass-input surface w-full px-4 py-2 rounded-lg"
               placeholder="이름을 입력하세요"
             />
             {errors.name && (
@@ -142,14 +142,14 @@ export default function SignupPage() {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="glass-input flex-1 px-4 py-2 rounded-lg"
+                className="glass-input surface flex-1 px-4 py-2 rounded-lg"
                 placeholder="아이디를 입력하세요"
               />
               <button
                 type="button"
                 onClick={handleUsernameCheck}
                 disabled={loading}
-                className="px-4 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
+                className="cta px-4 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
               >
                 중복확인
               </button>
@@ -174,7 +174,7 @@ export default function SignupPage() {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="glass-input w-full px-4 py-2 rounded-lg"
+              className="glass-input surface w-full px-4 py-2 rounded-lg"
               placeholder="비밀번호를 입력하세요"
             />
             {errors.password && (
@@ -192,7 +192,7 @@ export default function SignupPage() {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              className="glass-input w-full px-4 py-2 rounded-lg"
+              className="glass-input surface w-full px-4 py-2 rounded-lg"
               placeholder="비밀번호를 다시 입력하세요"
             />
             {errors.confirmPassword && (
@@ -211,7 +211,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
+            className="cta w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
           >
             {loading ? "가입 중..." : "회원가입"}
           </button>

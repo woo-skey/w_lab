@@ -42,9 +42,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md glass-card rounded-2xl p-8">
-        <h1 className="text-3xl font-bold text-center text-white mb-8">
+    <div className="tone min-h-screen flex items-center justify-center px-4">
+      <div className="tone-wrap w-full max-w-md glass-card card rounded-2xl p-8">
+        <h1 className="section-title text-3xl font-bold text-center text-white mb-8">
           🥃 위스키 연구소
         </h1>
         <h2 className="text-2xl font-bold text-white mb-6">로그인</h2>
@@ -59,7 +59,7 @@ export default function LoginPage() {
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              className="glass-input w-full px-4 py-2 rounded-lg"
+              className="glass-input surface w-full px-4 py-2 rounded-lg"
               placeholder="아이디를 입력하세요"
             />
           </div>
@@ -73,7 +73,7 @@ export default function LoginPage() {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="glass-input w-full px-4 py-2 rounded-lg"
+              className="glass-input surface w-full px-4 py-2 rounded-lg"
               placeholder="비밀번호를 입력하세요"
             />
           </div>
@@ -87,7 +87,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
+            className="cta w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition"
           >
             {loading ? "로그인 중..." : "로그인"}
           </button>
