@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
 import SafeHtml from "@/components/SafeHtml";
+import { passthroughImageLoader } from "@/lib/imageLoader";
 
 interface Article {
   id: string;
@@ -315,7 +317,15 @@ export default function ArticlesPage() {
                     </button>
                     {imagePreview && (
                       <div className="mt-2 relative inline-block">
-                        <img src={imagePreview} alt="preview" className="max-h-48 rounded-lg object-cover" />
+                        <Image
+                          src={imagePreview}
+                          alt="preview"
+                          loader={passthroughImageLoader}
+                          unoptimized
+                          width={640}
+                          height={360}
+                          className="max-h-48 w-auto rounded-lg object-cover"
+                        />
                         <button type="button" onClick={() => { setImageFile(null); setImagePreview(""); }}
                           className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">×</button>
                       </div>
@@ -415,7 +425,15 @@ export default function ArticlesPage() {
                         <div className="border-t border-white/8">
                           <div className="p-6" style={{ background: "rgba(255,255,255,0.03)" }}>
                             {article.image_url && (
-                              <img src={article.image_url} alt="article" className="w-full max-h-96 object-cover rounded-lg mb-4" />
+                              <Image
+                                src={article.image_url}
+                                alt="article"
+                                loader={passthroughImageLoader}
+                                unoptimized
+                                width={1200}
+                                height={675}
+                                className="w-full h-auto max-h-96 object-cover rounded-lg mb-4"
+                              />
                             )}
                             <SafeHtml html={article.content} className="rich-content text-sm leading-relaxed text-white/80" />
                           </div>

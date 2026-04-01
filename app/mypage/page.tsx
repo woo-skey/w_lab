@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
@@ -8,6 +9,7 @@ import { ENCYCLOPEDIA_WHISKEYS } from "@/lib/encyclopediaData";
 import bcrypt from "bcryptjs";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
+import { passthroughImageLoader } from "@/lib/imageLoader";
 
 interface UserProfile {
   id: string;
@@ -145,13 +147,14 @@ export default function MyPage() {
   const [collectionSearch, setCollectionSearch] = useState("");
   const [collectionManualName, setCollectionManualName] = useState("");
 
+  // Initial bootstrap for authenticated user data.
   useEffect(() => {
     const id = localStorage.getItem("userId");
     if (!id) { router.push("/login"); return; }
     setUserId(id);
     fetchAll(id);
     fetchCollection(id);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -651,10 +654,18 @@ export default function MyPage() {
             <div className="relative flex-shrink-0">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-20 h-20 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 text-3xl font-bold cursor-pointer overflow-hidden hover:opacity-80 transition"
+                className="relative w-20 h-20 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 text-3xl font-bold cursor-pointer overflow-hidden hover:opacity-80 transition"
               >
                 {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                  <Image
+                    src={profile.avatar_url}
+                    alt="avatar"
+                    loader={passthroughImageLoader}
+                    unoptimized
+                    fill
+                    sizes="80px"
+                    className="object-cover"
+                  />
                 ) : (
                   (profile?.name || "?")[0].toUpperCase()
                 )}
@@ -1157,8 +1168,20 @@ export default function MyPage() {
                     {adminUsers.map((u) => (
                       <div key={u.id} className={`flex items-center justify-between p-4 rounded-lg border ${u.id === userId ? "border-indigo-400/30 bg-indigo-500/10" : "border-white/8"}`} style={u.id !== userId ? { background: "rgba(255,255,255,0.03)" } : {}}>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-sm overflow-hidden flex-shrink-0">
-                            {u.avatar_url ? <img src={u.avatar_url} alt="avatar" className="w-full h-full object-cover" /> : (u.name || "?")[0].toUpperCase()}
+                          <div className="relative w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-sm overflow-hidden flex-shrink-0">
+                            {u.avatar_url ? (
+                              <Image
+                                src={u.avatar_url}
+                                alt="avatar"
+                                loader={passthroughImageLoader}
+                                unoptimized
+                                fill
+                                sizes="40px"
+                                className="object-cover"
+                              />
+                            ) : (
+                              (u.name || "?")[0].toUpperCase()
+                            )}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">

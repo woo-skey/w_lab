@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { passthroughImageLoader } from "@/lib/imageLoader";
 
 interface UserProfile {
   id: string;
@@ -140,9 +142,13 @@ export default function UserProfilePage() {
           {/* Avatar */}
           <div className="flex-shrink-0">
             {user.avatar_url ? (
-              <img
+              <Image
                 src={user.avatar_url}
                 alt={user.name}
+                loader={passthroughImageLoader}
+                unoptimized
+                width={80}
+                height={80}
                 className="w-20 h-20 rounded-full object-cover ring-2 ring-white/20"
               />
             ) : (

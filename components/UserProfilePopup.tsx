@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { passthroughImageLoader } from "@/lib/imageLoader";
 
 interface UserInfo {
   id: string;
@@ -106,9 +108,17 @@ export default function UserProfilePopup({ userId, displayName, avatarUrl }: Use
       ) : user ? (
         <>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 text-2xl font-bold overflow-hidden flex-shrink-0">
+            <div className="relative w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 text-2xl font-bold overflow-hidden flex-shrink-0">
               {user.avatar_url ? (
-                <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                <Image
+                  src={user.avatar_url}
+                  alt={user.name}
+                  loader={passthroughImageLoader}
+                  unoptimized
+                  fill
+                  sizes="56px"
+                  className="object-cover"
+                />
               ) : (
                 (user.name || "?")[0].toUpperCase()
               )}
@@ -176,9 +186,17 @@ export default function UserProfilePopup({ userId, displayName, avatarUrl }: Use
         onClick={handleOpen}
         className="flex items-center gap-1.5 hover:opacity-80 transition"
       >
-        <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xs font-bold overflow-hidden flex-shrink-0">
+        <div className="relative w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xs font-bold overflow-hidden flex-shrink-0">
           {avatarUrl ? (
-            <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+            <Image
+              src={avatarUrl}
+              alt={displayName}
+              loader={passthroughImageLoader}
+              unoptimized
+              fill
+              sizes="24px"
+              className="object-cover"
+            />
           ) : (
             (displayName || "?")[0].toUpperCase()
           )}
