@@ -49,6 +49,7 @@ export default function SpotlightSearch() {
   const [selected, setSelected] = useState(0);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const requestSeqRef = useRef(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -75,25 +76,32 @@ export default function SpotlightSearch() {
 
   useEffect(() => {
     if (!open) return;
+    requestSeqRef.current += 1;
     setTimeout(() => inputRef.current?.focus(), 50);
     setQuery("");
     setResults([]);
     setSelected(0);
+    setLoading(false);
   }, [open]);
 
   const runSearch = useCallback(async (q: string) => {
-    if (!q.trim()) {
+    const trimmed = q.trim();
+    if (!trimmed) {
+      requestSeqRef.current += 1;
       setResults([]);
       setLoading(false);
       return;
     }
 
+    const requestId = ++requestSeqRef.current;
     setLoading(true);
     try {
-      const found = await searchGlobalContent(q);
+      const found = await searchGlobalContent(trimmed);
+      if (requestSeqRef.current !== requestId) return;
       setResults(found);
       setSelected(0);
     } finally {
+      if (requestSeqRef.current !== requestId) return;
       setLoading(false);
     }
   }, []);

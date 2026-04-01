@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 import { ENCYCLOPEDIA_WHISKEYS, CATEGORY_TO_TYPE } from "@/lib/encyclopediaData";
@@ -65,6 +65,9 @@ function RatingGauge({ rating, size = "md" }: { rating: number; size?: "sm" | "m
 }
 
 export default function ReviewsPage() {
+  const deepLinkHandledRef = useRef<string | null>(null);
+  const [deepLinkWhiskeyId, setDeepLinkWhiskeyId] = useState<string | null>(null);
+
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
   const [reviews, setReviews] = useState<Record<string, Review[]>>({});
   const [comments, setComments] = useState<Record<string, ReviewComment[]>>({});
@@ -123,6 +126,32 @@ export default function ReviewsPage() {
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchWhiskeys();
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setDeepLinkWhiskeyId(params.get("whiskeyId"));
+  }, []);
+
+  useEffect(() => {
+    if (!deepLinkWhiskeyId || loading) return;
+    if (deepLinkHandledRef.current === deepLinkWhiskeyId) return;
+
+    const target = whiskeys.find((w) => w.id === deepLinkWhiskeyId);
+    deepLinkHandledRef.current = deepLinkWhiskeyId;
+    if (!target) return;
+
+    const targetType = WHISKEY_TYPES.includes(target.type) ? target.type : "전체";
+    setSelectedType(targetType);
+    setSearchQuery(target.name);
+    setShowSearchDrop(false);
+    setPage(1);
+    setExpandedWhiskey(target.id);
+
+    setTimeout(() => {
+      document.getElementById(`whiskey-${target.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 240);
+  }, [deepLinkWhiskeyId, loading, whiskeys]);
 
   const fetchWhiskeys = async () => {
     try {
@@ -676,7 +705,7 @@ export default function ReviewsPage() {
                 : null;
 
               return (
-                <div key={w.id} className="glass-card card rounded-xl overflow-hidden">
+                <div id={`whiskey-${w.id}`} key={w.id} className="glass-card card rounded-xl overflow-hidden">
                   {/* 위스키 헤더 */}
                   {editingWhiskey?.id === w.id ? (
                     <div className="p-6">

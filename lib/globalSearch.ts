@@ -58,7 +58,7 @@ export async function searchGlobalContent(rawQuery: string): Promise<GlobalSearc
         title: w.name,
         subtitle: w.type,
         type: "whiskey",
-        href: "/reviews",
+        href: `/reviews?whiskeyId=${encodeURIComponent(w.id)}`,
         createdAt: w.created_at,
       });
     });
@@ -84,7 +84,7 @@ export async function searchGlobalContent(rawQuery: string): Promise<GlobalSearc
         title: a.title,
         subtitle: a.category,
         type: "article",
-        href: "/articles",
+        href: `/articles?articleId=${encodeURIComponent(a.id)}`,
         createdAt: a.created_at,
       });
     });

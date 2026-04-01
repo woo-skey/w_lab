@@ -139,6 +139,20 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
   };
 
+  const handleDeleteAllNotifications = async () => {
+    if (!userId || notifications.length === 0) return;
+    if (!confirm("모든 알림을 삭제할까요? 이 작업은 되돌릴 수 없습니다.")) return;
+
+    const previous = notifications;
+    setNotifications([]);
+
+    const { error } = await supabase.from("notifications").delete().eq("user_id", userId);
+    if (error) {
+      setNotifications(previous);
+      alert("알림 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  };
+
   const handleNotifClick = async (n: Notification) => {
     if (!n.is_read) {
       await supabase.from("notifications").update({ is_read: true }).eq("id", n.id);
@@ -467,10 +481,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                 )}
                 {notifications.length > 0 && (
                   <button
-                    onClick={async () => {
-                      await supabase.from("notifications").delete().eq("user_id", userId);
-                      setNotifications([]);
-                    }}
+                    onClick={handleDeleteAllNotifications}
                     className="text-sm"
                     style={{ color: T.textMuted }}
                   >
@@ -627,10 +638,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                         )}
                         {notifications.length > 0 && (
                           <button
-                            onClick={async () => {
-                              await supabase.from("notifications").delete().eq("user_id", userId);
-                              setNotifications([]);
-                            }}
+                            onClick={handleDeleteAllNotifications}
                             className="text-xs hover:text-red-400 transition"
                             style={{ color: T.textMuted }}
                           >

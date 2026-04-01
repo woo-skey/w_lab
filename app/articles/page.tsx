@@ -32,6 +32,9 @@ interface Comment {
 const CATEGORIES = ["전체", "기초 지식", "테이스팅", "역사", "문화", "기타"];
 
 export default function ArticlesPage() {
+  const deepLinkHandledRef = useRef<string | null>(null);
+  const [deepLinkArticleId, setDeepLinkArticleId] = useState<string | null>(null);
+
   const [articles, setArticles] = useState<Article[]>([]);
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [loading, setLoading] = useState(true);
@@ -59,6 +62,47 @@ export default function ArticlesPage() {
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     fetchArticles();
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setDeepLinkArticleId(params.get("articleId"));
+  }, []);
+
+  useEffect(() => {
+    if (!deepLinkArticleId || loading) return;
+    if (deepLinkHandledRef.current === deepLinkArticleId) return;
+
+    const target = articles.find((a) => a.id === deepLinkArticleId);
+    deepLinkHandledRef.current = deepLinkArticleId;
+    if (!target) return;
+
+    const targetCategory = CATEGORIES.includes(target.category) ? target.category : "전체";
+    setSelectedCategory(targetCategory);
+    setSearchQuery(target.title);
+    setPage(1);
+    setExpandedId(target.id);
+
+    if (!comments[target.id]) {
+      void (async () => {
+        try {
+          const { data, error } = await supabase
+            .from("comments")
+            .select("*, users(name)")
+            .eq("article_id", target.id)
+            .order("created_at", { ascending: true });
+          if (error) throw error;
+          setComments((prev) => ({ ...prev, [target.id]: data || [] }));
+        } catch (err) {
+          console.error(err);
+        }
+      })();
+    }
+
+    setTimeout(() => {
+      document.getElementById(`article-${target.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 240);
+  }, [articles, comments, deepLinkArticleId, loading]);
 
   const fetchArticleLikes = async (uid: string) => {
     const { data } = await supabase.from("article_likes").select("article_id, user_id");
@@ -356,7 +400,7 @@ export default function ArticlesPage() {
               const isOwner = (article.author_id === userId || isAdmin);
 
               return (
-                <div key={article.id} className="glass-card card rounded-xl overflow-hidden">
+                <div id={`article-${article.id}`} key={article.id} className="glass-card card rounded-xl overflow-hidden">
                   {/* 편집 모드 */}
                   {editingArticle?.id === article.id ? (
                     <div className="p-6">
