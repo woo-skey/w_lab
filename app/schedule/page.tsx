@@ -140,6 +140,7 @@ export default function SchedulePage() {
   const handleToggleDate = async (dateStr: string) => {
     if (!userId || !isMember || isAdmin) return;
     if (!selectedSchedule) return;
+    if (selectedSchedule.confirmed_date) return;
 
     const existing = availabilityMap[dateStr];
 
@@ -421,7 +422,9 @@ export default function SchedulePage() {
                     <h2 className="text-xl font-bold text-white">{selectedSchedule.name}</h2>
                     {userId && isMember && !isAdmin && (
                       <p className="text-sm text-white/45 mt-1">
-                        가능한 날짜를 클릭해서 체크하세요 ✓
+                        {selectedSchedule.confirmed_date
+                          ? "일정이 확정되어 날짜 체크가 잠겨 있습니다."
+                          : "가능한 날짜를 클릭해서 체크하세요 ✓"}
                       </p>
                     )}
                   </div>
@@ -493,6 +496,7 @@ export default function SchedulePage() {
                     const isMyDate = info?.isAvailable || false;
                     const count = info?.count || 0;
                     const isConfirmed = selectedSchedule.confirmed_date === dateStr;
+                    const canVoteDate = !!userId && isMember && !isAdmin && !selectedSchedule.confirmed_date;
                     const isToday =
                       today.getFullYear() === viewYear &&
                       today.getMonth() === viewMonth &&
@@ -505,8 +509,8 @@ export default function SchedulePage() {
                         className={`calendar-cell aspect-square ${hoveredDate === dateStr ? "flipped" : ""}`}
                         onMouseEnter={() => count > 0 && setHoveredDate(dateStr)}
                         onMouseLeave={() => setHoveredDate(null)}
-                        onClick={() => userId && isMember && !isAdmin && handleToggleDate(dateStr)}
-                        style={{ cursor: userId && isMember && !isAdmin ? "pointer" : "default" }}
+                        onClick={() => canVoteDate && handleToggleDate(dateStr)}
+                        style={{ cursor: canVoteDate ? "pointer" : "default" }}
                       >
                         <div className="calendar-card">
                           {/* 앞면 */}
@@ -514,7 +518,7 @@ export default function SchedulePage() {
                             ${isConfirmed ? "font-bold" : ""}
                             ${isMyDate && !isConfirmed ? "bg-indigo-500 text-white font-bold" : ""}
                             ${!isMyDate && count > 0 && !isConfirmed ? "border border-indigo-400/40" : ""}
-                            ${!isMyDate && count === 0 && !isConfirmed ? "hover:bg-white/8" : ""}
+                            ${!isMyDate && count === 0 && !isConfirmed && canVoteDate ? "hover:bg-white/8" : ""}
                             ${isToday && !isMyDate && !isConfirmed ? "ring-2 ring-indigo-400/60" : ""}
                             ${dayOfWeek === 0 && !isMyDate && !isConfirmed ? "text-red-400" : ""}
                             ${dayOfWeek === 6 && !isMyDate && !isConfirmed ? "text-indigo-400" : ""}

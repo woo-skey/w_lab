@@ -411,6 +411,16 @@ export default function ReviewsPage() {
     )
     .sort((a, b) => sortBy === "popular" ? (reviewCounts[b.id] || 0) - (reviewCounts[a.id] || 0) : 0);
 
+  const filteredEncyclopediaEntries = ENCYCLOPEDIA_WHISKEYS.filter((e) => {
+    const matchCategory = encycCategory === "전체" || e.category === encycCategory;
+    const q = encycSearch.trim().toLowerCase();
+    const matchSearch =
+      !q ||
+      e.name.toLowerCase().includes(q) ||
+      e.distillery.toLowerCase().includes(q);
+    return matchCategory && matchSearch;
+  });
+
   const PAGE_SIZE = 10;
   const totalPages = Math.ceil(filteredWhiskeys.length / PAGE_SIZE);
   const pagedWhiskeys = filteredWhiskeys.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -552,43 +562,50 @@ export default function ReviewsPage() {
                   ))}
                 </div>
                 <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
-                  {ENCYCLOPEDIA_WHISKEYS.filter((e) => {
-                    const matchCategory = encycCategory === "전체" || e.category === encycCategory;
-                    const matchSearch =
-                      !encycSearch.trim() ||
-                      e.name.toLowerCase().includes(encycSearch.toLowerCase()) ||
-                      e.distillery.toLowerCase().includes(encycSearch.toLowerCase());
-                    return matchCategory && matchSearch;
-                  }).map((entry) => (
-                    <button
-                      key={entry.id}
-                      onClick={() => {
-                        const priceNum = parseInt(entry.priceRange.replace(/[₩,]/g, "").split("–")[0]) || 0;
-                        setWhiskey({
-                          name: entry.name,
-                          type: CATEGORY_TO_TYPE[entry.category] ?? "Etc",
-                          region: `${entry.region}, ${entry.country}`,
-                          age: entry.age ? String(entry.age) : "",
-                          abv: String(entry.abv),
-                          nose: entry.nose,
-                          palate: entry.palate,
-                          finish_note: entry.finish,
-                          tasting_notes: "",
-                          price: priceNum ? String(priceNum) : "",
-                        });
-                        setAddMode("manual");
-                      }}
-                      className="w-full text-left px-4 py-3 rounded-lg bg-white/4 hover:bg-white/8 transition"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div>
-                          <p className="text-white text-sm font-medium">{entry.name}</p>
-                          <p className="text-white/40 text-xs mt-0.5">{entry.distillery} · {entry.region}, {entry.country}</p>
+                  {filteredEncyclopediaEntries.length === 0 ? (
+                    <div className="rounded-lg border border-white/10 bg-white/4 px-4 py-5 text-center">
+                      <p className="text-sm text-white/55">검색 결과가 없습니다.</p>
+                      <p className="text-xs text-white/35 mt-1">검색어 또는 카테고리를 바꿔보세요.</p>
+                      <button
+                        type="button"
+                        onClick={() => { setEncycSearch(""); setEncycCategory("전체"); }}
+                        className="mt-3 px-3 py-1.5 rounded-lg text-xs bg-white/8 text-white/70 hover:bg-white/12 transition"
+                      >
+                        필터 초기화
+                      </button>
+                    </div>
+                  ) : (
+                    filteredEncyclopediaEntries.map((entry) => (
+                      <button
+                        key={entry.id}
+                        onClick={() => {
+                          const priceNum = parseInt(entry.priceRange.replace(/[₩,]/g, "").split("–")[0]) || 0;
+                          setWhiskey({
+                            name: entry.name,
+                            type: CATEGORY_TO_TYPE[entry.category] ?? "Etc",
+                            region: `${entry.region}, ${entry.country}`,
+                            age: entry.age ? String(entry.age) : "",
+                            abv: String(entry.abv),
+                            nose: entry.nose,
+                            palate: entry.palate,
+                            finish_note: entry.finish,
+                            tasting_notes: "",
+                            price: priceNum ? String(priceNum) : "",
+                          });
+                          setAddMode("manual");
+                        }}
+                        className="w-full text-left px-4 py-3 rounded-lg bg-white/4 hover:bg-white/8 transition"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-white text-sm font-medium">{entry.name}</p>
+                            <p className="text-white/40 text-xs mt-0.5">{entry.distillery} · {entry.region}, {entry.country}</p>
+                          </div>
+                          <span className="text-indigo-300 text-xs flex-shrink-0">{entry.priceRange}</span>
                         </div>
-                        <span className="text-indigo-300 text-xs flex-shrink-0">{entry.priceRange}</span>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    ))
+                  )}
                 </div>
               </div>
             )}
