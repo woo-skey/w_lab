@@ -6,7 +6,7 @@ import Underline from "@tiptap/extension-underline";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Color } from "@tiptap/extension-color";
 import { Extension } from "@tiptap/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const FontSize = Extension.create({
   name: "fontSize",
@@ -54,6 +54,8 @@ export default function RichTextEditor({
   placeholder = "내용을 입력하세요",
   minHeight = "160px",
 }: RichTextEditorProps) {
+  const [selectedFontSize, setSelectedFontSize] = useState("");
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -79,6 +81,32 @@ export default function RichTextEditor({
       editor.commands.setContent("");
     }
   }, [value, editor]);
+
+  useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+
+    const syncSelectedFontSize = () => {
+      const fontSize = editor.getAttributes("textStyle").fontSize as string | null;
+      if (!fontSize || typeof fontSize !== "string") {
+        setSelectedFontSize("");
+        return;
+      }
+
+      const matched = fontSize.match(/^(\d+)(px)?$/);
+      setSelectedFontSize(matched?.[1] ?? "");
+    };
+
+    syncSelectedFontSize();
+    editor.on("selectionUpdate", syncSelectedFontSize);
+    editor.on("transaction", syncSelectedFontSize);
+    editor.on("update", syncSelectedFontSize);
+
+    return () => {
+      editor.off("selectionUpdate", syncSelectedFontSize);
+      editor.off("transaction", syncSelectedFontSize);
+      editor.off("update", syncSelectedFontSize);
+    };
+  }, [editor]);
 
   if (!editor) return null;
 
@@ -139,6 +167,7 @@ export default function RichTextEditor({
 
         {/* Font Size */}
         <select
+          value={selectedFontSize}
           onChange={(e) => {
             if (e.target.value) {
               editor.chain().focus().setFontSize(e.target.value + "px").run();
@@ -148,7 +177,6 @@ export default function RichTextEditor({
           }}
           className="text-xs px-1 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
           title="폰트 크기"
-          defaultValue=""
         >
           <option value="">크기</option>
           {FONT_SIZES.map((s) => (
