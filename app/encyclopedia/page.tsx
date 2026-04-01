@@ -383,21 +383,21 @@ export default function EncyclopediaPage() {
   const setF = (patch: Partial<typeof formData>) => setFormData((p) => ({ ...p, ...patch }));
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
+    <div className="tone min-h-screen">
+      <div className="tone-wrap max-w-6xl mx-auto px-4 py-8 md:py-12">
         {/* 헤더 */}
         <div className="flex items-start justify-between gap-4 mb-2">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">위스키 백과</h1>
+          <h1 className="section-title text-3xl md:text-4xl font-bold text-white">위스키 백과</h1>
           {userId && (
             <button
               onClick={openAdd}
-              className="flex-shrink-0 px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-xl hover:bg-indigo-500 transition"
+              className="cta flex-shrink-0 px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-xl hover:bg-indigo-500 transition"
             >
               + 위스키 추가
             </button>
           )}
         </div>
-        <p className="text-white/55 mb-8">카테고리별 대표 위스키 도감. 각 위스키의 특징과 테이스팅 노트를 확인해보세요.</p>
+        <p className="meta text-white/55 mb-8">카테고리별 대표 위스키 도감. 각 위스키의 특징과 테이스팅 노트를 확인해보세요.</p>
 
         {/* 검색 */}
         <input
@@ -405,7 +405,7 @@ export default function EncyclopediaPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="이름, 증류소, 지역으로 검색..."
-          className="glass-input w-full px-4 py-2.5 rounded-xl text-sm mb-4"
+          className="glass-input surface w-full px-4 py-2.5 rounded-xl text-sm mb-4"
         />
 
         {/* 카테고리 */}
@@ -416,7 +416,7 @@ export default function EncyclopediaPage() {
               onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition border ${
                 selectedCategory === cat
-                  ? "bg-indigo-500/80 text-white border-indigo-500/60"
+                  ? "chip bg-indigo-500/80 text-white border-indigo-500/60"
                   : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white/80"
               }`}
             >
@@ -426,7 +426,7 @@ export default function EncyclopediaPage() {
         </div>
 
         {/* 상세 필터 */}
-        <div className="glass-card rounded-2xl p-4 mb-6 space-y-3">
+        <div className="glass-card card rounded-2xl p-4 mb-6 space-y-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-white/60 text-xs font-medium">상세 필터</span>
             {activeCount > 0 && (
@@ -446,7 +446,7 @@ export default function EncyclopediaPage() {
                     onClick={() => toggleFilter(key, val)}
                     className={`px-3 py-1 rounded-lg text-xs transition border ${
                       active
-                        ? "bg-indigo-500/70 text-white border-indigo-500/50"
+                        ? "chip bg-indigo-500/70 text-white border-indigo-500/50"
                         : "bg-white/5 text-white/50 border-white/10 hover:bg-white/10 hover:text-white/70"
                     }`}
                   >
@@ -459,17 +459,17 @@ export default function EncyclopediaPage() {
         </div>
 
         {/* 결과 수 */}
-        <p className="text-white/35 text-xs mb-5">{filtered.length}개의 위스키</p>
+        <p className="meta text-white/35 text-xs mb-5">{filtered.length}개의 위스키</p>
 
         {/* 카드 그리드 */}
         {filtered.length === 0 ? (
-          <div className="text-center py-20 text-white/30">검색 결과가 없습니다.</div>
+          <div className="empty text-center py-20 text-white/30">검색 결과가 없습니다.</div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
             {filtered.map((w) => {
               const isOpen = expandedId === w.id;
               return (
-                <div key={w.id} className="glass-card rounded-2xl overflow-hidden transition-all duration-200">
+                <div key={w.id} className="glass-card card rounded-2xl overflow-hidden transition-all duration-200">
                   {/* 카드 헤더 — 클릭으로 토글 */}
                   <button
                     onClick={() => setExpandedId(isOpen ? null : w.id)}
@@ -520,7 +520,7 @@ export default function EncyclopediaPage() {
                       {/* 태그 */}
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         {w.tags.map((tag) => (
-                          <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/45">
+                          <span key={tag} className="chip text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/45">
                             {tag}
                           </span>
                         ))}
@@ -558,7 +558,7 @@ export default function EncyclopediaPage() {
           className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4"
           onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
         >
-          <div className="glass-card rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+          <div className="glass-card card rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h2 className="text-lg font-bold text-white">{editTarget ? "위스키 편집" : "위스키 추가"}</h2>
               <button onClick={() => setShowModal(false)} className="text-white/40 hover:text-white text-2xl leading-none">×</button>
@@ -568,79 +568,79 @@ export default function EncyclopediaPage() {
                 <div>
                   <label className="block text-xs text-white/50 mb-1">ID (선택, 비워두면 자동생성)</label>
                   <input value={formId} onChange={(e) => setFormId(e.target.value)}
-                    placeholder="예: glenlivet-12" className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                    placeholder="예: glenlivet-12" className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 </div>
               )}
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
                   <label className="block text-xs text-white/50 mb-1">이름 *</label>
                   <input required value={F.name} onChange={(e) => setF({ name: e.target.value })}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs text-white/50 mb-1">증류소</label>
                   <input value={F.distillery} onChange={(e) => setF({ distillery: e.target.value })}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs text-white/50 mb-1">지역</label>
                   <input value={F.region} onChange={(e) => setF({ region: e.target.value })}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs text-white/50 mb-1">국가</label>
                   <input value={F.country} onChange={(e) => setF({ country: e.target.value })}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs text-white/50 mb-1">카테고리</label>
                   <select value={F.category} onChange={(e) => setF({ category: e.target.value })}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm">
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm">
                     {["스카치", "아이리쉬", "버번/라이", "기타"].map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs text-white/50 mb-1">숙성 (년, 빈칸=NAS)</label>
                   <input type="number" value={F.age ?? ""} onChange={(e) => setF({ age: e.target.value ? Number(e.target.value) : null })}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs text-white/50 mb-1">도수 (ABV%)</label>
                   <input type="number" step="0.1" value={F.abv} onChange={(e) => setF({ abv: Number(e.target.value) })}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs text-white/50 mb-1">난이도</label>
                   <select value={F.difficulty} onChange={(e) => setF({ difficulty: e.target.value as WhiskeyEntry["difficulty"] })}
-                    className="glass-input w-full px-3 py-2 rounded-lg text-sm">
+                    className="glass-input surface w-full px-3 py-2 rounded-lg text-sm">
                     {["입문", "중급", "상급"].map((d) => <option key={d} value={d}>{d}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs text-white/50 mb-1">가격대</label>
                   <input value={F.priceRange} onChange={(e) => setF({ priceRange: e.target.value })}
-                    placeholder="₩40,000–55,000" className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                    placeholder="₩40,000–55,000" className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs text-white/50 mb-1">향 (Nose)</label>
                 <input value={F.nose} onChange={(e) => setF({ nose: e.target.value })}
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-white/50 mb-1">맛 (Palate)</label>
                 <input value={F.palate} onChange={(e) => setF({ palate: e.target.value })}
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-white/50 mb-1">피니쉬 (Finish)</label>
                 <input value={F.finish} onChange={(e) => setF({ finish: e.target.value })}
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-white/50 mb-1">설명</label>
                 <textarea value={F.description} onChange={(e) => setF({ description: e.target.value })}
-                  rows={3} className="glass-input w-full px-3 py-2 rounded-lg text-sm resize-none" />
+                  rows={3} className="glass-input surface w-full px-3 py-2 rounded-lg text-sm resize-none" />
               </div>
               <div>
                 <label className="block text-xs text-white/50 mb-1">태그 (쉼표로 구분)</label>
@@ -648,11 +648,11 @@ export default function EncyclopediaPage() {
                   value={F.tags.join(", ")}
                   onChange={(e) => setF({ tags: e.target.value.split(",").map((t) => t.trim()).filter(Boolean) })}
                   placeholder="싱글몰트, Speyside, 달콤함"
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm"
+                  className="glass-input surface w-full px-3 py-2 rounded-lg text-sm"
                 />
               </div>
               <button type="submit" disabled={saving}
-                className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-xl hover:bg-indigo-500 disabled:opacity-50 transition">
+                className="cta w-full py-2 bg-indigo-500/80 text-white font-medium rounded-xl hover:bg-indigo-500 disabled:opacity-50 transition">
                 {saving ? "저장 중..." : "저장"}
               </button>
             </form>

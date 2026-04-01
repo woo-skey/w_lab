@@ -234,18 +234,18 @@ export default function ArticlesPage() {
   const pagedArticles = filteredArticles.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">위스키 지식</h1>
-        <p className="text-white/55 mb-2">위스키에 대한 다양한 정보와 지식을 공유하세요.</p>
-        <p className="text-xs text-white/30 mb-8">카테고리 탭으로 원하는 주제의 글을 찾아보세요. 글을 클릭하면 본문과 댓글이 펼쳐집니다. 새 글 작성 시 이미지도 첨부할 수 있습니다.</p>
+    <div className="tone min-h-screen">
+      <div className="tone-wrap max-w-5xl mx-auto px-4 py-8 md:py-12">
+        <h1 className="section-title text-3xl md:text-4xl font-bold text-white mb-2">위스키 지식</h1>
+        <p className="meta text-white/55 mb-2">위스키에 대한 다양한 정보와 지식을 공유하세요.</p>
+        <p className="meta text-xs text-white/30 mb-8">카테고리 탭으로 원하는 주제의 글을 찾아보세요. 글을 클릭하면 본문과 댓글이 펼쳐집니다. 새 글 작성 시 이미지도 첨부할 수 있습니다.</p>
 
         {/* 카테고리 필터 */}
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map((cat) => (
             <button key={cat} onClick={() => { setSelectedCategory(cat); setPage(1); }}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                selectedCategory === cat ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
+                selectedCategory === cat ? "chip bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
               }`}>{cat}</button>
           ))}
         </div>
@@ -257,7 +257,7 @@ export default function ArticlesPage() {
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
             placeholder="글 제목 검색..."
-            className="glass-input flex-1 px-4 py-2 rounded-lg text-sm"
+            className="glass-input surface flex-1 px-4 py-2 rounded-lg text-sm"
           />
           <div className="flex gap-1">
             {(["latest", "popular"] as const).map((s) => (
@@ -278,11 +278,11 @@ export default function ArticlesPage() {
                 }
                 setShowForm(!showForm);
               }}
-              className="mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition">
+              className="cta mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition">
               {showForm ? "취소" : "✏️ 새 글 작성"}
             </button>
             {showForm && (
-              <div className="glass-card rounded-xl p-8 mb-8">
+              <div className="glass-card card rounded-xl p-8 mb-8">
                 <h2 className="text-xl font-bold text-white mb-6">새 글 작성</h2>
                 <form onSubmit={handleSubmitArticle} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -291,13 +291,13 @@ export default function ArticlesPage() {
                       <input type="text" value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="글의 제목을 입력하세요"
-                        className="glass-input w-full px-4 py-2 rounded-lg" />
+                        className="glass-input surface w-full px-4 py-2 rounded-lg" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-white/70 mb-1">카테고리</label>
                       <select value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="glass-input w-full px-4 py-2 rounded-lg">
+                        className="glass-input surface w-full px-4 py-2 rounded-lg">
                         {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                       </select>
                     </div>
@@ -321,13 +321,13 @@ export default function ArticlesPage() {
                       </div>
                     )}
                   </div>
-                  <button type="submit" className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">글 등록</button>
+                  <button type="submit" className="cta w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">글 등록</button>
                 </form>
               </div>
             )}
           </>
         ) : (
-          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+          <div className="glass-card card rounded-lg p-4 mb-6 text-center">
             <p className="text-white/60 mb-2">글을 작성하려면 로그인이 필요합니다.</p>
             <a href="/login" className="text-indigo-400 underline font-medium">로그인하기</a>
           </div>
@@ -336,9 +336,9 @@ export default function ArticlesPage() {
         {/* 글 목록 */}
         <div className="space-y-4">
           {loading ? (
-            <div className="text-center py-12 text-white/40">로딩 중...</div>
+            <div className="empty text-center py-12 text-white/40">로딩 중...</div>
           ) : filteredArticles.length === 0 ? (
-            <div className="text-center py-12 text-white/30">아직 글이 없습니다.</div>
+            <div className="empty text-center py-12 text-white/30">아직 글이 없습니다.</div>
           ) : (
             pagedArticles.map((article) => {
               const isExpanded = expandedId === article.id;
@@ -346,7 +346,7 @@ export default function ArticlesPage() {
               const isOwner = (article.author_id === userId || isAdmin);
 
               return (
-                <div key={article.id} className="glass-card rounded-xl overflow-hidden">
+                <div key={article.id} className="glass-card card rounded-xl overflow-hidden">
                   {/* 편집 모드 */}
                   {editingArticle?.id === article.id ? (
                     <div className="p-6">
@@ -356,13 +356,13 @@ export default function ArticlesPage() {
                             <label className="block text-sm font-medium text-white/70 mb-1">제목</label>
                             <input type="text" value={editingArticle.title}
                               onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
-                              className="glass-input w-full px-4 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-4 py-2 rounded-lg" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-white/70 mb-1">카테고리</label>
                             <select value={editingArticle.category}
                               onChange={(e) => setEditingArticle({ ...editingArticle, category: e.target.value })}
-                              className="glass-input w-full px-4 py-2 rounded-lg">
+                              className="glass-input surface w-full px-4 py-2 rounded-lg">
                               {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                             </select>
                           </div>
@@ -382,7 +382,7 @@ export default function ArticlesPage() {
                         <div className="flex justify-between items-start gap-4">
                           <button onClick={() => handleToggleArticle(article.id)} className="flex-1 text-left">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{article.category}</span>
+                              <span className="chip text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{article.category}</span>
                             </div>
                             <h3 className="text-lg font-bold text-white mb-1">{article.title}</h3>
                             <SafeHtml html={article.content} className="rich-content text-white/45 text-sm break-words line-clamp-3" />
@@ -450,9 +450,9 @@ export default function ArticlesPage() {
                                   onChange={(e) => setCommentText((prev) => ({ ...prev, [article.id]: e.target.value }))}
                                   onKeyDown={(e) => { if (e.key === "Enter") handleSubmitComment(article.id); }}
                                   placeholder="댓글을 입력하세요..."
-                                  className="glass-input flex-1 px-4 py-2 rounded-lg text-sm" />
+                                  className="glass-input surface flex-1 px-4 py-2 rounded-lg text-sm" />
                                 <button onClick={() => handleSubmitComment(article.id)}
-                                  className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">등록</button>
+                                  className="cta px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">등록</button>
                               </div>
                             ) : (
                               <p className="text-sm text-white/40">

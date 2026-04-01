@@ -120,6 +120,144 @@ html:not(.dark) .skeleton {
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
+/* Nocturne Medium shared tokens */
+.tone {
+  position: relative;
+  color: rgba(243, 246, 255, 0.92);
+}
+.tone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 600px at 10% -20%, rgba(88, 101, 175, 0.22), transparent 62%),
+    radial-gradient(900px 520px at 100% 0%, rgba(181, 137, 56, 0.14), transparent 62%),
+    linear-gradient(145deg, rgba(10, 16, 36, 0.96) 0%, rgba(13, 20, 44, 0.94) 35%, rgba(11, 17, 32, 0.96) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.tone-wrap {
+  position: relative;
+  z-index: 1;
+}
+.tone .section-title {
+  color: rgba(245, 247, 255, 0.96);
+  letter-spacing: 0.01em;
+}
+.tone .meta {
+  color: rgba(198, 209, 235, 0.72);
+}
+.tone .card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 18px 40px rgba(4, 8, 20, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+.tone .card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(216, 183, 122, 0.42);
+  box-shadow: 0 24px 46px rgba(4, 8, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.11);
+}
+.tone .surface {
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  background: rgba(8, 13, 28, 0.44) !important;
+  color: rgba(241, 245, 255, 0.93) !important;
+}
+.tone .surface::placeholder {
+  color: rgba(208, 217, 240, 0.42) !important;
+}
+.tone .surface:hover {
+  border-color: rgba(216, 183, 122, 0.34) !important;
+}
+.tone .surface:focus {
+  border-color: rgba(216, 183, 122, 0.6) !important;
+}
+.tone .cta {
+  border: 1px solid rgba(216, 183, 122, 0.42);
+  background: linear-gradient(135deg, rgba(88, 101, 175, 0.9), rgba(63, 84, 161, 0.88));
+  box-shadow: 0 10px 24px rgba(16, 27, 69, 0.36);
+}
+.tone .cta:hover {
+  border-color: rgba(216, 183, 122, 0.58);
+  background: linear-gradient(135deg, rgba(98, 111, 188, 0.96), rgba(77, 97, 176, 0.93));
+}
+.tone .chip {
+  border: 1px solid rgba(216, 183, 122, 0.38);
+  background: rgba(216, 183, 122, 0.13);
+  color: rgba(237, 214, 166, 0.96);
+}
+.tone .empty {
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(203, 213, 235, 0.62) !important;
+}
+.tone .skeleton {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.tone a:focus-visible,
+.tone button:focus-visible,
+.tone input:focus-visible,
+.tone textarea:focus-visible,
+.tone select:focus-visible {
+  outline: 2px solid rgba(216, 183, 122, 0.8);
+  outline-offset: 2px;
+}
+
+html:not(.dark) .tone {
+  color: rgba(17, 24, 39, 0.92);
+}
+html:not(.dark) .tone::before {
+  background:
+    radial-gradient(1200px 620px at 8% -24%, rgba(109, 124, 190, 0.18), transparent 62%),
+    radial-gradient(980px 520px at 100% 0%, rgba(171, 132, 58, 0.15), transparent 62%),
+    linear-gradient(145deg, rgba(246, 248, 255, 0.96) 0%, rgba(239, 243, 255, 0.95) 46%, rgba(247, 249, 255, 0.97) 100%);
+}
+html:not(.dark) .tone .section-title {
+  color: rgba(17, 24, 39, 0.95);
+}
+html:not(.dark) .tone .meta {
+  color: rgba(53, 70, 96, 0.72);
+}
+html:not(.dark) .tone .card {
+  border-color: rgba(17, 24, 39, 0.1);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.84), rgba(250, 252, 255, 0.72));
+  box-shadow: 0 12px 28px rgba(30, 41, 59, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+html:not(.dark) .tone .card:hover {
+  border-color: rgba(171, 132, 58, 0.35);
+  box-shadow: 0 16px 30px rgba(30, 41, 59, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+html:not(.dark) .tone .surface {
+  border-color: rgba(17, 24, 39, 0.14) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(17, 24, 39, 0.9) !important;
+}
+html:not(.dark) .tone .surface::placeholder {
+  color: rgba(71, 85, 105, 0.48) !important;
+}
+html:not(.dark) .tone .chip {
+  border-color: rgba(171, 132, 58, 0.36);
+  background: rgba(171, 132, 58, 0.12);
+  color: rgba(103, 76, 30, 0.92);
+}
+html:not(.dark) .tone .empty {
+  border-color: rgba(17, 24, 39, 0.14);
+  background: rgba(255, 255, 255, 0.58);
+  color: rgba(55, 65, 81, 0.72) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tone .card,
+  .tone .cta {
+    transition: none !important;
+    transform: none !important;
+  }
+  .tone .skeleton {
+    animation: none !important;
+  }
+}
+
 img.emoji {
   height: 1em;
   width: 1em;

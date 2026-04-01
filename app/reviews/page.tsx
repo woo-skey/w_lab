@@ -387,18 +387,18 @@ export default function ReviewsPage() {
 
   return (
     <>
-    <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">위스키 리뷰</h1>
-        <p className="text-white/55 mb-2">다양한 위스키를 평가하고 리뷰를 공유하세요.</p>
-        <p className="text-xs text-white/30 mb-8">위스키 카드를 클릭하면 리뷰 목록이 펼쳐집니다. 새 위스키 추가 후 리뷰 작성 버튼으로 별점과 테이스팅 노트를 남길 수 있습니다.</p>
+    <div className="tone min-h-screen">
+      <div className="tone-wrap max-w-5xl mx-auto px-4 py-8 md:py-12">
+        <h1 className="section-title text-3xl md:text-4xl font-bold text-white mb-2">위스키 리뷰</h1>
+        <p className="meta text-white/55 mb-2">다양한 위스키를 평가하고 리뷰를 공유하세요.</p>
+        <p className="meta text-xs text-white/30 mb-8">위스키 카드를 클릭하면 리뷰 목록이 펼쳐집니다. 새 위스키 추가 후 리뷰 작성 버튼으로 별점과 테이스팅 노트를 남길 수 있습니다.</p>
 
         {/* 타입 필터 */}
         <div className="flex flex-wrap gap-2 mb-8">
           {WHISKEY_TYPES.map((type) => (
             <button key={type} onClick={() => { setSelectedType(type); setPage(1); }}
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                selectedType === type ? "bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
+                selectedType === type ? "chip bg-indigo-500/80 text-white" : "bg-white/5 text-white/60 border border-white/10 hover:border-indigo-400/50"
               }`}
             >
               {type}
@@ -416,7 +416,7 @@ export default function ReviewsPage() {
               onFocus={() => setShowSearchDrop(true)}
               onBlur={() => setTimeout(() => setShowSearchDrop(false), 150)}
               placeholder="위스키 이름 검색..."
-              className="glass-input w-full px-4 py-2 rounded-lg text-sm pr-8"
+              className="glass-input surface w-full px-4 py-2 rounded-lg text-sm pr-8"
             />
             {searchQuery && (
               <button
@@ -431,7 +431,7 @@ export default function ReviewsPage() {
                 .slice(0, 6);
               if (!suggestions.length) return null;
               return (
-                <div className="absolute top-full left-0 right-0 mt-1 glass-card rounded-xl overflow-hidden z-30 shadow-xl">
+                <div className="absolute top-full left-0 right-0 mt-1 glass-card card rounded-xl overflow-hidden z-30 shadow-xl">
                   {suggestions.map((w) => (
                     <button key={w.id} onMouseDown={(e) => e.preventDefault()}
                       onClick={() => { setSearchQuery(w.name); setShowSearchDrop(false); setPage(1); }}
@@ -464,11 +464,11 @@ export default function ReviewsPage() {
               }
               setShowAddForm(!showAddForm);
             }}
-            className="mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition">
+            className="cta mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition">
             {showAddForm ? "취소" : "🥃 새 위스키 추가"}
           </button>
         ) : (
-          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+          <div className="glass-card card rounded-lg p-4 mb-6 text-center">
             <p className="text-white/60 mb-2">위스키 추가 및 리뷰 작성은 로그인이 필요합니다.</p>
             <a href="/login" className="text-indigo-400 underline font-medium text-sm">로그인하기</a>
           </div>
@@ -476,7 +476,7 @@ export default function ReviewsPage() {
 
         {/* 위스키 추가 폼 */}
         {showAddForm && (
-          <div className="glass-card rounded-xl p-6 mb-8">
+          <div className="glass-card card rounded-xl p-6 mb-8">
             <h2 className="text-xl font-bold text-white mb-4">새 위스키 추가</h2>
 
             {/* 탭 */}
@@ -486,7 +486,7 @@ export default function ReviewsPage() {
                   key={mode}
                   onClick={() => setAddMode(mode)}
                   className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
-                    addMode === mode ? "bg-indigo-500/80 text-white" : "text-white/50 hover:text-white/70"
+                    addMode === mode ? "chip bg-indigo-500/80 text-white" : "text-white/50 hover:text-white/70"
                   }`}
                 >
                   {mode === "encyclopedia" ? "백과에서 가져오기" : "직접 입력"}
@@ -502,7 +502,7 @@ export default function ReviewsPage() {
                   value={encycSearch}
                   onChange={(e) => setEncycSearch(e.target.value)}
                   placeholder="위스키 이름으로 검색..."
-                  className="glass-input w-full px-4 py-2 rounded-lg text-sm mb-3"
+                  className="glass-input surface w-full px-4 py-2 rounded-lg text-sm mb-3"
                 />
                 <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
                   {ENCYCLOPEDIA_WHISKEYS.filter((e) =>
@@ -551,12 +551,12 @@ export default function ReviewsPage() {
                     <label className="block text-sm font-medium text-white/70 mb-1">이름 *</label>
                     <input type="text" value={whiskey.name} onChange={(e) => setWhiskey({ ...whiskey, name: e.target.value })}
                       placeholder="예: Glenmorangie 10" required
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/70 mb-1">타입 *</label>
                     <select value={whiskey.type} onChange={(e) => setWhiskey({ ...whiskey, type: e.target.value })}
-                      className="glass-input w-full px-4 py-2 rounded-lg">
+                      className="glass-input surface w-full px-4 py-2 rounded-lg">
                       {WHISKEY_TYPES.filter((t) => t !== "전체").map((t) => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </div>
@@ -564,25 +564,25 @@ export default function ReviewsPage() {
                     <label className="block text-sm font-medium text-white/70 mb-1">지역</label>
                     <input type="text" value={whiskey.region} onChange={(e) => setWhiskey({ ...whiskey, region: e.target.value })}
                       placeholder="예: Highland"
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/70 mb-1">숙성 (년)</label>
                     <input type="number" value={whiskey.age} onChange={(e) => setWhiskey({ ...whiskey, age: e.target.value })}
                       placeholder="10"
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/70 mb-1">도수 (%)</label>
                     <input type="number" step="0.1" value={whiskey.abv} onChange={(e) => setWhiskey({ ...whiskey, abv: e.target.value })}
                       placeholder="43.0"
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/70 mb-1">가격 (₩)</label>
                     <input type="number" value={whiskey.price} onChange={(e) => setWhiskey({ ...whiskey, price: e.target.value })}
                       placeholder="50000"
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -591,28 +591,28 @@ export default function ReviewsPage() {
                     <input type="text" value={whiskey.nose}
                       onChange={(e) => setWhiskey({ ...whiskey, nose: e.target.value })}
                       placeholder="예: 바닐라, 꿀, 시트러스"
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛 (Palate)</label>
                     <input type="text" value={whiskey.palate}
                       onChange={(e) => setWhiskey({ ...whiskey, palate: e.target.value })}
                       placeholder="예: 스모키, 오크, 카라멜"
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬 (Finish)</label>
                     <input type="text" value={whiskey.finish_note}
                       onChange={(e) => setWhiskey({ ...whiskey, finish_note: e.target.value })}
                       placeholder="예: 길고 따뜻한 여운"
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>리뷰</label>
                     <input type="text" value={whiskey.tasting_notes}
                       onChange={(e) => setWhiskey({ ...whiskey, tasting_notes: e.target.value })}
                       placeholder="기타 특징"
-                      className="glass-input w-full px-4 py-2 rounded-lg" />
+                      className="glass-input surface w-full px-4 py-2 rounded-lg" />
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -620,7 +620,7 @@ export default function ReviewsPage() {
                     className="px-4 py-2 text-sm text-white/50 hover:text-white/70 bg-white/5 rounded-lg transition">
                     ← 목록으로
                   </button>
-                  <button type="submit" className="flex-1 py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">
+                  <button type="submit" className="cta flex-1 py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">
                     위스키 추가
                   </button>
                 </div>
@@ -634,7 +634,7 @@ export default function ReviewsPage() {
           {loading ? (
             <div className="grid grid-cols-2 gap-3 md:gap-4 items-start">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="glass-card rounded-xl p-4 space-y-3">
+                <div key={i} className="glass-card card rounded-xl p-4 space-y-3">
                   <div className="skeleton h-5 w-3/4 rounded" />
                   <div className="skeleton h-3 w-1/3 rounded" />
                   <div className="skeleton h-3 w-full rounded mt-1" />
@@ -643,7 +643,7 @@ export default function ReviewsPage() {
               ))}
             </div>
           ) : filteredWhiskeys.length === 0 ? (
-            <div className="text-center py-12 text-white/40">아직 위스키가 없습니다.</div>
+            <div className="empty text-center py-12 text-white/40">아직 위스키가 없습니다.</div>
           ) : (
             <div className="grid grid-cols-2 gap-3 md:gap-4 items-start">
             {pagedWhiskeys.map((w) => {
@@ -655,7 +655,7 @@ export default function ReviewsPage() {
                 : null;
 
               return (
-                <div key={w.id} className="glass-card rounded-xl overflow-hidden">
+                <div key={w.id} className="glass-card card rounded-xl overflow-hidden">
                   {/* 위스키 헤더 */}
                   {editingWhiskey?.id === w.id ? (
                     <div className="p-6">
@@ -665,13 +665,13 @@ export default function ReviewsPage() {
                             <label className="block text-sm font-medium text-white/70 mb-1">이름</label>
                             <input type="text" value={editingWhiskey.name}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, name: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-white/70 mb-1">타입</label>
                             <select value={editingWhiskey.type}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, type: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg">
+                              className="glass-input surface w-full px-3 py-2 rounded-lg">
                               {WHISKEY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                             </select>
                           </div>
@@ -679,25 +679,25 @@ export default function ReviewsPage() {
                             <label className="block text-sm font-medium text-white/70 mb-1">지역</label>
                             <input type="text" value={editingWhiskey.region || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, region: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-white/70 mb-1">숙성 (년)</label>
                             <input type="number" value={editingWhiskey.age || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, age: parseInt(e.target.value) || 0 })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-white/70 mb-1">도수 (%)</label>
                             <input type="number" step="0.1" value={editingWhiskey.abv || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, abv: parseFloat(e.target.value) || 0 })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-white/70 mb-1">가격 (₩)</label>
                             <input type="number" value={editingWhiskey.price || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, price: parseFloat(e.target.value) || 0 })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
@@ -705,25 +705,25 @@ export default function ReviewsPage() {
                             <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>향</label>
                             <input type="text" value={editingWhiskey.nose || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, nose: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛</label>
                             <input type="text" value={editingWhiskey.palate || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, palate: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬</label>
                             <input type="text" value={editingWhiskey.finish_note || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, finish_note: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>리뷰</label>
                             <input type="text" value={editingWhiskey.tasting_notes || ""}
                               onChange={(e) => setEditingWhiskey({ ...editingWhiskey, tasting_notes: e.target.value })}
-                              className="glass-input w-full px-3 py-2 rounded-lg" />
+                              className="glass-input surface w-full px-3 py-2 rounded-lg" />
                           </div>
                         </div>
                         <div className="flex gap-2">
@@ -788,7 +788,7 @@ export default function ReviewsPage() {
                                 <span className="text-sm font-medium text-white/70">평점</span>
                                 <select value={reviewForm.rating}
                                   onChange={(e) => setReviewForm({ ...reviewForm, rating: parseInt(e.target.value) })}
-                                  className="glass-input px-2 py-1 rounded text-sm">
+                                  className="glass-input surface px-2 py-1 rounded text-sm">
                                   {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((r) => (
                                     <option key={r} value={r}>{r}/10</option>
                                   ))}
@@ -806,28 +806,28 @@ export default function ReviewsPage() {
                                   <input type="text" value={reviewForm.nose}
                                     onChange={(e) => setReviewForm({ ...reviewForm, nose: e.target.value })}
                                     placeholder="예: 바닐라, 꿀, 시트러스"
-                                    className="glass-input w-full px-3 py-2 rounded-lg" />
+                                    className="glass-input surface w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
                                   <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛 (Palate)</label>
                                   <input type="text" value={reviewForm.palate}
                                     onChange={(e) => setReviewForm({ ...reviewForm, palate: e.target.value })}
                                     placeholder="예: 스모키, 오크, 카라멜"
-                                    className="glass-input w-full px-3 py-2 rounded-lg" />
+                                    className="glass-input surface w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
                                   <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬 (Finish)</label>
                                   <input type="text" value={reviewForm.finish_note}
                                     onChange={(e) => setReviewForm({ ...reviewForm, finish_note: e.target.value })}
                                     placeholder="예: 길고 따뜻한 여운"
-                                    className="glass-input w-full px-3 py-2 rounded-lg" />
+                                    className="glass-input surface w-full px-3 py-2 rounded-lg" />
                                 </div>
                                 <div>
                                   <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>비고</label>
                                   <input type="text" value={reviewForm.remarks}
                                     onChange={(e) => setReviewForm({ ...reviewForm, remarks: e.target.value })}
                                     placeholder="기타 메모"
-                                    className="glass-input w-full px-3 py-2 rounded-lg" />
+                                    className="glass-input surface w-full px-3 py-2 rounded-lg" />
                                 </div>
                               </div>
                               <div className="flex gap-2">
@@ -897,7 +897,7 @@ export default function ReviewsPage() {
                                       <span className="text-sm font-medium text-white/70">평점</span>
                                       <select value={editingReview.rating}
                                         onChange={(e) => setEditingReview({ ...editingReview, rating: parseInt(e.target.value) })}
-                                        className="glass-input px-2 py-1 rounded text-sm">
+                                        className="glass-input surface px-2 py-1 rounded text-sm">
                                         {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((r) => (
                                           <option key={r} value={r}>{r}/10</option>
                                         ))}
@@ -915,32 +915,32 @@ export default function ReviewsPage() {
                                         <input type="text" value={editingReview.nose || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, nose: e.target.value })}
                                           placeholder="예: 바닐라, 꿀, 시트러스"
-                                          className="glass-input w-full px-3 py-2 rounded-lg" />
+                                          className="glass-input surface w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
                                         <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>맛 (Palate)</label>
                                         <input type="text" value={editingReview.palate || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, palate: e.target.value })}
                                           placeholder="예: 스모키, 오크, 카라멜"
-                                          className="glass-input w-full px-3 py-2 rounded-lg" />
+                                          className="glass-input surface w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
                                         <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>피니쉬 (Finish)</label>
                                         <input type="text" value={editingReview.finish_note || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, finish_note: e.target.value })}
                                           placeholder="예: 길고 따뜻한 여운"
-                                          className="glass-input w-full px-3 py-2 rounded-lg" />
+                                          className="glass-input surface w-full px-3 py-2 rounded-lg" />
                                       </div>
                                       <div>
                                         <label className="block text-xs font-medium text-white/70 mb-1"><span className="text-indigo-400/70 mr-1">·</span>비고</label>
                                         <input type="text" value={editingReview.remarks || ""}
                                           onChange={(e) => setEditingReview({ ...editingReview, remarks: e.target.value })}
                                           placeholder="기타 메모"
-                                          className="glass-input w-full px-3 py-2 rounded-lg" />
+                                          className="glass-input surface w-full px-3 py-2 rounded-lg" />
                                       </div>
                                     </div>
                                     <div className="flex gap-2">
-                                      <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
+                                      <button type="submit" className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
                                         저장
                                       </button>
                                       <button type="button" onClick={() => setEditingReview(null)}
@@ -1040,9 +1040,9 @@ export default function ReviewsPage() {
                                               onChange={(e) => setCommentText((prev) => ({ ...prev, [r.id]: e.target.value }))}
                                               onKeyDown={(e) => { if (e.key === "Enter") handleAddComment(r.id); }}
                                               placeholder="댓글 입력..."
-                                              className="glass-input flex-1 px-3 py-1.5 rounded-lg text-xs" />
+                                              className="glass-input surface flex-1 px-3 py-1.5 rounded-lg text-xs" />
                                             <button onClick={() => handleAddComment(r.id)}
-                                              className="px-3 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">
+                                              className="cta px-3 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">
                                               등록
                                             </button>
                                           </div>
@@ -1110,7 +1110,7 @@ export default function ReviewsPage() {
       return (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-2 sm:px-4"
           onClick={(e) => { if (e.target === e.currentTarget) setCompareList([]); }}>
-          <div className="glass-card rounded-2xl w-full max-w-2xl p-4 sm:p-6 overflow-y-auto max-h-[92vh]">
+          <div className="glass-card card rounded-2xl w-full max-w-2xl p-4 sm:p-6 overflow-y-auto max-h-[92vh]">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-bold text-white">위스키 비교</h2>
               <button onClick={() => setCompareList([])} className="text-white/40 hover:text-white text-xl">✕</button>

@@ -128,18 +128,18 @@ export default function BarsPage() {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+    <div className="tone min-h-screen">
+      <div className="tone-wrap max-w-5xl mx-auto px-4 py-8 md:py-12">
         {/* 헤더 */}
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Bar 추천</h1>
-        <p className="text-white/55 mb-2">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
-        <p className="text-xs text-white/30 mb-8">Bar 추가하기 버튼을 눌러 바 이름, 링크, 메모를 입력하면 목록에 추가됩니다. 본인이 등록한 Bar는 편집·삭제할 수 있습니다.</p>
+        <h1 className="section-title text-3xl md:text-4xl font-bold text-white mb-2">Bar 추천</h1>
+        <p className="meta text-white/55 mb-2">좋아하는 바를 추천하고 다른 사람들의 추천을 확인해보세요.</p>
+        <p className="meta text-xs text-white/30 mb-8">Bar 추가하기 버튼을 눌러 바 이름, 링크, 메모를 입력하면 목록에 추가됩니다. 본인이 등록한 Bar는 편집·삭제할 수 있습니다.</p>
 
         <div className="flex gap-3 mb-6 flex-wrap items-center">
           {userId && (
             <button
               onClick={() => setShowModal(true)}
-              className="px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition flex-shrink-0"
+              className="cta px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition flex-shrink-0"
             >
               🍸 Bar 추가하기
             </button>
@@ -149,11 +149,11 @@ export default function BarsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="바 이름으로 검색..."
-            className="glass-input flex-1 min-w-[160px] px-4 py-2 rounded-lg text-sm"
+            className="glass-input surface flex-1 min-w-[160px] px-4 py-2 rounded-lg text-sm"
           />
         </div>
         {!userId && (
-          <div className="glass-card rounded-lg p-4 mb-4 text-center">
+          <div className="glass-card card rounded-lg p-4 mb-4 text-center">
             <p className="text-white/60 mb-2">바를 추천하려면 로그인이 필요합니다.</p>
             <Link href="/login" className="text-indigo-400 underline font-medium">로그인하기</Link>
           </div>
@@ -163,7 +163,7 @@ export default function BarsPage() {
         {loading ? (
           <div className="grid md:grid-cols-2 gap-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="glass-card rounded-xl p-6 space-y-3">
+              <div key={i} className="glass-card card rounded-xl p-6 space-y-3">
                 <div className="skeleton h-5 w-2/3 rounded" />
                 <div className="skeleton h-3 w-1/2 rounded" />
                 <div className="skeleton h-3 w-full rounded mt-1" />
@@ -172,24 +172,24 @@ export default function BarsPage() {
             ))}
           </div>
         ) : bars.length === 0 ? (
-          <div className="text-center py-12 text-white/40">아직 추천된 바가 없습니다.</div>
+          <div className="empty text-center py-12 text-white/40">아직 추천된 바가 없습니다.</div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
             {bars.filter((bar) => !searchQuery.trim() || bar.bar_name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && searchQuery.trim() ? (
-              <div className="col-span-2 text-center py-12 text-white/40">&ldquo;{searchQuery}&rdquo;에 해당하는 바가 없습니다.</div>
+              <div className="empty col-span-2 text-center py-12 text-white/40">&ldquo;{searchQuery}&rdquo;에 해당하는 바가 없습니다.</div>
             ) : null}
             {bars.filter((bar) => !searchQuery.trim() || bar.bar_name.toLowerCase().includes(searchQuery.toLowerCase())).map((bar) => (
-              <div key={bar.id} className="glass-card rounded-xl p-6 hover:bg-white/8 transition cursor-pointer"
+              <div key={bar.id} className="glass-card card rounded-xl p-6 hover:bg-white/8 transition cursor-pointer"
                 onClick={() => !editingBar && router.push(`/bars/${bar.id}`)}>
                 {editingBar?.id === bar.id ? (
                   <form onSubmit={handleEdit} className="space-y-3">
                     <input type="text" value={editingBar.bar_name}
                       onChange={(e) => setEditingBar({ ...editingBar, bar_name: e.target.value })}
-                      className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                      className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                     <input type="url" value={editingBar.link || ""}
                       onChange={(e) => setEditingBar({ ...editingBar, link: e.target.value })}
                       placeholder="링크"
-                      className="glass-input w-full px-3 py-2 rounded-lg text-sm" />
+                      className="glass-input surface w-full px-3 py-2 rounded-lg text-sm" />
                     <RichTextEditor
                       value={editingBar.notes || ""}
                       onChange={(html) => setEditingBar({ ...editingBar, notes: html })}
@@ -197,7 +197,7 @@ export default function BarsPage() {
                       minHeight="100px"
                     />
                     <div className="flex gap-2">
-                      <button type="submit" className="px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">저장</button>
+                      <button type="submit" className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">저장</button>
                       <button type="button" onClick={() => setEditingBar(null)} className="px-4 py-1.5 bg-white/8 text-white/70 text-sm rounded-lg hover:bg-white/12 transition">취소</button>
                     </div>
                   </form>
@@ -246,7 +246,7 @@ export default function BarsPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4"
           onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}>
-          <div className="glass-card rounded-2xl w-full max-w-md p-8">
+          <div className="glass-card card rounded-2xl w-full max-w-md p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white">Bar 추천하기</h2>
               <button onClick={() => setShowModal(false)} className="text-white/40 hover:text-white text-2xl leading-none">×</button>
@@ -257,14 +257,14 @@ export default function BarsPage() {
                 <input type="text" value={formData.bar_name}
                   onChange={(e) => setFormData({ ...formData, bar_name: e.target.value })}
                   placeholder="예: The Macallan Lounge"
-                  className="glass-input w-full px-4 py-2 rounded-lg" />
+                  className="glass-input surface w-full px-4 py-2 rounded-lg" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1">링크</label>
                 <input type="url" value={formData.link}
                   onChange={(e) => setFormData({ ...formData, link: e.target.value })}
                   placeholder="https://example.com"
-                  className="glass-input w-full px-4 py-2 rounded-lg" />
+                  className="glass-input surface w-full px-4 py-2 rounded-lg" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1">비고</label>
@@ -277,7 +277,7 @@ export default function BarsPage() {
               </div>
               {error && <p className="text-red-400 text-sm">{error}</p>}
               <button type="submit" disabled={submitting}
-                className="w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
+                className="cta w-full py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
                 {submitting ? "추천 중..." : "Bar 추천하기"}
               </button>
             </form>

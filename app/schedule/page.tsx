@@ -271,23 +271,23 @@ export default function SchedulePage() {
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">일정 맞추기</h1>
-        <p className="text-white/55 mb-2">달력에서 가능한 날을 클릭해서 멤버들과 일정을 조율하세요.</p>
-        <p className="text-xs text-white/30 mb-8">새 일정 만들기로 이름을 정하고, 달력에서 참여 가능한 날짜를 클릭하면 됩니다. 여러 명이 같은 일정에 참여해 날짜를 선택하면 최다 가능 날짜가 자동으로 표시됩니다.</p>
+    <div className="tone min-h-screen">
+      <div className="tone-wrap max-w-5xl mx-auto px-4 py-8 md:py-12">
+        <h1 className="section-title text-3xl md:text-4xl font-bold text-white mb-2">일정 맞추기</h1>
+        <p className="meta text-white/55 mb-2">달력에서 가능한 날을 클릭해서 멤버들과 일정을 조율하세요.</p>
+        <p className="meta text-xs text-white/30 mb-8">새 일정 만들기로 이름을 정하고, 달력에서 참여 가능한 날짜를 클릭하면 됩니다. 여러 명이 같은 일정에 참여해 날짜를 선택하면 최다 가능 날짜가 자동으로 표시됩니다.</p>
 
         {/* 새 일정 버튼 */}
         {userId && isMember && !isAdmin ? (
           <>
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition"
+              className="cta mb-6 px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition"
             >
               {showCreateForm ? "취소" : "📅 새 일정 만들기"}
             </button>
             {showCreateForm && (
-              <div className="glass-card rounded-xl p-6 mb-6">
+              <div className="glass-card card rounded-xl p-6 mb-6">
                 <h2 className="text-lg font-bold text-white mb-4">새 일정 만들기</h2>
                 <form onSubmit={handleCreateSchedule} className="flex gap-3">
                   <input
@@ -295,9 +295,9 @@ export default function SchedulePage() {
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="일정 이름을 입력하세요"
-                    className="glass-input flex-1 px-4 py-2 rounded-lg"
+                    className="glass-input surface flex-1 px-4 py-2 rounded-lg"
                   />
-                  <button type="submit" className="px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition font-medium">
+                  <button type="submit" className="cta px-6 py-2 bg-indigo-500/80 text-white rounded-lg hover:bg-indigo-500 transition font-medium">
                     생성
                   </button>
                 </form>
@@ -305,12 +305,12 @@ export default function SchedulePage() {
             )}
           </>
         ) : !userId ? (
-          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+          <div className="glass-card card rounded-lg p-4 mb-6 text-center">
             <p className="text-white/60 mb-2">일정을 만들려면 로그인이 필요합니다.</p>
             <a href="/login" className="text-indigo-400 underline font-medium text-sm">로그인하기</a>
           </div>
         ) : !isMember ? (
-          <div className="glass-card rounded-lg p-4 mb-6 text-center">
+          <div className="glass-card card rounded-lg p-4 mb-6 text-center">
             <p className="text-white/60 text-sm">w_lab 일반 회원(관리자 제외)만 일정을 만들고 투표할 수 있습니다.</p>
           </div>
         ) : null}
@@ -318,7 +318,7 @@ export default function SchedulePage() {
         <div className="grid lg:grid-cols-4 gap-6">
           {/* 사이드바: 일정 목록 */}
           <div className="lg:col-span-1 space-y-4">
-            <div className="glass-card rounded-xl p-4">
+            <div className="glass-card card rounded-xl p-4">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-bold text-white">일정 목록</h2>
               </div>
@@ -351,7 +351,7 @@ export default function SchedulePage() {
 
             {/* 추천 날짜 */}
             {bestDates.length > 0 && (
-              <div className="glass-card rounded-xl p-4">
+              <div className="glass-card card rounded-xl p-4">
                 <h2 className="font-bold text-white mb-3">🏆 최다 가능 날짜</h2>
                 <div className="space-y-2">
                   {bestDates.map(([date, info], idx) => {
@@ -396,7 +396,7 @@ export default function SchedulePage() {
           {/* 메인: 달력 */}
           <div className="lg:col-span-3">
             {selectedSchedule ? (
-              <div className="glass-card rounded-xl p-3 md:p-6">
+              <div className="glass-card card rounded-xl p-3 md:p-6">
                 {/* 확정 날짜 배너 */}
                 {selectedSchedule.confirmed_date && (
                   <div className="mb-4 px-4 py-3 rounded-xl flex items-center gap-3" style={{ background: "rgba(234,179,8,0.12)", border: "1px solid rgba(234,179,8,0.3)" }}>
@@ -579,7 +579,7 @@ export default function SchedulePage() {
                 </div>
               </div>
             ) : (
-              <div className="glass-card rounded-xl p-12 text-center text-white/40">
+              <div className="glass-card card empty rounded-xl p-12 text-center text-white/40">
                 왼쪽에서 일정을 선택하거나 새 일정을 만들어보세요.
               </div>
             )}
@@ -588,7 +588,7 @@ export default function SchedulePage() {
 
         {/* 관리자 전용: 계정별 선택 날짜 */}
         {isAdmin && selectedSchedule && userDateMap.length > 0 && (
-          <div className="mt-8 glass-card rounded-xl p-6">
+          <div className="mt-8 glass-card card rounded-xl p-6">
             <h2 className="text-lg font-bold text-white mb-1">🔐 관리자 — 계정별 가능 날짜</h2>
             <p className="text-xs text-white/30 mb-5">각 유저가 선택한 날짜 목록입니다.</p>
             <div className="overflow-x-auto">
