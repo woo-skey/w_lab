@@ -80,6 +80,7 @@ export default function ReviewsPage() {
   // 위스키 추가 폼
   const [addMode, setAddMode] = useState<"encyclopedia" | "manual">("encyclopedia");
   const [encycSearch, setEncycSearch] = useState("");
+  const [encycCategory, setEncycCategory] = useState<"전체" | "스카치" | "아이리쉬" | "버번/라이" | "기타">("전체");
   const [whiskey, setWhiskey] = useState({ name: "", type: "Scotch", region: "", age: "", abv: "", nose: "", palate: "", finish_note: "", tasting_notes: "", price: "" });
 
   // 리뷰 작성 폼
@@ -460,6 +461,7 @@ export default function ReviewsPage() {
               if (!showAddForm) {
                 setAddMode("encyclopedia");
                 setEncycSearch("");
+                setEncycCategory("전체");
                 setWhiskey({ name: "", type: selectedType !== "전체" ? selectedType : "Scotch", region: "", age: "", abv: "", nose: "", palate: "", finish_note: "", tasting_notes: "", price: "" });
               }
               setShowAddForm(!showAddForm);
@@ -504,12 +506,31 @@ export default function ReviewsPage() {
                   placeholder="위스키 이름으로 검색..."
                   className="glass-input surface w-full px-4 py-2 rounded-lg text-sm mb-3"
                 />
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {(["전체", "스카치", "아이리쉬", "버번/라이", "기타"] as const).map((category) => (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => setEncycCategory(category)}
+                      className={`px-3 py-1 rounded-full text-xs border transition ${
+                        encycCategory === category
+                          ? "chip bg-indigo-500/80 text-white border-indigo-500/70"
+                          : "bg-white/5 text-white/60 border-white/10 hover:bg-white/8 hover:text-white/80"
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
                 <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
-                  {ENCYCLOPEDIA_WHISKEYS.filter((e) =>
-                    !encycSearch.trim() ||
-                    e.name.toLowerCase().includes(encycSearch.toLowerCase()) ||
-                    e.distillery.toLowerCase().includes(encycSearch.toLowerCase())
-                  ).map((entry) => (
+                  {ENCYCLOPEDIA_WHISKEYS.filter((e) => {
+                    const matchCategory = encycCategory === "전체" || e.category === encycCategory;
+                    const matchSearch =
+                      !encycSearch.trim() ||
+                      e.name.toLowerCase().includes(encycSearch.toLowerCase()) ||
+                      e.distillery.toLowerCase().includes(encycSearch.toLowerCase());
+                    return matchCategory && matchSearch;
+                  }).map((entry) => (
                     <button
                       key={entry.id}
                       onClick={() => {
