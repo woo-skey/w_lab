@@ -184,7 +184,10 @@ export default function Home() {
                 <span className="nr-display-line nr-display-line-fixed">오늘의 위스키 저널</span>
               </>
             ) : (
-              "위스키를 더 깊고 우아하게 기록하는 커뮤니티"
+              <>
+                <span className="nr-display-line nr-display-line-fixed">위스키를 더 깊고 우아하게</span>
+                <span className="nr-display-line nr-display-line-fixed">기록하는 커뮤니티</span>
+              </>
             )}
           </h1>
           <p className="nr-body mt-4">
