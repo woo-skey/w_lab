@@ -76,12 +76,13 @@ export default function Home() {
   useEffect(() => {
     const id = localStorage.getItem("userId");
     const name = localStorage.getItem("userName");
-    setLoggedIn(!!id);
+    const isLoggedIn = !!id;
+    setLoggedIn(isLoggedIn);
     if (name) setUserName(name);
-    loadDashboard();
+    loadDashboard(isLoggedIn);
   }, []);
 
-  const loadDashboard = async () => {
+  const loadDashboard = async (isLoggedIn: boolean) => {
     try {
       const [reviewsRes, schedulesRes, whiskeyRatingsRes, reviewCountRes, memberCountRes, whiskeyCountRes] = await Promise.all([
         supabase
@@ -89,13 +90,15 @@ export default function Home() {
           .select("id, rating, review_text, created_at, users(name), whiskeys(name)")
           .order("created_at", { ascending: false })
           .limit(5),
-        supabase
-          .from("schedules")
-          .select("id, name, confirmed_date")
-          .not("confirmed_date", "is", null)
-          .gte("confirmed_date", new Date().toISOString().slice(0, 10))
-          .order("confirmed_date", { ascending: true })
-          .limit(1),
+        isLoggedIn
+          ? supabase
+              .from("schedules")
+              .select("id, name, confirmed_date")
+              .not("confirmed_date", "is", null)
+              .gte("confirmed_date", new Date().toISOString().slice(0, 10))
+              .order("confirmed_date", { ascending: true })
+              .limit(1)
+          : Promise.resolve({ data: [] as ConfirmedSchedule[] }),
         supabase
           .from("reviews")
           .select("whiskey_id, rating, whiskeys(id, name, type)"),
@@ -112,7 +115,9 @@ export default function Home() {
       ]);
 
       setRecentReviews((reviewsRes.data || []) as unknown as RecentReview[]);
-      setConfirmedSchedule((schedulesRes.data?.[0] as ConfirmedSchedule | undefined) || null);
+      setConfirmedSchedule(
+        isLoggedIn ? ((schedulesRes.data?.[0] as ConfirmedSchedule | undefined) || null) : null
+      );
       setMetrics({
         totalReviews: reviewCountRes.count || 0,
         totalMembers: memberCountRes.count || 0,
@@ -309,43 +314,55 @@ export default function Home() {
             )}
           </article>
 
-          <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "300ms" }}>
-            <header className="flex items-center justify-between gap-3 mb-4">
-              <h2 className="nr-section-title">This Week&apos;s Gathering</h2>
-              <Link
-                href="/schedule"
-                className="nr-section-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d8b77a]/70 rounded"
-              >
-                일정 보러가기
-              </Link>
-            </header>
+          {loggedIn ? (
+            <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "300ms" }}>
+              <header className="flex items-center justify-between gap-3 mb-4">
+                <h2 className="nr-section-title">This Week&apos;s Gathering</h2>
+                <Link
+                  href="/schedule"
+                  className="nr-section-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d8b77a]/70 rounded"
+                >
+                  일정 보러가기
+                </Link>
+              </header>
 
-            {loading ? (
-              <div className="nr-skeleton h-24 rounded-xl" aria-label="일정 로딩 중" />
-            ) : confirmedSchedule ? (
-              <div className="nr-schedule-card">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="nr-schedule-kicker">Confirmed</p>
-                  <span className="nr-schedule-badge">
-                    {scheduleCountdown}
-                  </span>
+              {loading ? (
+                <div className="nr-skeleton h-24 rounded-xl" aria-label="일정 로딩 중" />
+              ) : confirmedSchedule ? (
+                <div className="nr-schedule-card">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="nr-schedule-kicker">Confirmed</p>
+                    <span className="nr-schedule-badge">
+                      {scheduleCountdown}
+                    </span>
+                  </div>
+                  <p className="nr-schedule-title mt-2">{confirmedSchedule.name}</p>
+                  <p className="nr-schedule-date mt-1">
+                    {new Date(confirmedSchedule.confirmed_date + "T00:00:00").toLocaleDateString("ko-KR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      weekday: "long",
+                    })}
+                  </p>
                 </div>
-                <p className="nr-schedule-title mt-2">{confirmedSchedule.name}</p>
-                <p className="nr-schedule-date mt-1">
-                  {new Date(confirmedSchedule.confirmed_date + "T00:00:00").toLocaleDateString("ko-KR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    weekday: "long",
-                  })}
-                </p>
-              </div>
-            ) : (
+              ) : (
+                <div className="nr-empty">
+                  이번 주 확정 일정이 없습니다. 날짜 제안을 추가하고 구성원들과 일정을 맞춰보세요.
+                </div>
+              )}
+            </article>
+          ) : (
+            <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "300ms" }}>
+              <header className="flex items-center justify-between gap-3 mb-4">
+                <h2 className="nr-section-title">Gathering Access</h2>
+              </header>
+
               <div className="nr-empty">
-                이번 주 확정 일정이 없습니다. 날짜 제안을 추가하고 구성원들과 일정을 맞춰보세요.
+                로그인하면 모임 일정과 확정 날짜를 확인할 수 있습니다.
               </div>
-            )}
-          </article>
+            </article>
+          )}
         </section>
 
         <section className="mt-6 nr-reveal" style={{ animationDelay: "360ms" }}>
@@ -372,12 +389,14 @@ export default function Home() {
                 title: "Bar 추천",
                 description: "직접 다녀온 Bar 노트를 공유하고 저장해보세요.",
               },
-              {
-                href: "/schedule",
-                eyebrow: "Gathering",
-                title: "일정 맞추기",
-                description: "모임 날짜를 제안하고 확정 일정을 한눈에 확인하세요.",
-              },
+              ...(loggedIn
+                ? [{
+                    href: "/schedule",
+                    eyebrow: "Gathering",
+                    title: "일정 맞추기",
+                    description: "모임 날짜를 제안하고 확정 일정을 한눈에 확인하세요.",
+                  }]
+                : []),
             ].map((item) => (
               <Link
                 key={item.href}

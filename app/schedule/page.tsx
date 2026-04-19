@@ -28,6 +28,7 @@ export default function SchedulePage() {
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [availabilityMap, setAvailabilityMap] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
   const [userId, setUserId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMember, setIsMember] = useState(false);
@@ -42,10 +43,17 @@ export default function SchedulePage() {
   const [viewMonth, setViewMonth] = useState(today.getMonth());
 
   useEffect(() => {
-    const id = localStorage.getItem("userId");
-    if (id) setUserId(id);
+    const id = localStorage.getItem("userId") || "";
+    setUserId(id);
     setIsAdmin(localStorage.getItem("isAdmin") === "true");
     setIsMember(localStorage.getItem("isMember") === "true");
+    setAuthChecked(true);
+
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
     fetchSchedules();
     supabase
       .from("users")
@@ -270,6 +278,35 @@ export default function SchedulePage() {
     .filter(([, v]) => v.count > 0)
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, 3);
+
+  if (!authChecked) {
+    return (
+      <div className="tone min-h-screen flex items-center justify-center">
+        <div className="text-white/40 text-sm">불러오는 중...</div>
+      </div>
+    );
+  }
+
+  if (!userId) {
+    return (
+      <div className="tone min-h-screen">
+        <div className="tone-wrap max-w-3xl mx-auto px-4 py-8 md:py-12">
+          <h1 className="section-title text-3xl md:text-4xl font-bold text-white mb-2">일정 맞추기</h1>
+          <p className="meta text-white/55 mb-8">일정 내용은 로그인 후에만 확인할 수 있습니다.</p>
+
+          <div className="glass-card card rounded-2xl p-6 md:p-8 text-center">
+            <p className="text-white/70 mb-3">로그인하면 일정 목록, 투표 현황, 확정 날짜를 볼 수 있습니다.</p>
+            <a
+              href="/login"
+              className="inline-flex items-center justify-center text-indigo-400 underline font-medium text-sm"
+            >
+              로그인하기
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="tone min-h-screen">
