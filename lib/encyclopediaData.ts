@@ -650,6 +650,101 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     description: "증기 간접 가열 증류로 화사한 과일향이 돋보이는 미야기쿄 증류소의 우아한 싱글몰트.",
     priceRange: "₩90,000–120,000", difficulty: "중급", tags: ["싱글몰트", "Japanese", "프루티", "셰리"],
   },
+
+  // ─── 추가 2차: 블렌디드 스카치 (지역·클래식·프리미엄 보강) ───
+  {
+    id: "johnnie-walker-green", name: "Johnnie Walker Green Label 15", distillery: "Johnnie Walker",
+    region: "Multiple", country: "Scotland", category: "스카치", age: 15, abv: 43,
+    nose: "에스프레소, 우드스모크, 비터초콜릿", palate: "곡물, 커피빈, 대추야자", finish: "길고 스파이시한 꿀과 오크",
+    description: "크라간모어·링크우드·카올일라·탈리스커 네 싱글몰트를 블렌딩한 15년 블렌디드 몰트.",
+    priceRange: "₩70,000–90,000", difficulty: "중급", tags: ["블렌디드몰트", "Scotch", "스모키", "몰티"],
+  },
+  {
+    id: "dewars-12", name: "Dewar's 12", distillery: "Dewar's",
+    region: "Multiple", country: "Scotland", category: "스카치", age: 12, abv: 40,
+    nose: "꿀, 열대과일, 바닐라", palate: "배, 복숭아, 너트맥", finish: "오크와 꿀의 부드러운 여운",
+    description: "더블 에이징으로 마무리해 부드러움을 강조한 12년 블렌디드 스카치.",
+    priceRange: "₩45,000–60,000", difficulty: "입문", tags: ["블렌디드", "Scotch", "부드러움", "더블에이징"],
+  },
+  {
+    id: "famous-grouse", name: "The Famous Grouse", distillery: "The Famous Grouse",
+    region: "Multiple", country: "Scotland", category: "스카치", age: null, abv: 40,
+    nose: "토피애플, 비스킷 보리, 시트러스필", palate: "크리미한 몰트, 약한 스파이스, 옅은 스모크", finish: "달콤하고 몰티한 균형 잡힌 마무리",
+    description: "스코틀랜드 국민 위스키로 불리는 대중적인 입문용 블렌디드 스카치.",
+    priceRange: "₩30,000–40,000", difficulty: "입문", tags: ["블렌디드", "Scotch", "대중적", "균형"],
+  },
+  {
+    id: "old-parr-12", name: "Old Parr 12", distillery: "Old Parr",
+    region: "Multiple", country: "Scotland", category: "스카치", age: 12, abv: 40,
+    nose: "꿀, 쇼트브레드, 몰티 시리얼", palate: "꿀, 건과일, 은은한 피트", finish: "레몬그라스와 페퍼리한 스파이스의 긴 여운",
+    description: "꿀과 은은한 스모크가 어우러진, 한국에서 오랜 인기를 누린 12년 블렌디드 스카치.",
+    priceRange: "₩50,000–65,000", difficulty: "입문", tags: ["블렌디드", "Scotch", "꿀", "몰티"],
+  },
+  {
+    id: "ballantines-21", name: "Ballantine's 21 Year Old", distillery: "Ballantine's",
+    region: "Multiple", country: "Scotland", category: "스카치", age: 21, abv: 40,
+    nose: "꿀, 바닐라, 화이트초콜릿", palate: "정향, 너트맥, 캐러멜 퍼지", finish: "스무스한 스파이스와 꿀의 긴 여운",
+    description: "유러피언 오크 비중을 높여 풍부함을 더한 21년 숙성 프리미엄 블렌디드 스카치.",
+    priceRange: "₩280,000–350,000", difficulty: "상급", tags: ["블렌디드", "Scotch", "프리미엄", "장기숙성"],
+  },
+
+  // ─── 추가 2차: 싱글몰트 스카치 (지역 다양성·프리미엄 보강) ───
+  {
+    id: "glenlivet-15", name: "The Glenlivet 15 French Oak Reserve", distillery: "The Glenlivet",
+    region: "Speyside", country: "Scotland", category: "스카치", age: 15, abv: 40,
+    nose: "파인애플, 꿀, 바닐라", palate: "정향, 너트, 건포도, 오크 스파이스", finish: "꿀과 시나몬의 중간 길이 피니쉬",
+    description: "리무진 프렌치 오크에서 추가 숙성해 부드러운 스파이스와 견과류 풍미를 더한 스페이사이드 싱글몰트.",
+    priceRange: "₩90,000–120,000", difficulty: "입문", tags: ["싱글몰트", "Speyside", "프렌치오크", "부드러움"],
+  },
+  {
+    id: "highland-park-18", name: "Highland Park 18 Viking Pride", distillery: "Highland Park",
+    region: "Highland (Orkney)", country: "Scotland", category: "스카치", age: 18, abv: 43,
+    nose: "성숙한 오크, 꿀, 말린 과일, 은은한 히더 피트 스모크", palate: "캔디드 오렌지, 꿀, 체리, 코코아, 겨울 스파이스", finish: "부드럽고 둥근 긴 피니쉬",
+    description: "셰리 숙성과 오크니 특유의 히더 피트가 균형을 이룬 프리미엄 싱글몰트.",
+    priceRange: "₩280,000–350,000", difficulty: "상급", tags: ["싱글몰트", "Orkney", "셰리", "프리미엄"],
+  },
+  {
+    id: "lagavulin-8", name: "Lagavulin 8", distillery: "Lagavulin",
+    region: "Islay", country: "Scotland", category: "스카치", age: 8, abv: 48,
+    nose: "키퍼 피트, 짭짤한 소금기, 요오드, 잘 익은 배", palate: "묵직한 스모크, 훈제 생선, 사과 껍질, 단 몰트", finish: "길고 건조한 재 같은 피니쉬",
+    description: "비교적 어린 숙성에도 라가불린 특유의 강렬한 피트와 짠맛이 살아있는 아일라 싱글몰트.",
+    priceRange: "₩90,000–120,000", difficulty: "상급", tags: ["싱글몰트", "Islay", "피트", "스모키"],
+  },
+  {
+    id: "laphroaig-quarter-cask", name: "Laphroaig Quarter Cask", distillery: "Laphroaig",
+    region: "Islay", country: "Scotland", category: "스카치", age: null, abv: 48,
+    nose: "약품 피트, 요오드, 단 시리얼, 감초", palate: "강한 피트, 바닐라, 보리 단맛, 오크, 후추 스파이스", finish: "피트와 스모크, 오크가 길게 이어지는 피니쉬",
+    description: "쿼터 캐스크 추가 숙성으로 오크 접촉을 극대화해 진하고 강렬한 피트를 끌어낸 아일라 싱글몰트.",
+    priceRange: "₩70,000–95,000", difficulty: "상급", tags: ["싱글몰트", "Islay", "쿼터캐스크", "강한피트"],
+  },
+  {
+    id: "glendronach-18", name: "The GlenDronach 18 Allardice", distillery: "The GlenDronach",
+    region: "Highland", country: "Scotland", category: "스카치", age: 18, abv: 46,
+    nose: "올로로소 셰리, 대추, 건포도, 다크초콜릿, 크리스마스 스파이스", palate: "셰리 단맛, 스튜 과일, 코코아, 오렌지 필, 토스트 호두", finish: "셰리와 다크 프루트, 스파이스가 길게 남는 피니쉬",
+    description: "올로로소 셰리 캐스크에서 18년 숙성해 진한 다크 프루트와 초콜릿 풍미가 가득한 프리미엄 하이랜드 싱글몰트.",
+    priceRange: "₩190,000–260,000", difficulty: "상급", tags: ["싱글몰트", "Highland", "올로로소셰리", "프리미엄"],
+  },
+  {
+    id: "glenkinchie-12", name: "Glenkinchie 12", distillery: "Glenkinchie",
+    region: "Lowland", country: "Scotland", category: "스카치", age: 12, abv: 43,
+    nose: "레몬, 풋사과, 꿀, 바닐라, 풀향", palate: "풋과일, 보리 몰트, 코코아, 가벼운 스파이스", finish: "시트러스와 풋사과가 깔끔하게 떨어지는 피니쉬",
+    description: "가볍고 산뜻한 풀향과 시트러스가 돋보이는 로우랜드 대표 싱글몰트.",
+    priceRange: "₩70,000–95,000", difficulty: "입문", tags: ["싱글몰트", "Lowland", "가벼움", "입문용"],
+  },
+  {
+    id: "caol-ila-12", name: "Caol Ila 12", distillery: "Caol Ila",
+    region: "Islay", country: "Scotland", category: "스카치", age: 12, abv: 43,
+    nose: "바다 소금, 풀향, 훈제 고기, 시트러스, 오일리한 스모크", palate: "오일리한 타르, 우아한 스모크, 브라인, 가벼운 스파이스", finish: "후추 같은 스파이스와 스모크가 길게 이어지는 피니쉬",
+    description: "묵직하지 않으면서 깔끔한 스모크와 바다 향이 균형 잡힌 접근성 좋은 아일라 싱글몰트.",
+    priceRange: "₩80,000–110,000", difficulty: "중급", tags: ["싱글몰트", "Islay", "스모키", "해풍"],
+  },
+  {
+    id: "clynelish-14", name: "Clynelish 14", distillery: "Clynelish",
+    region: "Highland", country: "Scotland", category: "스카치", age: 14, abv: 46,
+    nose: "꿀, 바닐라, 배, 사과, 특유의 왁시함", palate: "오일리하고 왁시한 질감, 버터스카치, 배, 토피", finish: "스파이스와 꿀, 플로럴함이 길게 남는 피니쉬",
+    description: "특유의 왁시한 질감과 꿀, 과일 풍미가 어우러진 하이랜드 코스탈 싱글몰트.",
+    priceRange: "₩90,000–120,000", difficulty: "중급", tags: ["싱글몰트", "Highland", "왁시", "꿀"],
+  },
 ];
 
 export const CATEGORY_TO_TYPE: Record<string, string> = {
