@@ -1556,7 +1556,7 @@ export default function MyPage() {
           <div className="glass-card card rounded-2xl w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-white">{collectionAddStatus === "tried" ? "마셔봤어요 추가" : "마시고 싶어요 추가"}</h2>
-              <button onClick={() => setShowCollectionModal(false)} className="text-white/40 hover:text-white text-xl">×</button>
+              <button type="button" aria-label="닫기" onClick={() => setShowCollectionModal(false)} className="text-white/40 hover:text-white text-xl">×</button>
             </div>
             <div className="flex gap-2 mb-4">
               {(["encyclopedia", "manual"] as const).map((m) => (

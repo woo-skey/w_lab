@@ -393,7 +393,7 @@ export default function EncyclopediaPage() {
           <div className="glass-card card rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h2 className="text-lg font-bold text-white">{editTarget ? "위스키 편집" : "위스키 추가"}</h2>
-              <button onClick={() => setShowModal(false)} className="text-white/40 hover:text-white text-2xl leading-none">×</button>
+              <button type="button" aria-label="닫기" onClick={() => setShowModal(false)} className="text-white/40 hover:text-white text-2xl leading-none">×</button>
             </div>
             <form onSubmit={handleSave} className="space-y-3">
               {!editTarget && (

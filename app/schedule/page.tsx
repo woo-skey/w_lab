@@ -381,8 +381,8 @@ export default function SchedulePage() {
                 <div className="space-y-2">
                   {schedules.map((s) => (
                     <div key={s.id} className={`flex items-center rounded-lg text-sm transition ${
-                      selectedSchedule?.id === s.id ? "bg-indigo-500/80 text-white" : "text-white/70"
-                    }`} style={selectedSchedule?.id === s.id ? {} : { background: "rgba(255,255,255,0.05)" }}>
+                      selectedSchedule?.id === s.id ? "bg-indigo-500/80 text-white" : "text-white/70 bg-black/5 dark:bg-white/5"
+                    }`}>
                       <button onClick={() => { if (selectedSchedule?.id !== s.id) { setAvailabilityMap({}); setSelectedSchedule(s); } }}
                         className="flex-1 text-left px-3 py-2">
                         <p className="font-medium truncate">{s.name}</p>
@@ -409,8 +409,8 @@ export default function SchedulePage() {
                     const isCreator = selectedSchedule?.created_by === userId;
                     return (
                       <div key={date} className={`px-3 py-2 rounded-lg text-sm ${
-                        isConfirmed ? "border border-amber-400/50" : idx === 0 ? "border border-indigo-400/40" : ""
-                      }`} style={{ background: isConfirmed ? "rgba(234,179,8,0.15)" : idx === 0 ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.05)" }}>
+                        isConfirmed ? "border border-amber-400/50 bg-amber-500/15" : idx === 0 ? "border border-indigo-400/40 bg-indigo-500/15" : "bg-black/5 dark:bg-white/5"
+                      }`}>
                         <div className="flex items-start justify-between gap-1">
                           <div className="min-w-0">
                             <p className={`font-medium truncate ${isConfirmed ? "text-amber-300" : idx === 0 ? "text-indigo-300" : "text-white/70"}`}>
@@ -479,6 +479,8 @@ export default function SchedulePage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <button
+                      type="button"
+                      aria-label="이전 달"
                       onClick={() => {
                         const d = new Date(viewYear, viewMonth - 1);
                         setViewYear(d.getFullYear());
@@ -492,6 +494,8 @@ export default function SchedulePage() {
                       {viewYear}년 {MONTHS[viewMonth]}
                     </span>
                     <button
+                      type="button"
+                      aria-label="다음 달"
                       onClick={() => {
                         const d = new Date(viewYear, viewMonth + 1);
                         setViewYear(d.getFullYear());
@@ -505,7 +509,7 @@ export default function SchedulePage() {
                 </div>
 
                 {/* 투표 현황 */}
-                <div className="mb-4 px-4 py-2.5 rounded-xl flex items-center gap-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div className="mb-4 px-4 py-2.5 rounded-xl flex items-center gap-3 bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08]">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-white/50 text-xs">투표 현황</span>
@@ -514,7 +518,7 @@ export default function SchedulePage() {
                       </span>
                     </div>
                     {totalMembersExcludingAdmin > 0 && (
-                      <div className="w-full h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+                      <div className="w-full h-1.5 rounded-full bg-black/[0.08] dark:bg-white/[0.08]">
                         <div
                           className="h-1.5 rounded-full transition-all duration-500"
                           style={{ width: `${Math.min((userDateMap.length / totalMembersExcludingAdmin) * 100, 100)}%`, background: "rgba(99,102,241,0.8)" }}
@@ -556,10 +560,22 @@ export default function SchedulePage() {
                       <div
                         key={dateStr}
                         className={`calendar-cell aspect-square ${hoveredDate === dateStr ? "flipped" : ""}`}
+                        role={canVoteDate ? "button" : undefined}
+                        tabIndex={canVoteDate ? 0 : undefined}
+                        aria-label={canVoteDate ? `${viewMonth + 1}월 ${day}일 ${isMyDate ? "체크 해제" : "가능 체크"} (현재 ${count}명)` : undefined}
                         onMouseEnter={() => count > 0 && setHoveredDate(dateStr)}
                         onMouseLeave={() => setHoveredDate(null)}
-                        onClick={() => canVoteDate && handleToggleDate(dateStr)}
-                        style={{ cursor: canVoteDate ? "pointer" : "default" }}
+                        onClick={() => {
+                          if (canVoteDate) handleToggleDate(dateStr);
+                          else if (count > 0) setHoveredDate((prev) => (prev === dateStr ? null : dateStr));
+                        }}
+                        onKeyDown={(e) => {
+                          if (canVoteDate && (e.key === "Enter" || e.key === " ")) {
+                            e.preventDefault();
+                            handleToggleDate(dateStr);
+                          }
+                        }}
+                        style={{ cursor: canVoteDate || count > 0 ? "pointer" : "default" }}
                       >
                         <div className="calendar-card">
                           {/* 앞면 */}

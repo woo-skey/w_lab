@@ -371,7 +371,7 @@ export default function ArticlesPage() {
                           height={360}
                           className="max-h-48 w-auto rounded-lg object-cover"
                         />
-                        <button type="button" onClick={() => { setImageFile(null); setImagePreview(""); }}
+                        <button type="button" aria-label="이미지 제거" onClick={() => { setImageFile(null); setImagePreview(""); }}
                           className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">×</button>
                       </div>
                     )}

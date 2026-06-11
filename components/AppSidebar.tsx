@@ -307,7 +307,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
           <Link href="/" style={{ color: T.textPrimary, fontWeight: 700, fontSize: 15 }}>
             🥃 위스키 연구소
           </Link>
-          <button onClick={openSpotlight} className="p-2 rounded-lg transition" style={{ color: T.navInactive, fontSize: 18 }}>
+          <button onClick={openSpotlight} aria-label="검색 열기" className="p-2 rounded-lg transition" style={{ color: T.navInactive, fontSize: 18 }}>
             🔎
           </button>
         </div>

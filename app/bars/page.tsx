@@ -259,7 +259,7 @@ export default function BarsPage() {
           <div className="glass-card card rounded-2xl w-full max-w-md p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white">Bar 추천하기</h2>
-              <button onClick={() => setShowModal(false)} className="text-white/40 hover:text-white text-2xl leading-none">×</button>
+              <button type="button" aria-label="닫기" onClick={() => setShowModal(false)} className="text-white/40 hover:text-white text-2xl leading-none">×</button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

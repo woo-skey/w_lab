@@ -477,6 +477,8 @@ export default function ReviewsPage() {
             />
             {searchQuery && (
               <button
+                type="button"
+                aria-label="검색어 지우기"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => { setSearchQuery(""); setPage(1); setShowSearchDrop(false); }}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 text-base leading-none"
@@ -1197,7 +1199,7 @@ export default function ReviewsPage() {
           <div className="glass-card card rounded-2xl w-full max-w-2xl p-4 sm:p-6 overflow-y-auto max-h-[92vh]">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-bold text-white">위스키 비교</h2>
-              <button onClick={() => setCompareList([])} className="text-white/40 hover:text-white text-xl">✕</button>
+              <button type="button" aria-label="비교 모달 닫기" onClick={() => setCompareList([])} className="text-white/40 hover:text-white text-xl">✕</button>
             </div>
             {/* 헤더 */}
             <div className="grid grid-cols-3 gap-4 mb-4">
