@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 
@@ -37,6 +37,7 @@ export default function SchedulePage() {
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   const [userDateMap, setUserDateMap] = useState<{ name: string; dates: string[] }[]>([]);
   const [totalMembersExcludingAdmin, setTotalMembersExcludingAdmin] = useState(0);
+  const togglingRef = useRef(false);
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -149,53 +150,58 @@ export default function SchedulePage() {
     if (!userId || !isMember || isAdmin) return;
     if (!selectedSchedule) return;
     if (selectedSchedule.confirmed_date) return;
+    if (togglingRef.current) return; // 진행 중이면 중복 클릭 무시
+    togglingRef.current = true;
+    try {
+      const existing = availabilityMap[dateStr];
 
-    const existing = availabilityMap[dateStr];
-
-    if (existing) {
-      if (existing.isAvailable) {
-        // 이 날짜에 연결된 모든 schedule_dates ID에서 삭제 (중복 행 대응)
-        const { data: allDateRows } = await supabase
+      if (existing) {
+        if (existing.isAvailable) {
+          // 이 날짜에 연결된 모든 schedule_dates ID에서 삭제 (중복 행 대응)
+          const { data: allDateRows } = await supabase
+            .from("schedule_dates")
+            .select("id")
+            .eq("schedule_id", selectedSchedule.id)
+            .eq("date", dateStr);
+          if (allDateRows && allDateRows.length > 0) {
+            await supabase
+              .from("user_availability")
+              .delete()
+              .in("schedule_date_id", allDateRows.map((d) => d.id))
+              .eq("user_id", userId);
+          }
+        } else {
+          await supabase
+            .from("user_availability")
+            .insert([{ schedule_date_id: existing.dateId, user_id: userId, is_available: true }]);
+        }
+      } else {
+        // schedule_dates 행이 이미 있으면 재사용, 없으면 생성 (중복 방지)
+        const { data: existingRow } = await supabase
           .from("schedule_dates")
           .select("id")
           .eq("schedule_id", selectedSchedule.id)
-          .eq("date", dateStr);
-        if (allDateRows && allDateRows.length > 0) {
-          await supabase
-            .from("user_availability")
-            .delete()
-            .in("schedule_date_id", allDateRows.map((d) => d.id))
-            .eq("user_id", userId);
-        }
-      } else {
+          .eq("date", dateStr)
+          .maybeSingle();
+        const dateId = existingRow?.id ?? (await (async () => {
+          const { data: newDate, error } = await supabase
+            .from("schedule_dates")
+            .insert([{ schedule_id: selectedSchedule.id, date: dateStr }])
+            .select()
+            .single();
+          if (error) { console.error(error); return null; }
+          return newDate.id;
+        })());
+        if (!dateId) return;
         await supabase
           .from("user_availability")
-          .insert([{ schedule_date_id: existing.dateId, user_id: userId, is_available: true }]);
+          .insert([{ schedule_date_id: dateId, user_id: userId, is_available: true }]);
       }
-    } else {
-      // schedule_dates 행이 이미 있으면 재사용, 없으면 생성 (중복 방지)
-      const { data: existingRow } = await supabase
-        .from("schedule_dates")
-        .select("id")
-        .eq("schedule_id", selectedSchedule.id)
-        .eq("date", dateStr)
-        .maybeSingle();
-      const dateId = existingRow?.id ?? (await (async () => {
-        const { data: newDate, error } = await supabase
-          .from("schedule_dates")
-          .insert([{ schedule_id: selectedSchedule.id, date: dateStr }])
-          .select()
-          .single();
-        if (error) { console.error(error); return null; }
-        return newDate.id;
-      })());
-      if (!dateId) return;
-      await supabase
-        .from("user_availability")
-        .insert([{ schedule_date_id: dateId, user_id: userId, is_available: true }]);
-    }
 
-    setSelectedSchedule({ ...selectedSchedule });
+      setSelectedSchedule({ ...selectedSchedule });
+    } finally {
+      togglingRef.current = false;
+    }
   };
 
   const handleDeleteSchedule = async (scheduleId: string) => {

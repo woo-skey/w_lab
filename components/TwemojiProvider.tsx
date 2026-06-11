@@ -7,33 +7,42 @@ export default function TwemojiProvider({ children }: { children: React.ReactNod
   const pathname = usePathname();
 
   useEffect(() => {
-    let isParsing = false;
+    let cancelled = false;
+    let observer: MutationObserver | null = null;
+    let scheduled = false;
 
-    const parse = async () => {
-      if (isParsing) return;
-      isParsing = true;
+    (async () => {
       const twemoji = (await import("twemoji")).default;
-      twemoji.parse(document.body, {
-        folder: "svg",
-        ext: ".svg",
-        base: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/",
+      if (cancelled) return;
+
+      const parse = () => {
+        // 파싱이 삽입하는 <img>가 옵저버를 다시 트리거해 무한 재파싱되는 것을 막기 위해
+        // 파싱 동안에는 옵저버를 끊었다가 끝나면 다시 연결한다.
+        observer?.disconnect();
+        twemoji.parse(document.body, {
+          folder: "svg",
+          ext: ".svg",
+          base: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/",
+        });
+        if (!cancelled) observer?.observe(document.body, { childList: true, subtree: true });
+      };
+
+      observer = new MutationObserver(() => {
+        if (scheduled || cancelled) return;
+        scheduled = true;
+        // 변경을 한 프레임으로 모아 처리 (연속 변경 시 폭주 방지)
+        requestAnimationFrame(() => {
+          scheduled = false;
+          if (!cancelled) parse();
+        });
       });
-      setTimeout(() => { isParsing = false; }, 200);
-    };
 
-    parse();
-
-    const observer = new MutationObserver(() => {
-      if (!isParsing) parse();
-    });
-
-    const timeout = setTimeout(() => {
-      observer.observe(document.body, { childList: true, subtree: true });
-    }, 500);
+      parse();
+    })();
 
     return () => {
-      clearTimeout(timeout);
-      observer.disconnect();
+      cancelled = true;
+      observer?.disconnect();
     };
   }, [pathname]);
 

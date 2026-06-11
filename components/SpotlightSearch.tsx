@@ -54,7 +54,7 @@ export default function SpotlightSearch() {
 
   useEffect(() => {
     const keyHandler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key?.toLowerCase() === "k") {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
@@ -77,11 +77,12 @@ export default function SpotlightSearch() {
   useEffect(() => {
     if (!open) return;
     requestSeqRef.current += 1;
-    setTimeout(() => inputRef.current?.focus(), 50);
+    const focusTimer = setTimeout(() => inputRef.current?.focus(), 50);
     setQuery("");
     setResults([]);
     setSelected(0);
     setLoading(false);
+    return () => clearTimeout(focusTimer);
   }, [open]);
 
   const runSearch = useCallback(async (q: string) => {
@@ -117,6 +118,7 @@ export default function SpotlightSearch() {
   };
 
   const onInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing) return; // 한글 IME 조합 중 Enter로 조기 이동 방지
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelected((prev) => Math.min(prev + 1, Math.max(results.length - 1, 0)));

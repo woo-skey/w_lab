@@ -53,6 +53,18 @@ export default function UserProfilePopup({ userId, displayName, avatarUrl }: Use
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
+  // 스크롤/리사이즈 시 고정 위치가 트리거와 어긋나므로 팝업을 닫는다
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [open]);
+
   const handleOpen = async (e: React.MouseEvent) => {
     e.stopPropagation();
 

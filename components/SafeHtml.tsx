@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DOMPurify from "dompurify";
 
 interface SafeHtmlProps {
@@ -25,8 +25,12 @@ function sanitizeStyle(value: string): string {
 }
 
 export default function SafeHtml({ html, className }: SafeHtmlProps) {
+  // 서버/클라 첫 렌더를 빈 값으로 일치시켜 하이드레이션 불일치 방지 → 마운트 후 sanitize 결과 렌더
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const clean = useMemo(() => {
-    if (typeof window === "undefined") return "";
+    if (!mounted || typeof window === "undefined") return "";
     DOMPurify.addHook("uponSanitizeAttribute", (_node, data) => {
       if (data.attrName === "style") {
         data.attrValue = sanitizeStyle(data.attrValue);
@@ -38,7 +42,7 @@ export default function SafeHtml({ html, className }: SafeHtmlProps) {
     });
     DOMPurify.removeHook("uponSanitizeAttribute");
     return result;
-  }, [html]);
+  }, [html, mounted]);
 
-  return <div dangerouslySetInnerHTML={{ __html: clean }} className={className} />;
+  return <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: clean }} className={className} />;
 }

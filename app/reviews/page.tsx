@@ -105,6 +105,8 @@ export default function ReviewsPage() {
   const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set());
   const [userReviewedWhiskeys, setUserReviewedWhiskeys] = useState<Set<string>>(new Set());
   const [compareList, setCompareList] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
 
   // 카드 펼칠 때 리뷰 fetch
   useEffect(() => {
@@ -244,7 +246,8 @@ export default function ReviewsPage() {
 
   const handleEditWhiskey = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingWhiskey) return;
+    if (!editingWhiskey || submitting) return;
+    setSubmitting(true);
     try {
       const { error } = await supabase.from("whiskeys").update({
         name: editingWhiskey.name, type: editingWhiskey.type, region: editingWhiskey.region,
@@ -259,6 +262,8 @@ export default function ReviewsPage() {
       fetchWhiskeys();
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -275,12 +280,14 @@ export default function ReviewsPage() {
       setExpandedReview(null);
     } else {
       setExpandedReview(reviewId);
-      if (!comments[reviewId]) fetchComments(reviewId);
+      fetchComments(reviewId);
     }
   };
 
   const handleAddWhiskey = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
     try {
       const { error } = await supabase.from("whiskeys").insert([{
         name: whiskey.name, type: whiskey.type,
@@ -301,12 +308,15 @@ export default function ReviewsPage() {
     } catch (err) {
       console.error(err);
       alert("위스키 추가에 실패했습니다");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reviewForm) return;
+    if (!reviewForm || submitting) return;
+    setSubmitting(true);
     try {
       const { error } = await supabase.from("reviews").insert([{
         whiskey_id: reviewForm.whiskey_id,
@@ -332,6 +342,8 @@ export default function ReviewsPage() {
     } catch (err) {
       console.error(err);
       alert("리뷰 등록에 실패했습니다");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -348,7 +360,8 @@ export default function ReviewsPage() {
 
   const handleEditReview = async (e: React.FormEvent, whiskeyId: string) => {
     e.preventDefault();
-    if (!editingReview) return;
+    if (!editingReview || submitting) return;
+    setSubmitting(true);
     try {
       const { error } = await supabase.from("reviews").update({
         rating: editingReview.rating,
@@ -365,6 +378,8 @@ export default function ReviewsPage() {
     } catch (err) {
       console.error(err);
       alert("편집에 실패했습니다");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -381,7 +396,8 @@ export default function ReviewsPage() {
 
   const handleAddComment = async (reviewId: string) => {
     const content = commentText[reviewId]?.trim();
-    if (!content) return;
+    if (!content || commentSubmitting) return;
+    setCommentSubmitting(true);
     try {
       const { error } = await supabase.from("review_comments").insert([{
         review_id: reviewId,
@@ -400,6 +416,8 @@ export default function ReviewsPage() {
       fetchComments(reviewId);
     } catch (err) {
       console.error(err);
+    } finally {
+      setCommentSubmitting(false);
     }
   };
 
@@ -686,7 +704,7 @@ export default function ReviewsPage() {
                     className="px-4 py-2 text-sm text-white/50 hover:text-white/70 bg-white/5 rounded-lg transition">
                     ← 목록으로
                   </button>
-                  <button type="submit" className="cta flex-1 py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 transition">
+                  <button type="submit" disabled={submitting} className="cta flex-1 py-2 bg-indigo-500/80 text-white font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
                     위스키 추가
                   </button>
                 </div>
@@ -793,7 +811,7 @@ export default function ReviewsPage() {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <button type="submit" className="px-6 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">저장</button>
+                          <button type="submit" disabled={submitting} className="px-6 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">저장</button>
                           <button type="button" onClick={() => setEditingWhiskey(null)}
                             className="px-6 py-2 bg-white/8 text-white/70 text-sm rounded-lg hover:bg-white/12 transition">취소</button>
                         </div>
@@ -897,7 +915,7 @@ export default function ReviewsPage() {
                                 </div>
                               </div>
                               <div className="flex gap-2">
-                                <button type="submit" className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
+                                <button type="submit" disabled={submitting} className="px-4 py-2 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
                                   리뷰 등록
                                 </button>
                                 <button type="button" onClick={() => setReviewForm(null)}
@@ -1006,7 +1024,7 @@ export default function ReviewsPage() {
                                       </div>
                                     </div>
                                     <div className="flex gap-2">
-                                      <button type="submit" className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 transition">
+                                      <button type="submit" disabled={submitting} className="cta px-4 py-1.5 bg-indigo-500/80 text-white text-sm rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition">
                                         저장
                                       </button>
                                       <button type="button" onClick={() => setEditingReview(null)}
@@ -1107,7 +1125,7 @@ export default function ReviewsPage() {
                                               onKeyDown={(e) => { if (e.key === "Enter") handleAddComment(r.id); }}
                                               placeholder="댓글 입력..."
                                               className="glass-input surface flex-1 px-3 py-1.5 rounded-lg text-xs" />
-                                            <button onClick={() => handleAddComment(r.id)}
+                                            <button onClick={() => handleAddComment(r.id)} disabled={commentSubmitting}
                                               className="cta px-3 py-1.5 bg-indigo-500/80 text-white text-xs rounded-lg hover:bg-indigo-500 transition">
                                               등록
                                             </button>
