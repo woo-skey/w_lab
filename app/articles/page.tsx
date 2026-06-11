@@ -454,9 +454,9 @@ export default function ArticlesPage() {
                             {isOwner && (
                               <>
                                 <button onClick={() => { setEditingArticle(article); setExpandedId(null); }}
-                                  className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
+                                  className="text-xs text-white/40 hover:text-indigo-300 px-2.5 py-1.5 rounded hover:bg-indigo-500/10 transition">편집</button>
                                 <button onClick={() => handleDeleteArticle(article.id)}
-                                  className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                                  className="text-xs text-white/40 hover:text-red-400 px-2.5 py-1.5 rounded hover:bg-red-500/10 transition">삭제</button>
                               </>
                             )}
                             <button onClick={() => handleToggleArticle(article.id)}

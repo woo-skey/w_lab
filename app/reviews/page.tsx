@@ -847,9 +847,9 @@ export default function ReviewsPage() {
                         {(w.created_by === userId || isAdmin) && userId && (
                           <div className="flex gap-1 mt-1">
                             <button onClick={() => setEditingWhiskey(w)}
-                              className="text-xs text-white/40 hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-500/10 transition">편집</button>
+                              className="text-xs text-white/40 hover:text-indigo-300 px-2.5 py-1.5 rounded hover:bg-indigo-500/10 transition">편집</button>
                             <button onClick={() => handleDeleteWhiskey(w.id)}
-                              className="text-xs text-white/40 hover:text-red-400 px-2 py-1 rounded hover:bg-red-500/10 transition">삭제</button>
+                              className="text-xs text-white/40 hover:text-red-400 px-2.5 py-1.5 rounded hover:bg-red-500/10 transition">삭제</button>
                           </div>
                         )}
                         <button
@@ -1202,17 +1202,17 @@ export default function ReviewsPage() {
               <button type="button" aria-label="비교 모달 닫기" onClick={() => setCompareList([])} className="text-white/40 hover:text-white text-xl">✕</button>
             </div>
             {/* 헤더 */}
-            <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-[4.25rem_1fr_1fr] sm:grid-cols-3 gap-2 sm:gap-4 mb-4">
               <div />
               {[w1, w2].map((w) => (
                 <div key={w.id} className="text-center">
-                  <p className="font-bold text-white text-sm">{w.name}</p>
+                  <p className="font-bold text-white text-xs sm:text-sm leading-tight break-keep">{w.name}</p>
                   <span className="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{w.type}</span>
                 </div>
               ))}
             </div>
             {/* 평점 */}
-            <div className="grid grid-cols-3 gap-4 py-3 border-b border-white/8">
+            <div className="grid grid-cols-[4.25rem_1fr_1fr] sm:grid-cols-3 gap-2 sm:gap-4 py-3 border-b border-white/8">
               <p className="text-xs text-white/40 self-center">평균 평점</p>
               {[r1, r2].map((rs, i) => (
                 <div key={i} className="flex flex-col items-center gap-1">
@@ -1223,7 +1223,7 @@ export default function ReviewsPage() {
             </div>
             {/* 필드들 */}
             {fields.map(({ label, key }) => (
-              <div key={key} className="grid grid-cols-3 gap-4 py-3 border-b border-white/8">
+              <div key={key} className="grid grid-cols-[4.25rem_1fr_1fr] sm:grid-cols-3 gap-2 sm:gap-4 py-3 border-b border-white/8">
                 <p className="text-xs text-white/40 self-center">
                   {TASTING_KEYS.has(key as string) && <span className="text-indigo-400/70 mr-1">·</span>}{label}
                 </p>

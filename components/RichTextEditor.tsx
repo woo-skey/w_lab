@@ -121,7 +121,7 @@ export default function RichTextEditor({
   return (
     <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
       {/* 툴바 */}
-      <div className="flex flex-wrap items-center gap-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex flex-wrap items-center gap-1 px-2 sm:px-3 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         {/* Bold */}
         <button
           type="button"

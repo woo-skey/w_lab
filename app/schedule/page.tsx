@@ -661,7 +661,7 @@ export default function SchedulePage() {
             <h2 className="text-lg font-bold text-white mb-1">🔐 관리자 — 계정별 가능 날짜</h2>
             <p className="text-xs text-white/30 mb-5">각 유저가 선택한 날짜 목록입니다.</p>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[26rem] text-sm">
                 <thead>
                   <tr className="border-b border-white/10">
                     <th className="text-left py-2 px-3 text-white/50 font-semibold w-32">유저</th>
