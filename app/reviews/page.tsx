@@ -369,6 +369,7 @@ export default function ReviewsPage() {
   };
 
   const handleDeleteComment = async (commentId: string, reviewId: string) => {
+    if (!confirm("댓글을 삭제할까요?")) return;
     try {
       const { error } = await supabase.from("review_comments").delete().eq("id", commentId);
       if (error) throw error;
@@ -697,7 +698,7 @@ export default function ReviewsPage() {
         {/* 위스키 목록 */}
         <div>
           {loading ? (
-            <div className="grid grid-cols-2 gap-3 md:gap-4 items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 items-start">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="glass-card card rounded-xl p-4 space-y-3">
                   <div className="skeleton h-5 w-3/4 rounded" />
@@ -710,7 +711,7 @@ export default function ReviewsPage() {
           ) : filteredWhiskeys.length === 0 ? (
             <div className="empty text-center py-12 text-white/40">아직 위스키가 없습니다.</div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 md:gap-4 items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 items-start">
             {pagedWhiskeys.map((w) => {
               const isExpanded = expandedWhiskey === w.id;
               const whiskeyReviews = reviews[w.id] || [];

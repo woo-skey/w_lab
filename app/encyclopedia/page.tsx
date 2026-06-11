@@ -163,7 +163,11 @@ export default function EncyclopediaPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const id = editTarget ? editTarget.id : formId.trim() || formData.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    let id = editTarget ? editTarget.id : formId.trim();
+    if (!id) {
+      const slug = formData.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
+      id = slug || `wk-${crypto.randomUUID().slice(0, 8)}`;
+    }
     const payload = {
       id, name: formData.name, distillery: formData.distillery, region: formData.region,
       country: formData.country, category: formData.category, age: formData.age,
@@ -293,7 +297,7 @@ export default function EncyclopediaPage() {
         {filtered.length === 0 ? (
           <div className="empty text-center py-20 text-white/30">검색 결과가 없습니다.</div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
             {filtered.map((w) => {
               const isOpen = expandedId === w.id;
               return (

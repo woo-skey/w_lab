@@ -43,10 +43,12 @@ export async function searchGlobalContent(rawQuery: string): Promise<GlobalSearc
   const q = rawQuery.trim();
   if (!q) return [];
 
+  // ilike 와일드카드(% _ \) 이스케이프 — 검색어 특수문자가 패턴으로 해석되지 않도록
+  const likeQ = q.replace(/[\\%_]/g, (m) => `\\${m}`);
   const [whiskeyRes, barRes, articleRes] = await Promise.allSettled([
-    supabase.from("whiskeys").select("id, name, type, created_at").ilike("name", `%${q}%`).limit(PER_TYPE_LIMIT),
-    supabase.from("bars").select("id, bar_name, notes, created_at").ilike("bar_name", `%${q}%`).limit(PER_TYPE_LIMIT),
-    supabase.from("articles").select("id, title, category, created_at").ilike("title", `%${q}%`).limit(PER_TYPE_LIMIT),
+    supabase.from("whiskeys").select("id, name, type, created_at").ilike("name", `%${likeQ}%`).limit(PER_TYPE_LIMIT),
+    supabase.from("bars").select("id, bar_name, notes, created_at").ilike("bar_name", `%${likeQ}%`).limit(PER_TYPE_LIMIT),
+    supabase.from("articles").select("id, title, category, created_at").ilike("title", `%${likeQ}%`).limit(PER_TYPE_LIMIT),
   ]);
 
   const rows: GlobalSearchResult[] = [];

@@ -235,6 +235,10 @@ export default function SchedulePage() {
   const handleConfirmDate = async (dateStr: string) => {
     if (!selectedSchedule || selectedSchedule.created_by !== userId) return;
     const newDate = selectedSchedule.confirmed_date === dateStr ? null : dateStr;
+    if (newDate) {
+      const label = new Date(newDate + "T00:00:00").toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" });
+      if (!confirm(`${label}로 확정하고 참여자에게 알림을 보낼까요?`)) return;
+    }
     const { error } = await supabase.from("schedules").update({ confirmed_date: newDate }).eq("id", selectedSchedule.id);
     if (error) { console.error(error); return; }
     const updated = { ...selectedSchedule, confirmed_date: newDate };
