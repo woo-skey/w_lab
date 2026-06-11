@@ -168,10 +168,18 @@ Bar 추천 목록 및 댓글. `bar_comments`는 bar_id, user_id, content.
 - 개별 클릭 시 읽음 처리 + 해당 페이지 이동
 - "모두 읽음" 버튼
 
-### 8. 관리자 (`/admin`)
-- 유저 목록 조회
-- `is_member` 토글 (관리자 계정은 토글 불가)
+### 8. 관리자 (`/admin` → `/mypage?tab=admin`)
+- `/admin`은 `/mypage?tab=admin&sub=users`로 redirect (실제 UI는 마이페이지 `🛡️ 관리자` 탭)
 - `isAdmin !== "true"` 이면 자동 redirect
+- 서브탭: 통계 / 유저 / 공지 / 리뷰 / 지식글 / Bar / 위스키 / 일정
+- **통계 탭 = 운영 대시보드**:
+  - 처리 필요 패널: 미답변 문의 수(→ `/contact`), 미확정 일정 수(→ `/schedule`)
+  - 이번 주 활동: 신규 가입/리뷰/지식글 (최근 7일, 지난주 대비 증감)
+  - 전체 현황 6개 카운터 + 활동 많은 유저 Top 5 + 회원 구성(회원/비회원/관리자) 비율 바
+  - 데이터는 `fetchAdminData()`에서 일괄 집계 (inquiries.status, schedules.confirmed_date 포함)
+- **유저 탭**: 이름/아이디 검색, 회원/비회원/관리자 필터, 가입순/활동순 정렬
+  - `is_member` 토글(관리자 계정은 불가), `is_admin` 토글, 회원탈퇴(본인 제외)
+- 콘텐츠 탭(공지/리뷰/지식글/Bar/위스키/일정): 검색·정렬, 편집·삭제 모더레이션
 
 ### 9. 공지사항 (`/notices`)
 - 관리자만 작성 (Rich Text Editor)

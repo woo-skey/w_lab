@@ -67,6 +67,18 @@ interface AdminStats {
   totalBars: number;
   totalWhiskeys: number;
   totalSchedules: number;
+  pendingInquiries: number;
+  unconfirmedSchedules: number;
+  memberCount: number;
+  adminCount: number;
+  nonMemberCount: number;
+  newUsersThisWeek: number;
+  newUsersLastWeek: number;
+  newReviewsThisWeek: number;
+  newReviewsLastWeek: number;
+  newArticlesThisWeek: number;
+  newArticlesLastWeek: number;
+  topUsers: { id: string; name: string; avatar_url?: string; review_count: number; article_count: number; bar_count: number; total: number }[];
 }
 
 const USER_TAB_IDS = [
@@ -122,6 +134,9 @@ export default function MyPage() {
   const [adminSearchQuery, setAdminSearchQuery] = useState("");
   const [adminSortOrder, setAdminSortOrder] = useState<"latest" | "oldest">("latest");
   const [adminStatusFilter, setAdminStatusFilter] = useState("all");
+  const [userSearch, setUserSearch] = useState("");
+  const [userFilter, setUserFilter] = useState<"all" | "member" | "nonmember" | "admin">("all");
+  const [userSort, setUserSort] = useState<"latest" | "oldest" | "active">("latest");
   const [allArticles, setAllArticles] = useState<AllArticle[]>([]);
   const [allReviews, setAllReviews] = useState<AllReview[]>([]);
   const [allBars, setAllBars] = useState<AllBar[]>([]);
@@ -253,19 +268,22 @@ export default function MyPage() {
   const fetchAdminData = async () => {
     setAdminLoading(true);
     try {
-      const [usersRes, reviewsRes, articlesRes, barsRes, whiskeysRes, schedulesRes] = await Promise.allSettled([
+      const [usersRes, reviewsRes, articlesRes, barsRes, whiskeysRes, schedulesRes, inquiriesRes] = await Promise.allSettled([
         supabase.from("users").select("id, name, username, created_at, is_admin, is_member, avatar_url").order("created_at", { ascending: false }),
-        supabase.from("reviews").select("id, user_id"),
-        supabase.from("articles").select("id, author_id"),
+        supabase.from("reviews").select("id, user_id, created_at"),
+        supabase.from("articles").select("id, author_id, created_at"),
         supabase.from("bars").select("id, user_id"),
         supabase.from("whiskeys").select("id"),
-        supabase.from("schedules").select("id"),
+        supabase.from("schedules").select("id, confirmed_date"),
+        supabase.from("inquiries").select("id, status"),
       ]);
 
       const usersData = usersRes.status === "fulfilled" ? (usersRes.value.data || []) : [];
       const reviewsData = reviewsRes.status === "fulfilled" ? (reviewsRes.value.data || []) : [];
       const articlesData = articlesRes.status === "fulfilled" ? (articlesRes.value.data || []) : [];
       const barsData = barsRes.status === "fulfilled" ? (barsRes.value.data || []) : [];
+      const schedulesData = schedulesRes.status === "fulfilled" ? (schedulesRes.value.data || []) : [];
+      const inquiriesData = inquiriesRes.status === "fulfilled" ? (inquiriesRes.value.data || []) : [];
 
       // 유저별 활동 수 계산
       const reviewCountMap: Record<string, number> = {};
@@ -283,13 +301,49 @@ export default function MyPage() {
       }));
       setAdminUsers(enrichedUsers);
 
+      // 주간 활동 (최근 7일 / 지난주)
+      const nowMs = new Date().getTime();
+      const WEEK = 7 * 24 * 60 * 60 * 1000;
+      const weekAgo = nowMs - WEEK;
+      const twoWeeksAgo = nowMs - 2 * WEEK;
+      const countThisWeek = <T extends { created_at?: string }>(rows: T[]) =>
+        rows.filter((r) => r.created_at && new Date(r.created_at).getTime() >= weekAgo).length;
+      const countLastWeek = <T extends { created_at?: string }>(rows: T[]) =>
+        rows.filter((r) => {
+          if (!r.created_at) return false;
+          const t = new Date(r.created_at).getTime();
+          return t >= twoWeeksAgo && t < weekAgo;
+        }).length;
+
+      const topUsers = enrichedUsers
+        .map((u) => ({
+          id: u.id, name: u.name, avatar_url: u.avatar_url,
+          review_count: u.review_count || 0, article_count: u.article_count || 0, bar_count: u.bar_count || 0,
+          total: (u.review_count || 0) + (u.article_count || 0) + (u.bar_count || 0),
+        }))
+        .filter((u) => u.total > 0)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 5);
+
       setAdminStats({
         totalUsers: usersData.length,
         totalReviews: reviewsData.length,
         totalArticles: articlesData.length,
         totalBars: barsData.length,
         totalWhiskeys: whiskeysRes.status === "fulfilled" ? (whiskeysRes.value.data?.length || 0) : 0,
-        totalSchedules: schedulesRes.status === "fulfilled" ? (schedulesRes.value.data?.length || 0) : 0,
+        totalSchedules: schedulesData.length,
+        pendingInquiries: inquiriesData.filter((i) => i.status === "pending").length,
+        unconfirmedSchedules: schedulesData.filter((s) => !s.confirmed_date).length,
+        memberCount: usersData.filter((u) => u.is_member && !u.is_admin).length,
+        adminCount: usersData.filter((u) => u.is_admin).length,
+        nonMemberCount: usersData.filter((u) => !u.is_member && !u.is_admin).length,
+        newUsersThisWeek: countThisWeek(usersData),
+        newUsersLastWeek: countLastWeek(usersData),
+        newReviewsThisWeek: countThisWeek(reviewsData),
+        newReviewsLastWeek: countLastWeek(reviewsData),
+        newArticlesThisWeek: countThisWeek(articlesData),
+        newArticlesLastWeek: countLastWeek(articlesData),
+        topUsers,
       });
     } catch (err) {
       console.error(err);
@@ -620,6 +674,25 @@ export default function MyPage() {
       })
       .filter((s) => matchesAdminQuery(s.name, s.creator_name))
   );
+
+  const userQuery = userSearch.trim().toLowerCase();
+  const visibleAdminUsers = adminUsers
+    .filter((u) => {
+      if (userFilter === "member") return u.is_member && !u.is_admin;
+      if (userFilter === "nonmember") return !u.is_member && !u.is_admin;
+      if (userFilter === "admin") return u.is_admin;
+      return true;
+    })
+    .filter((u) => !userQuery || (u.name || "").toLowerCase().includes(userQuery) || (u.username || "").toLowerCase().includes(userQuery))
+    .sort((a, b) => {
+      if (userSort === "active") {
+        const ta = (a.review_count || 0) + (a.article_count || 0) + (a.bar_count || 0);
+        const tb = (b.review_count || 0) + (b.article_count || 0) + (b.bar_count || 0);
+        return tb - ta;
+      }
+      const factor = userSort === "latest" ? -1 : 1;
+      return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * factor;
+    });
 
   const adminSearchPlaceholderMap: Record<AdminSubTab, string> = {
     stats: "검색",
@@ -1132,28 +1205,144 @@ export default function MyPage() {
               </div>
             )}
 
-            {/* 통계 */}
+            {/* 통계 — 운영 대시보드 */}
             {adminSubTab === "stats" && (
-              <div className="glass-card card rounded-xl p-6">
-                <h2 className="font-bold text-white mb-4 text-lg">사이트 통계</h2>
-                {adminLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : adminStats ? (
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                    {[
-                      { label: "전체 유저", count: adminStats.totalUsers, color: "text-indigo-300" },
-                      { label: "전체 리뷰", count: adminStats.totalReviews, color: "text-green-400" },
-                      { label: "전체 지식글", count: adminStats.totalArticles, color: "text-purple-400" },
-                      { label: "전체 Bar", count: adminStats.totalBars, color: "text-orange-300" },
-                      { label: "전체 위스키", count: adminStats.totalWhiskeys, color: "text-amber-300" },
-                      { label: "전체 일정", count: adminStats.totalSchedules, color: "text-pink-300" },
-                    ].map((s) => (
-                      <div key={s.label} className="text-center p-3 bg-indigo-500/10 rounded-lg">
-                        <p className={`text-2xl font-bold ${s.color}`}>{s.count}</p>
-                        <p className="text-xs text-white/40 mt-0.5">{s.label}</p>
+              adminLoading ? (
+                <div className="glass-card card rounded-xl p-6"><p className="text-white/30 text-sm">로딩 중...</p></div>
+              ) : adminStats ? (
+                <div className="space-y-4">
+                  {/* 처리 필요 */}
+                  {(adminStats.pendingInquiries > 0 || adminStats.unconfirmedSchedules > 0) ? (
+                    <div className="glass-card card rounded-xl p-5 border border-orange-400/20">
+                      <h2 className="font-bold text-white text-base mb-3">처리 필요 <span className="text-xs font-normal text-white/40 ml-1">지금 확인이 필요한 항목</span></h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {adminStats.pendingInquiries > 0 && (
+                          <a href="/contact" className="flex items-center justify-between p-4 rounded-lg bg-orange-500/10 border border-orange-400/20 hover:bg-orange-500/20 transition">
+                            <div>
+                              <p className="text-xs text-white/50 mb-0.5">미답변 문의</p>
+                              <p className="text-2xl font-bold text-orange-300">{adminStats.pendingInquiries}<span className="text-sm font-normal text-white/40 ml-1">건</span></p>
+                            </div>
+                            <span className="text-xs text-orange-300/80">답변하기 →</span>
+                          </a>
+                        )}
+                        {adminStats.unconfirmedSchedules > 0 && (
+                          <a href="/schedule" className="flex items-center justify-between p-4 rounded-lg bg-amber-500/10 border border-amber-400/20 hover:bg-amber-500/20 transition">
+                            <div>
+                              <p className="text-xs text-white/50 mb-0.5">미확정 일정</p>
+                              <p className="text-2xl font-bold text-amber-300">{adminStats.unconfirmedSchedules}<span className="text-sm font-normal text-white/40 ml-1">건</span></p>
+                            </div>
+                            <span className="text-xs text-amber-300/80">보러가기 →</span>
+                          </a>
+                        )}
                       </div>
-                    ))}
+                    </div>
+                  ) : (
+                    <div className="glass-card card rounded-xl p-4 border border-emerald-400/20">
+                      <p className="text-sm font-medium text-emerald-300">✓ 처리할 항목이 없습니다.</p>
+                    </div>
+                  )}
+
+                  {/* 이번 주 활동 */}
+                  <div className="glass-card card rounded-xl p-6">
+                    <h2 className="font-bold text-white text-base mb-4">이번 주 활동 <span className="text-xs font-normal text-white/40 ml-1">최근 7일 · 지난주 대비</span></h2>
+                    <div className="grid grid-cols-3 gap-3 md:gap-4">
+                      {[
+                        { label: "신규 가입", now: adminStats.newUsersThisWeek, prev: adminStats.newUsersLastWeek, color: "text-indigo-300" },
+                        { label: "신규 리뷰", now: adminStats.newReviewsThisWeek, prev: adminStats.newReviewsLastWeek, color: "text-green-400" },
+                        { label: "신규 지식글", now: adminStats.newArticlesThisWeek, prev: adminStats.newArticlesLastWeek, color: "text-purple-400" },
+                      ].map((m) => {
+                        const delta = m.now - m.prev;
+                        return (
+                          <div key={m.label} className="text-center p-3 rounded-lg bg-black/[0.03] dark:bg-white/[0.03]">
+                            <p className="text-xs text-white/40 mb-1">{m.label}</p>
+                            <p className={`text-2xl font-bold ${m.color}`}>{m.now}</p>
+                            <p className={`text-xs mt-1 ${delta > 0 ? "text-emerald-400" : delta < 0 ? "text-red-400" : "text-white/30"}`}>
+                              {delta > 0 ? `▲ ${delta}` : delta < 0 ? `▼ ${Math.abs(delta)}` : "± 0"}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                ) : null}
-              </div>
+
+                  {/* 전체 현황 */}
+                  <div className="glass-card card rounded-xl p-6">
+                    <h2 className="font-bold text-white text-base mb-4">전체 현황</h2>
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
+                      {[
+                        { label: "전체 유저", count: adminStats.totalUsers, color: "text-indigo-300" },
+                        { label: "전체 리뷰", count: adminStats.totalReviews, color: "text-green-400" },
+                        { label: "전체 지식글", count: adminStats.totalArticles, color: "text-purple-400" },
+                        { label: "전체 Bar", count: adminStats.totalBars, color: "text-orange-300" },
+                        { label: "전체 위스키", count: adminStats.totalWhiskeys, color: "text-amber-300" },
+                        { label: "전체 일정", count: adminStats.totalSchedules, color: "text-pink-300" },
+                      ].map((s) => (
+                        <div key={s.label} className="text-center p-3 bg-indigo-500/10 rounded-lg">
+                          <p className={`text-2xl font-bold ${s.color}`}>{s.count}</p>
+                          <p className="text-xs text-white/40 mt-0.5">{s.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 활동 많은 유저 + 회원 구성 */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="glass-card card rounded-xl p-6">
+                      <h2 className="font-bold text-white text-base mb-4">활동 많은 유저 <span className="text-xs font-normal text-white/40 ml-1">리뷰+글+Bar 합산</span></h2>
+                      {adminStats.topUsers.length === 0 ? (
+                        <p className="text-white/30 text-sm py-4 text-center">아직 활동 데이터가 없습니다.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {adminStats.topUsers.map((u, i) => (
+                            <div key={u.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-black/[0.03] dark:bg-white/[0.03]">
+                              <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold flex-shrink-0 ${i === 0 ? "bg-amber-400/30 text-amber-200" : i === 1 ? "bg-white/20 text-white/80" : i === 2 ? "bg-orange-400/20 text-orange-200" : "bg-white/8 text-white/50"}`}>{i + 1}</span>
+                              <div className="relative w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-xs overflow-hidden flex-shrink-0">
+                                {u.avatar_url ? (
+                                  <Image src={u.avatar_url} alt="avatar" loader={passthroughImageLoader} unoptimized fill sizes="32px" className="object-cover" />
+                                ) : (u.name || "?")[0].toUpperCase()}
+                              </div>
+                              <span className="flex-1 min-w-0 truncate text-sm font-medium text-white">{u.name}</span>
+                              <div className="text-right flex-shrink-0">
+                                <span className="text-sm font-bold text-indigo-300">{u.total}</span>
+                                <span className="hidden sm:inline text-[11px] text-white/35 ml-2">리뷰 {u.review_count} · 글 {u.article_count} · Bar {u.bar_count}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="glass-card card rounded-xl p-6">
+                      <h2 className="font-bold text-white text-base mb-4">회원 구성 <span className="text-xs font-normal text-white/40 ml-1">총 {adminStats.totalUsers}명</span></h2>
+                      {(() => {
+                        const total = adminStats.memberCount + adminStats.nonMemberCount + adminStats.adminCount || 1;
+                        const seg = [
+                          { label: "w_lab 회원", count: adminStats.memberCount, bar: "bg-emerald-400", dot: "bg-emerald-400" },
+                          { label: "비회원", count: adminStats.nonMemberCount, bar: "bg-gray-400", dot: "bg-gray-400" },
+                          { label: "관리자", count: adminStats.adminCount, bar: "bg-indigo-400", dot: "bg-indigo-400" },
+                        ];
+                        return (
+                          <>
+                            <div className="flex h-3 rounded-full overflow-hidden mb-4 bg-black/10 dark:bg-white/5">
+                              {seg.map((s) => s.count > 0 ? (
+                                <div key={s.label} className={s.bar} style={{ width: `${(s.count / total) * 100}%` }} />
+                              ) : null)}
+                            </div>
+                            <div className="space-y-2">
+                              {seg.map((s) => (
+                                <div key={s.label} className="flex items-center justify-between text-sm">
+                                  <span className="flex items-center gap-2 text-white/60"><span className={`w-2.5 h-2.5 rounded-full ${s.dot}`} />{s.label}</span>
+                                  <span className="text-white/80 font-medium">{s.count}명 <span className="text-white/30 text-xs">({Math.round((s.count / total) * 100)}%)</span></span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              ) : null
             )}
 
             {/* 유저 관리 */}
@@ -1161,11 +1350,39 @@ export default function MyPage() {
               <div className="glass-card card rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-white text-lg">유저 관리</h2>
-                  <span className="text-sm text-white/40">{adminUsers.length}명</span>
+                  <span className="text-sm text-white/40">{visibleAdminUsers.length}{visibleAdminUsers.length !== adminUsers.length ? ` / ${adminUsers.length}` : ""}명</span>
                 </div>
-                {adminLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
+
+                {/* 검색·필터·정렬 */}
+                <div className="flex flex-col md:flex-row gap-2 md:items-center mb-4">
+                  <input
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    placeholder="이름 또는 아이디 검색"
+                    className="glass-input surface flex-1 px-3 py-2 rounded-lg text-sm"
+                  />
+                  <div className="flex gap-1.5 flex-wrap">
+                    {([["all", "전체"], ["member", "회원"], ["nonmember", "비회원"], ["admin", "관리자"]] as const).map(([val, label]) => (
+                      <button key={val} type="button" onClick={() => setUserFilter(val)}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition ${userFilter === val ? "bg-indigo-500/80 text-white" : "bg-white/8 text-white/60 hover:bg-white/12"}`}>{label}</button>
+                    ))}
+                  </div>
+                  <select
+                    value={userSort}
+                    onChange={(e) => setUserSort(e.target.value as "latest" | "oldest" | "active")}
+                    className="glass-input surface md:w-32 px-3 py-2 rounded-lg text-sm"
+                  >
+                    <option value="latest">가입 최신순</option>
+                    <option value="oldest">가입 오래된순</option>
+                    <option value="active">활동순</option>
+                  </select>
+                </div>
+
+                {adminLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : visibleAdminUsers.length === 0 ? (
+                  <p className="text-center text-white/30 text-sm py-8">조건에 맞는 유저가 없습니다.</p>
+                ) : (
                   <div className="space-y-3">
-                    {adminUsers.map((u) => (
+                    {visibleAdminUsers.map((u) => (
                       <div key={u.id} className={`flex items-center justify-between p-4 rounded-lg border ${u.id === userId ? "border-indigo-400/30 bg-indigo-500/10" : "border-white/8 bg-black/[0.03] dark:bg-white/[0.03]"}`}>
                         <div className="flex items-center gap-3">
                           <div className="relative w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-sm overflow-hidden flex-shrink-0">
