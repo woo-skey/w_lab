@@ -468,7 +468,7 @@ export default function ArticlesPage() {
                       {/* 본문 + 댓글 */}
                       {isExpanded && (
                         <div className="border-t border-white/8">
-                          <div className="p-6" style={{ background: "rgba(255,255,255,0.03)" }}>
+                          <div className="p-6 bg-black/[0.03] dark:bg-white/[0.03]">
                             {article.image_url && (
                               <Image
                                 src={article.image_url}
@@ -490,7 +490,7 @@ export default function ArticlesPage() {
                               ) : (
                                 articleComments.map((comment) => (
                                   <div key={comment.id} className="flex gap-3">
-                                    <div className="flex-1 rounded-lg px-4 py-2" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                    <div className="flex-1 rounded-lg px-4 py-2 bg-black/[0.04] dark:bg-white/[0.05]">
                                       <div className="flex justify-between items-center mb-1">
                                         <div className="flex gap-2 items-center">
                                           <UserProfilePopup userId={comment.user_id} displayName={comment.users?.name || "알 수 없음"} />

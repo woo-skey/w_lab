@@ -104,7 +104,6 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
       setUserName(localStorage.getItem("userName") || "");
       setUserId(id);
       setIsAdmin(localStorage.getItem("isAdmin") === "true");
-      if (id) fetchNotifications(id);
     };
     sync();
     window.addEventListener("storage", sync);
@@ -113,7 +112,12 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
       window.removeEventListener("storage", sync);
       window.removeEventListener("auth-change", sync);
     };
-  }, [pathname]);
+  }, []);
+
+  // 알림은 userId 변경 시 1회만 조회(라우트 이동마다 재조회하지 않음). 이후는 Realtime 구독이 갱신.
+  useEffect(() => {
+    if (userId) fetchNotifications(userId);
+  }, [userId]);
 
   const fetchNotifications = async (id: string) => {
     const { data } = await supabase

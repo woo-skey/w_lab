@@ -111,6 +111,7 @@ export default function ContactPage() {
       }
     } catch (err) {
       console.error(err);
+      alert("답변 등록에 실패했습니다.");
     } finally {
       setReplying(null);
     }
@@ -171,7 +172,7 @@ export default function ContactPage() {
                   {expandedId === inq.id && (
                     <div className="px-6 pb-6 border-t border-white/8">
                       {/* 문의 내용 */}
-                      <div className="mt-4 p-4 rounded-lg" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <div className="mt-4 p-4 rounded-lg bg-black/[0.04] dark:bg-white/[0.04]">
                         <p className="text-xs text-white/40 mb-2 font-medium">문의 내용</p>
                         <SafeHtml html={inq.content} className="rich-content text-sm leading-relaxed text-white/80" />
                       </div>
@@ -290,7 +291,7 @@ export default function ContactPage() {
 
                   {expandedId === inq.id && (
                     <div className="px-6 pb-5 border-t border-white/8">
-                      <div className="mt-4 p-4 rounded-lg" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <div className="mt-4 p-4 rounded-lg bg-black/[0.04] dark:bg-white/[0.04]">
                         <p className="text-xs text-white/40 mb-2 font-medium">문의 내용</p>
                         <SafeHtml html={inq.content} className="rich-content text-sm leading-relaxed text-white/80" />
                       </div>

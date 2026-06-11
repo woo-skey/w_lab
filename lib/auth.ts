@@ -49,6 +49,10 @@ export async function signup(
 
     return { success: true, userId: data.id };
   } catch (error) {
+    const code = (error as { code?: string } | null)?.code;
+    if (code === "23505") {
+      return { success: false, error: "이미 사용 중인 아이디입니다" };
+    }
     return { success: false, error: "회원가입에 실패했습니다" };
   }
 }

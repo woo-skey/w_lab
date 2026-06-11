@@ -77,6 +77,8 @@ export default function SignupPage() {
 
     if (!formData.password) {
       newErrors.password = "비밀번호를 입력해주세요";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "비밀번호는 6자 이상이어야 합니다";
     }
 
     if (formData.password !== formData.confirmPassword) {

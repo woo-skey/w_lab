@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ENCYCLOPEDIA_WHISKEYS, type EncyclopediaEntry } from "@/lib/encyclopediaData";
 import { supabase } from "@/lib/supabase";
 
@@ -104,7 +104,7 @@ export default function EncyclopediaPage() {
   };
 
   // Merge: DB entries override static by id; new DB entries appended; deleted static entries hidden
-  const mergedWhiskeys = (() => {
+  const mergedWhiskeys = useMemo(() => {
     const dbMap = new Map(dbEntries.map((e) => [e.id, e]));
     const merged = ENCYCLOPEDIA_WHISKEYS
       .filter((w) => !deletedStaticIds.has(w.id))
@@ -112,7 +112,7 @@ export default function EncyclopediaPage() {
     const staticIds = new Set(ENCYCLOPEDIA_WHISKEYS.map((w) => w.id));
     dbEntries.filter((e) => !staticIds.has(e.id)).forEach((e) => merged.push(e));
     return merged;
-  })();
+  }, [dbEntries, deletedStaticIds]);
 
   const toggleFilter = (key: FilterKey, val: string) =>
     setFilters((prev) => ({

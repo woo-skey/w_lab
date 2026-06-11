@@ -65,6 +65,7 @@ export default function RichTextEditor({
       FontSize,
     ],
     content: value,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },

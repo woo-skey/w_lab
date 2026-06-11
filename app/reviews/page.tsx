@@ -57,7 +57,7 @@ function RatingGauge({ rating, size = "md" }: { rating: number; size?: "sm" | "m
       <span className={`font-bold leading-none ${isSmall ? "text-sm" : "text-base"}`} style={{ color }}>
         {typeof rating === "number" ? rating.toFixed(1) : rating}/10
       </span>
-      <div className={`w-full rounded-full overflow-hidden ${isSmall ? "h-1" : "h-1.5"}`} style={{ background: "rgba(255,255,255,0.1)" }}>
+      <div className={`w-full rounded-full overflow-hidden bg-black/10 dark:bg-white/10 ${isSmall ? "h-1" : "h-1.5"}`}>
         <div className="h-full rounded-full transition-all duration-300" style={{ width: `${(Number(rating) / 10) * 100}%`, background: color }} />
       </div>
     </div>
@@ -866,7 +866,7 @@ export default function ReviewsPage() {
                   {isExpanded && (
                     <div className="border-t border-white/8">
                       {/* 리뷰 작성 버튼 */}
-                      <div className="px-4 py-3 md:px-6 md:py-4 border-b border-white/8" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div className="px-4 py-3 md:px-6 md:py-4 border-b border-white/8 bg-black/[0.03] dark:bg-white/[0.03]">
                         {userId ? (
                           reviewForm?.whiskey_id === w.id ? (
                             <form onSubmit={handleAddReview} className="space-y-3">
@@ -946,7 +946,7 @@ export default function ReviewsPage() {
                         const dist = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((s) => ({ star: s, count: whiskeyReviews.filter((r) => r.rating === s).length }));
                         const max = Math.max(...dist.map((d) => d.count), 1);
                         return (
-                          <div className="px-4 py-3 md:px-6 md:py-4 border-b border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <div className="px-4 py-3 md:px-6 md:py-4 border-b border-white/8 bg-black/[0.02] dark:bg-white/[0.02]">
                             <p className="text-xs text-white/30 mb-2">평점 분포</p>
                             <div className="space-y-1">
                               {dist.map(({ star, count }) => (
@@ -1103,7 +1103,7 @@ export default function ReviewsPage() {
                                         ) : (
                                           reviewComments.map((c) => (
                                             <div key={c.id} className="flex gap-2">
-                                              <div className="flex-1 rounded-lg px-3 py-2" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                              <div className="flex-1 rounded-lg px-3 py-2 bg-black/[0.04] dark:bg-white/[0.05]">
                                                 <div className="flex justify-between items-center">
                                                   <div className="flex items-center gap-2">
                                                     <UserProfilePopup userId={c.user_id} displayName={c.users?.name || "알 수 없음"} />

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
 import { ENCYCLOPEDIA_WHISKEYS } from "@/lib/encyclopediaData";
-import bcrypt from "bcryptjs";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
 import { passthroughImageLoader } from "@/lib/imageLoader";
@@ -541,6 +540,7 @@ export default function MyPage() {
     setPwChanging(true);
     const { data } = await supabase.from("users").select("password_hash").eq("id", userId).single();
     if (!data) { setPwError("사용자 정보를 불러올 수 없습니다."); setPwChanging(false); return; }
+    const bcrypt = (await import("bcryptjs")).default;
     const match = await bcrypt.compare(pwForm.current, data.password_hash);
     if (!match) { setPwError("현재 비밀번호가 올바르지 않습니다."); setPwChanging(false); return; }
     const newHash = await bcrypt.hash(pwForm.newPw, 10);
@@ -1166,7 +1166,7 @@ export default function MyPage() {
                 {adminLoading ? <p className="text-white/30 text-sm">로딩 중...</p> : (
                   <div className="space-y-3">
                     {adminUsers.map((u) => (
-                      <div key={u.id} className={`flex items-center justify-between p-4 rounded-lg border ${u.id === userId ? "border-indigo-400/30 bg-indigo-500/10" : "border-white/8"}`} style={u.id !== userId ? { background: "rgba(255,255,255,0.03)" } : {}}>
+                      <div key={u.id} className={`flex items-center justify-between p-4 rounded-lg border ${u.id === userId ? "border-indigo-400/30 bg-indigo-500/10" : "border-white/8 bg-black/[0.03] dark:bg-white/[0.03]"}`}>
                         <div className="flex items-center gap-3">
                           <div className="relative w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-sm overflow-hidden flex-shrink-0">
                             {u.avatar_url ? (
@@ -1264,7 +1264,7 @@ export default function MyPage() {
                         {hasAdminQuery ? "조건에 맞는 공지가 없습니다." : "등록된 공지가 없습니다."}
                       </p>
                     ) : visibleAnnouncements.map((a) => (
-                      <div key={a.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div key={a.id} className="border border-white/8 rounded-lg p-4 bg-black/[0.03] dark:bg-white/[0.03]">
                         {editingAdminAnnouncement?.id === a.id ? (
                           <form onSubmit={handleAdminSaveAnnouncement} className="space-y-3">
                             <input value={editingAdminAnnouncement.title}
@@ -1317,7 +1317,7 @@ export default function MyPage() {
                         {hasAdminQuery ? "조건에 맞는 지식글이 없습니다." : "등록된 지식글이 없습니다."}
                       </p>
                     ) : visibleArticles.map((a) => (
-                      <div key={a.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div key={a.id} className="border border-white/8 rounded-lg p-4 bg-black/[0.03] dark:bg-white/[0.03]">
                         {editingAdminArticle?.id === a.id ? (
                           <form onSubmit={handleAdminSaveArticle} className="space-y-3">
                             <input value={editingAdminArticle.title} onChange={(e) => setEditingAdminArticle({ ...editingAdminArticle, title: e.target.value })}
@@ -1377,7 +1377,7 @@ export default function MyPage() {
                         {hasAdminQuery ? "조건에 맞는 리뷰가 없습니다." : "등록된 리뷰가 없습니다."}
                       </p>
                     ) : visibleReviews.map((r) => (
-                      <div key={r.id} className="border border-white/8 rounded-lg p-4 flex justify-between items-start gap-3" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div key={r.id} className="border border-white/8 rounded-lg p-4 flex justify-between items-start gap-3 bg-black/[0.03] dark:bg-white/[0.03]">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xs text-white/30">{r.users?.name || "-"}</span>
@@ -1411,7 +1411,7 @@ export default function MyPage() {
                         {hasAdminQuery ? "조건에 맞는 Bar가 없습니다." : "등록된 Bar가 없습니다."}
                       </p>
                     ) : visibleBars.map((b) => (
-                      <div key={b.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div key={b.id} className="border border-white/8 rounded-lg p-4 bg-black/[0.03] dark:bg-white/[0.03]">
                         {editingAdminBar?.id === b.id ? (
                           <form onSubmit={handleAdminSaveBar} className="space-y-3">
                             <input value={editingAdminBar.bar_name} onChange={(e) => setEditingAdminBar({ ...editingAdminBar, bar_name: e.target.value })}
@@ -1464,7 +1464,7 @@ export default function MyPage() {
                         {hasAdminQuery ? "조건에 맞는 위스키가 없습니다." : "등록된 위스키가 없습니다."}
                       </p>
                     ) : visibleWhiskeys.map((w) => (
-                      <div key={w.id} className="border border-white/8 rounded-lg p-4" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div key={w.id} className="border border-white/8 rounded-lg p-4 bg-black/[0.03] dark:bg-white/[0.03]">
                         {editingAdminWhiskey?.id === w.id ? (
                           <form onSubmit={handleAdminSaveWhiskey} className="space-y-3">
                             <div className="grid grid-cols-2 gap-2">
@@ -1527,7 +1527,7 @@ export default function MyPage() {
                         {hasAdminQuery || adminStatusFilter !== "all" ? "조건에 맞는 일정이 없습니다." : "등록된 일정이 없습니다."}
                       </p>
                     ) : visibleSchedules.map((s) => (
-                      <div key={s.id} className="border border-white/8 rounded-lg p-4 flex justify-between items-start gap-3" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div key={s.id} className="border border-white/8 rounded-lg p-4 flex justify-between items-start gap-3 bg-black/[0.03] dark:bg-white/[0.03]">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xs text-white/30">{s.creator_name || "-"}</span>
