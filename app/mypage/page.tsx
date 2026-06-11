@@ -362,7 +362,7 @@ export default function MyPage() {
         author_id: userId, author_name: authorName,
       }]);
       if (error) throw error;
-      await notifyAllUsers("announcement", `📢 새 공지: ${announcementForm.title}`, "/notices");
+      await notifyAllUsers("announcement", `📢 새 공지: ${announcementForm.title}`, "/notices", userId);
       setAnnouncementForm({ title: "", content: "" });
       setShowAnnouncementForm(false);
       fetchAdminContent("notices");
@@ -1381,7 +1381,7 @@ export default function MyPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xs text-white/30">{r.users?.name || "-"}</span>
-                            <span className="text-xs text-blue-400">{"★".repeat(r.rating)}</span>
+                            <span className="text-xs text-blue-400">{r.rating}/10</span>
                           </div>
                           <p className="font-medium text-white text-sm">{(r.whiskeys as unknown as { name: string } | null)?.name || "위스키"}</p>
                           {r.review_text && <p className="text-xs text-white/40 mt-1 break-words">{r.review_text}</p>}

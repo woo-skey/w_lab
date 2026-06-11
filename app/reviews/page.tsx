@@ -111,12 +111,10 @@ export default function ReviewsPage() {
     if (expandedWhiskey) fetchReviews(expandedWhiskey);
   }, [expandedWhiskey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 비교 모달 열릴 때 리뷰 미리 fetch
+  // 비교 모달 열릴 때 리뷰 미리 fetch (빈 배열 캐시 가드 금지 — 항상 재요청)
   useEffect(() => {
     if (compareList.length === 2) {
-      compareList.forEach((id) => {
-        if (!reviews[id]) fetchReviews(id);
-      });
+      compareList.forEach((id) => fetchReviews(id));
     }
   }, [compareList]); // eslint-disable-line react-hooks/exhaustive-deps
 

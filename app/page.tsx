@@ -108,7 +108,8 @@ export default function Home() {
         supabase
           .from("users")
           .select("id", { count: "exact", head: true })
-          .eq("is_member", true),
+          .eq("is_member", true)
+          .neq("is_admin", true),
         supabase
           .from("whiskeys")
           .select("id", { count: "exact", head: true }),

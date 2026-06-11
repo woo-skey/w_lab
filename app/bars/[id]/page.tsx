@@ -82,7 +82,7 @@ export default function BarDetailPage() {
     } else {
       await supabase.from("bar_favorites").insert([{ bar_id: id, user_id: userId }]);
       setIsFavorited(true);
-      setFavorites((prev) => [...prev, { user_id: userId }]);
+      setFavorites((prev) => [...prev, { user_id: userId, users: { name: localStorage.getItem("userName") || "멤버" } }]);
     }
   };
 

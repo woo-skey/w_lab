@@ -64,7 +64,7 @@ export default function NoticesPage() {
       if (error) throw error;
 
       // 전체 유저에게 알림
-      await notifyAllUsers("announcement", `📢 새 공지: ${formData.title}`, "/notices");
+      await notifyAllUsers("announcement", `📢 새 공지: ${formData.title}`, "/notices", userId);
 
       setFormData({ title: "", content: "" });
       setShowForm(false);

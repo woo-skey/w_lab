@@ -97,7 +97,7 @@ export default function SchedulePage() {
         Object.entries(dateGroupMap).forEach(([date, group]) => {
           const dateAvail = group.avail || [];
           // 중복 user 제거 후 count
-          const uniqueUsers = [...new Map(dateAvail.map((a) => [a.user_id, a])).values()];
+          const uniqueUsers = [...new Map(dateAvail.filter((a) => !(a.users as any)?.is_admin).map((a) => [a.user_id, a])).values()];
           const count = uniqueUsers.length;
           const isAvailable = uniqueUsers.some((a) => a.user_id === userId);
           const users = uniqueUsers.map((a) => (a.users as any)?.name || "알 수 없음");

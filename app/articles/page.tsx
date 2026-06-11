@@ -167,7 +167,7 @@ export default function ArticlesPage() {
       setExpandedId(null);
     } else {
       setExpandedId(articleId);
-      if (!comments[articleId]) fetchComments(articleId);
+      fetchComments(articleId);
     }
   };
 
@@ -205,6 +205,7 @@ export default function ArticlesPage() {
       setImageFile(null);
       setImagePreview("");
       setShowForm(false);
+      setPage(1);
       fetchArticles();
     } catch (err) {
       console.error(err);

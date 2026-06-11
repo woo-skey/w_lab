@@ -66,6 +66,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
 
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifMaxH, setNotifMaxH] = useState(340);
@@ -102,6 +103,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
       const id = localStorage.getItem("userId") || "";
       setUserName(localStorage.getItem("userName") || "");
       setUserId(id);
+      setIsAdmin(localStorage.getItem("isAdmin") === "true");
       if (id) fetchNotifications(id);
     };
     sync();
@@ -383,6 +385,17 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                     <span className="truncate">{userName}</span>
                   </Link>
 
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors"
+                      style={{ background: T.searchBg, color: T.textSecondary }}
+                    >
+                      <span className="text-base">🔐</span>
+                      <span>회원 관리</span>
+                    </Link>
+                  )}
+
                   <div className="flex gap-2">
                     <button
                       onClick={toggleTheme}
@@ -584,6 +597,21 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
               </Link>
             );
           })}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150"
+              style={{
+                color: pathname.startsWith("/admin") ? T.navActive : T.navInactive,
+                background: pathname.startsWith("/admin") ? "rgba(99,102,241,0.25)" : "transparent",
+                border: pathname.startsWith("/admin") ? "1px solid rgba(99,102,241,0.3)" : "1px solid transparent",
+                fontWeight: pathname.startsWith("/admin") ? 600 : 400,
+              }}
+            >
+              <span className="text-base w-5 text-center">🔐</span>
+              <span>회원 관리</span>
+            </Link>
+          )}
         </nav>
 
         <div className="px-3 py-4 space-y-1" style={{ borderTop: `1px solid ${T.border}` }}>
