@@ -137,8 +137,13 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
   const handleMarkAllRead = async () => {
     const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
     if (unreadIds.length === 0) return;
-    await supabase.from("notifications").update({ is_read: true }).in("id", unreadIds);
+    const previous = notifications;
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    const { error } = await supabase.from("notifications").update({ is_read: true }).in("id", unreadIds);
+    if (error) {
+      setNotifications(previous);
+      alert("읽음 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
   };
 
   const handleDeleteAllNotifications = async () => {

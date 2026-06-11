@@ -101,7 +101,7 @@ export default function ContactPage() {
         i.id === inquiryId ? { ...i, reply, status: "answered", replied_at: repliedAt } : i
       ));
       setReplyText((prev) => ({ ...prev, [inquiryId]: "" }));
-      if (targetInquiry?.user_id && targetInquiry.user_id !== userId) {
+      if (!targetInquiry?.reply && targetInquiry?.user_id && targetInquiry.user_id !== userId) {
         await createNotification(
           targetInquiry.user_id,
           "contact_reply",

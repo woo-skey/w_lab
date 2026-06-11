@@ -521,7 +521,7 @@ export default function MyPage() {
       favorite_category: profileForm.favorite_category || null,
       favorite_whiskey: profileForm.favorite_whiskey || null,
     }).eq("id", userId);
-    setProfile((prev) => prev ? { ...prev, ...profileForm } : prev);
+    await fetchAll(userId);
     setEditingProfile(false);
     setProfileSaving(false);
   };

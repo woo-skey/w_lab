@@ -199,6 +199,8 @@ export default function SchedulePage() {
   };
 
   const handleDeleteSchedule = async (scheduleId: string) => {
+    const target = schedules.find((s) => s.id === scheduleId);
+    if (!target || (target.created_by !== userId && !isAdmin)) return;
     if (!confirm("일정을 삭제할까요?")) return;
     try {
       const { error } = await supabase.from("schedules").delete().eq("id", scheduleId);
@@ -231,7 +233,7 @@ export default function SchedulePage() {
   };
 
   const handleConfirmDate = async (dateStr: string) => {
-    if (!selectedSchedule) return;
+    if (!selectedSchedule || selectedSchedule.created_by !== userId) return;
     const newDate = selectedSchedule.confirmed_date === dateStr ? null : dateStr;
     const { error } = await supabase.from("schedules").update({ confirmed_date: newDate }).eq("id", selectedSchedule.id);
     if (error) { console.error(error); return; }

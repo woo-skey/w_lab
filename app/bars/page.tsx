@@ -46,12 +46,22 @@ export default function BarsPage() {
 
   const handleToggleFavorite = async (barId: string) => {
     if (!userId) { alert("로그인이 필요합니다."); return; }
-    if (favoritedBars.has(barId)) {
-      await supabase.from("bar_favorites").delete().eq("bar_id", barId).eq("user_id", userId);
-      setFavoritedBars((prev) => { const n = new Set(prev); n.delete(barId); return n; });
-    } else {
-      await supabase.from("bar_favorites").insert([{ bar_id: barId, user_id: userId }]);
-      setFavoritedBars((prev) => new Set([...prev, barId]));
+    const wasFavorited = favoritedBars.has(barId);
+    // 낙관적 업데이트 (빠른 더블클릭 중복 요청 방지)
+    setFavoritedBars((prev) => {
+      const n = new Set(prev);
+      if (wasFavorited) n.delete(barId); else n.add(barId);
+      return n;
+    });
+    const { error } = wasFavorited
+      ? await supabase.from("bar_favorites").delete().eq("bar_id", barId).eq("user_id", userId)
+      : await supabase.from("bar_favorites").insert([{ bar_id: barId, user_id: userId }]);
+    if (error) {
+      setFavoritedBars((prev) => {
+        const n = new Set(prev);
+        if (wasFavorited) n.add(barId); else n.delete(barId);
+        return n;
+      });
     }
   };
 
