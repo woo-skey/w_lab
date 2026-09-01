@@ -29,12 +29,6 @@ interface ConfirmedSchedule {
   confirmed_date: string;
 }
 
-interface HomeMetrics {
-  totalReviews: number;
-  totalMembers: number;
-  totalWhiskeys: number;
-}
-
 const numberFormatter = new Intl.NumberFormat("ko-KR");
 
 function getName(rel: NameRelation | undefined, fallback: string) {
@@ -66,11 +60,6 @@ export default function Home() {
   const [recentReviews, setRecentReviews] = useState<RecentReview[]>([]);
   const [topWhiskeys, setTopWhiskeys] = useState<TopWhiskey[]>([]);
   const [confirmedSchedule, setConfirmedSchedule] = useState<ConfirmedSchedule | null>(null);
-  const [metrics, setMetrics] = useState<HomeMetrics>({
-    totalReviews: 0,
-    totalMembers: 0,
-    totalWhiskeys: 0,
-  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -84,7 +73,7 @@ export default function Home() {
 
   const loadDashboard = async (isLoggedIn: boolean) => {
     try {
-      const [reviewsRes, schedulesRes, whiskeyRatingsRes, reviewCountRes, memberCountRes, whiskeyCountRes] = await Promise.all([
+      const [reviewsRes, schedulesRes, whiskeyRatingsRes] = await Promise.all([
         supabase
           .from("reviews")
           .select("id, rating, review_text, created_at, users(name), whiskeys(name)")
@@ -102,28 +91,12 @@ export default function Home() {
         supabase
           .from("reviews")
           .select("whiskey_id, rating, whiskeys(id, name, type)"),
-        supabase
-          .from("reviews")
-          .select("id", { count: "exact", head: true }),
-        supabase
-          .from("users")
-          .select("id", { count: "exact", head: true })
-          .eq("is_member", true)
-          .neq("is_admin", true),
-        supabase
-          .from("whiskeys")
-          .select("id", { count: "exact", head: true }),
       ]);
 
       setRecentReviews((reviewsRes.data || []) as unknown as RecentReview[]);
       setConfirmedSchedule(
         isLoggedIn ? ((schedulesRes.data?.[0] as ConfirmedSchedule | undefined) || null) : null
       );
-      setMetrics({
-        totalReviews: reviewCountRes.count || 0,
-        totalMembers: memberCountRes.count || 0,
-        totalWhiskeys: whiskeyCountRes.count || 0,
-      });
 
       const ratingData = (whiskeyRatingsRes.data || []) as unknown as {
         whiskey_id: string;
@@ -163,12 +136,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-
-  const trustStrip = [
-    { label: "누적 리뷰", value: metrics.totalReviews },
-    { label: "활동 멤버", value: metrics.totalMembers },
-    { label: "등록 위스키", value: metrics.totalWhiskeys },
-  ];
 
   const scheduleCountdown = confirmedSchedule ? getScheduleCountdown(confirmedSchedule.confirmed_date) : null;
   const heroUser = userName || "멤버";
@@ -211,19 +178,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="nr-card nr-strip mt-6 nr-reveal" style={{ animationDelay: "80ms" }}>
-          <div className="grid grid-cols-1 sm:grid-cols-3">
-            {trustStrip.map((item) => (
-              <div key={item.label} className="nr-strip-item px-5 py-4 sm:px-6 sm:py-5">
-                <p className="nr-metric-label">{item.label}</p>
-                <p className="nr-metric-value">{numberFormatter.format(item.value)}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
         <section className="mt-6 grid gap-4 lg:grid-cols-12">
-          <article className="nr-card p-5 sm:p-6 lg:col-span-7 lg:row-span-2 nr-reveal" style={{ animationDelay: "140ms" }}>
+          <article className="nr-card p-5 sm:p-6 lg:col-span-7 lg:row-span-2 nr-reveal" style={{ animationDelay: "80ms" }}>
             <header className="flex items-center justify-between gap-3 mb-4">
               <h2 className="nr-section-title">Recent Tasting Notes</h2>
               <Link
@@ -270,7 +226,7 @@ export default function Home() {
             )}
           </article>
 
-          <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "220ms" }}>
+          <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "160ms" }}>
             <header className="flex items-center justify-between gap-3 mb-4">
               <h2 className="nr-section-title">Top Rated Whiskies</h2>
               <Link
@@ -315,7 +271,7 @@ export default function Home() {
           </article>
 
           {loggedIn ? (
-            <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "300ms" }}>
+            <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "240ms" }}>
               <header className="flex items-center justify-between gap-3 mb-4">
                 <h2 className="nr-section-title">This Week&apos;s Gathering</h2>
                 <Link
@@ -353,7 +309,7 @@ export default function Home() {
               )}
             </article>
           ) : (
-            <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "300ms" }}>
+            <article className="nr-card p-5 sm:p-6 lg:col-span-5 nr-reveal" style={{ animationDelay: "240ms" }}>
               <header className="flex items-center justify-between gap-3 mb-4">
                 <h2 className="nr-section-title">Gathering Access</h2>
               </header>
@@ -365,7 +321,7 @@ export default function Home() {
           )}
         </section>
 
-        <section className="mt-6 nr-reveal" style={{ animationDelay: "360ms" }}>
+        <section className="mt-6 nr-reveal" style={{ animationDelay: "320ms" }}>
           <div className="flex items-center justify-between gap-3 mb-3">
             <h2 className="nr-section-title">Quick Navigation</h2>
           </div>
@@ -525,26 +481,6 @@ export default function Home() {
         .nr-card:focus-within {
           border-color: rgba(216, 183, 122, 0.48);
           box-shadow: 0 0 0 1px rgba(216, 183, 122, 0.24), 0 16px 40px rgba(0, 0, 0, 0.36);
-        }
-
-        .nr-strip-item + .nr-strip-item {
-          border-top: 1px solid rgba(216, 183, 122, 0.14);
-        }
-
-        .nr-metric-label {
-          color: rgba(201, 183, 148, 0.72);
-          font-size: 0.78rem;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          margin-bottom: 0.34rem;
-        }
-
-        .nr-metric-value {
-          color: #f4efe4;
-          font-size: 1.45rem;
-          line-height: 1.15;
-          font-weight: 700;
-          font-family: "Iowan Old Style", "Times New Roman", "Noto Serif KR", serif;
         }
 
         .nr-section-title {
@@ -735,13 +671,6 @@ export default function Home() {
           }
         }
 
-        @media (min-width: 640px) {
-          .nr-strip-item + .nr-strip-item {
-            border-top: 0;
-            border-left: 1px solid rgba(216, 183, 122, 0.14);
-          }
-        }
-
         @media (max-width: 640px) {
           .nr-display {
             max-width: 100%;
@@ -792,8 +721,7 @@ export default function Home() {
 
         :global(html:not(.dark) .nr-section-title),
         :global(html:not(.dark) .nr-item-title),
-        :global(html:not(.dark) .nr-quick-title),
-        :global(html:not(.dark) .nr-metric-value) {
+        :global(html:not(.dark) .nr-quick-title) {
           color: rgba(38, 46, 63, 0.92);
         }
 
