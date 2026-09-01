@@ -192,11 +192,7 @@ export default function Home() {
             )}
           </h1>
           <p className="nr-body mt-4">
-            취향을 남기고, 평점을 읽고, 다음 모임의 한 잔을 함께 고르세요. 데이터는 선명하게,
-            분위기는 절제된 럭셔리로 정리했습니다.
-          </p>
-          <p className="nr-caption mt-4">
-            오늘의 아카이브: 기록은 더 단단하게, 탐색은 더 가볍게.
+            취향을 남기고, 평점을 읽고, 다음 모임의 한 잔을 함께 고르세요.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -478,13 +474,8 @@ export default function Home() {
           font-size: clamp(0.98rem, 1.4vw, 1.12rem);
           line-height: 1.72;
           max-width: 42rem;
-        }
-
-        .nr-caption {
-          color: rgba(201, 183, 148, 0.78);
-          font-size: 0.82rem;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
+          white-space: nowrap;
+          word-break: keep-all;
         }
 
         .nr-btn-primary,
@@ -499,14 +490,14 @@ export default function Home() {
 
         .nr-btn-primary {
           color: #f8f1e2;
-          border: 1px solid rgba(216, 183, 122, 0.62);
+          border: 1.5px solid rgba(216, 183, 122, 0.9);
           background: linear-gradient(140deg, rgba(216, 183, 122, 0.24), rgba(216, 183, 122, 0.14));
           box-shadow: inset 0 1px 0 rgba(255, 236, 199, 0.2);
         }
 
         .nr-btn-secondary {
           color: rgba(221, 213, 197, 0.88);
-          border: 1px solid rgba(154, 168, 212, 0.32);
+          border: 1.5px solid rgba(156, 168, 212, 0.65);
           background: rgba(141, 154, 196, 0.08);
         }
 
@@ -764,11 +755,7 @@ export default function Home() {
           .nr-body {
             font-size: 0.95rem;
             line-height: 1.64;
-          }
-
-          .nr-caption {
-            font-size: 0.74rem;
-            letter-spacing: 0.05em;
+            white-space: normal;
           }
         }
 
@@ -790,10 +777,6 @@ export default function Home() {
 
         :global(html:not(.dark) .nr-body) {
           color: rgba(40, 45, 60, 0.72);
-        }
-
-        :global(html:not(.dark) .nr-caption) {
-          color: rgba(133, 101, 53, 0.82);
         }
 
         :global(html:not(.dark) .nr-card) {
