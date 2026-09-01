@@ -1463,6 +1463,20 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     description: "켄터키 버번 디스틸러스(윌렛 계열)가 병입하는 114.3프루프의 고도수 스몰배치 버번으로, 진한 스파이스와 오크 풍미로 커뮤니티에서 꾸준히 회자되는 논에이지 프리미엄 버번.",
     priceRange: "₩169,900–189,000", difficulty: "중급", tags: ["버번", "Kentucky", "고도수", "스몰배치"],
   },
+  {
+    id: "angels-envy-rye", name: "엔젤스 엔비 라이", distillery: "Angel's Envy",
+    region: "Louisville, Kentucky", country: "USA", category: "버번/라이", age: null, abv: 50,
+    nose: "메이플슈가, 진저브레드, 흑설탕, 시나몬롤", palate: "당밀, 캐러멜 캔디, 다크 프루트, 라이 스파이스", finish: "버터스카치와 넛맥이 남는 에그노그 같은 여운",
+    description: "95% 하이라이 매시빌 원액을 카리브해 럼 캐스크에서 추가로 피니시해 라이 특유의 스파이스에 럼의 진한 단맛을 더한 엔젤스 엔비의 라이 라인.",
+    priceRange: "₩90,000–130,000", difficulty: "중급", tags: ["라이", "Kentucky", "럼캐스크", "하이라이"],
+  },
+  {
+    id: "angels-envy-triple-oak", name: "엔젤스 엔비 트리플 오크", distillery: "Angel's Envy",
+    region: "Louisville, Kentucky", country: "USA", category: "버번/라이", age: null, abv: 46,
+    nose: "캐러멜, 바닐라, 은은한 꽃향, 복합적인 오크", palate: "스트룹와플 같은 도우와 단맛, 모카, 초콜릿시럽", finish: "베이킹 스파이스와 코코아가 남는 여운",
+    description: "프렌치 오크·헝가리안 오크·켄터키 친카핀 오크 세 종류의 캐스크를 블렌딩해 마무리한 엔젤스 엔비의 세 번째 정규 라인업.",
+    priceRange: "₩120,000–160,000", difficulty: "중급", tags: ["버번", "Kentucky", "트리플오크", "프리미엄"],
+  },
 ];
 
 export const CATEGORY_TO_TYPE: Record<string, string> = {
