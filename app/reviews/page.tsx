@@ -83,7 +83,7 @@ export default function ReviewsPage() {
   // 위스키 추가 폼
   const [addMode, setAddMode] = useState<"encyclopedia" | "manual">("encyclopedia");
   const [encycSearch, setEncycSearch] = useState("");
-  const [encycCategory, setEncycCategory] = useState<"전체" | "싱글몰트" | "블렌디드" | "논몰트" | "아이리쉬" | "버번/라이" | "테네시" | "기타">("전체");
+  const [encycCategory, setEncycCategory] = useState<"전체" | "싱글몰트" | "블렌디드" | "그레인" | "아이리쉬" | "버번/라이" | "테네시" | "기타">("전체");
   const [whiskey, setWhiskey] = useState({ name: "", type: "Scotch", region: "", age: "", abv: "", nose: "", palate: "", finish_note: "", tasting_notes: "", price: "" });
 
   // 리뷰 작성 폼
@@ -569,7 +569,7 @@ export default function ReviewsPage() {
                   className="glass-input surface w-full px-4 py-2 rounded-lg text-sm mb-3"
                 />
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {(["전체", "싱글몰트", "블렌디드", "논몰트", "아이리쉬", "버번/라이", "테네시", "기타"] as const).map((category) => (
+                  {(["전체", "싱글몰트", "블렌디드", "그레인", "아이리쉬", "버번/라이", "테네시", "기타"] as const).map((category) => (
                     <button
                       key={category}
                       type="button"

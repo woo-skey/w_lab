@@ -1244,7 +1244,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
   },
   {
     id: "haig-club", name: "헤이그 클럽", distillery: "Cameronbridge",
-    region: "Lowland", country: "Scotland", category: "논몰트", age: null, abv: 40,
+    region: "Lowland", country: "Scotland", category: "그레인", age: null, abv: 40,
     nose: "꿀, 바닐라, 가벼운 시트러스", palate: "토피, 부드러운 곡물, 은은한 스파이스", finish: "짧고 부드러운 곡물 여운",
     description: "카메론브리지 증류소에서 만든 싱글 그레인 위스키로, 부드럽고 가벼운 스타일 덕에 하이볼로 특히 즐기기 좋다.",
     priceRange: "₩78,000", difficulty: "입문", tags: ["싱글그레인", "Lowland", "하이볼", "부드러움"],
@@ -1320,17 +1320,17 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩150,000–220,000", difficulty: "상급", tags: ["블렌디드", "Japanese", "월드블렌디드", "희소성"],
   },
 
-  // ─── 추가 8차: 논몰트(그레인) 스카치·테네시 위스키 카테고리 보강 ───
+  // ─── 추가 8차: 그레인 스카치·테네시 위스키 카테고리 보강 ───
   {
     id: "compass-box-hedonism", name: "컴파스 박스 헤도니즘", distillery: "Compass Box",
-    region: "Scotland (Blended)", country: "Scotland", category: "논몰트", age: null, abv: 46,
+    region: "Scotland (Blended)", country: "Scotland", category: "그레인", age: null, abv: 46,
     nose: "카페라떼, 버터스카치, 오렌지크림", palate: "누가, 구운 헤이즐넛, 우디한 단맛", finish: "밀크초콜릿이 남는 여운",
     description: "몰트가 아닌 그레인 원액만을 블렌딩한 독특한 컨셉의 논칠필터 위스키로, 크리미하고 달콤한 그레인 특유의 개성을 보여준다.",
     priceRange: "₩215,000", difficulty: "중급", tags: ["그레인위스키", "Scotch", "블렌디드그레인", "논칠필터"],
   },
   {
     id: "loch-lomond-single-grain", name: "로크로몬드 싱글 그레인", distillery: "Loch Lomond Distillery",
-    region: "Highland (Loch Lomond)", country: "Scotland", category: "논몰트", age: null, abv: 46,
+    region: "Highland (Loch Lomond)", country: "Scotland", category: "그레인", age: null, abv: 46,
     nose: "바닐라, 청사과, 배, 코코넛", palate: "초콜릿, 진저, 크리미한 바닐라", finish: "넛맥과 클로브, 오크가 남는 여운",
     description: "코페이식 연속증류기로 만든 접근성 좋은 싱글 그레인 위스키로, 부드럽고 달콤해 그레인 위스키 입문용으로 알맞다.",
     priceRange: "₩63,000", difficulty: "입문", tags: ["싱글그레인", "Highland", "부드러움", "입문추천"],
@@ -1477,12 +1477,112 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     description: "프렌치 오크·헝가리안 오크·켄터키 친카핀 오크 세 종류의 캐스크를 블렌딩해 마무리한 엔젤스 엔비의 세 번째 정규 라인업.",
     priceRange: "₩120,000–160,000", difficulty: "중급", tags: ["버번", "Kentucky", "트리플오크", "프리미엄"],
   },
+
+  // ─── 추가 10차: 싱글몰트·블렌디드·그레인 보강 (전 항목 데일리샷 가격 검증) ───
+  {
+    id: "fettercairn-12", name: "패터캐른 12년", distillery: "Fettercairn",
+    region: "Highland", country: "Scotland", category: "싱글몰트", age: 12, abv: 46,
+    nose: "바닐라, 배, 은은한 스파이스", palate: "넥타린, 트로피컬 프루트", finish: "건포도와 로스티드 커피, 블랙 토피의 여운",
+    description: "무착색·비냉각여과로 병입한 아버딘셔의 하이랜드 싱글몰트로, 독특한 워터 링 냉각 방식이 가벼운 과일향을 만들어낸다.",
+    priceRange: "₩95,000", difficulty: "입문", tags: ["싱글몰트", "Highland", "과일향", "입문추천"],
+  },
+  {
+    id: "aultmore-12", name: "올트모어 12년", distillery: "Aultmore",
+    region: "Speyside", country: "Scotland", category: "싱글몰트", age: 12, abv: 46,
+    nose: "청사과, 로즈마리, 타임", palate: "은은한 꽃향, 부드러운 단맛", finish: "허브와 과일이 산뜻하게 남는 여운",
+    description: "듀어스의 '라스트 그레이트 몰트' 라인 중 하나로, 무착색·비냉각여과의 허브향 가득한 스페이사이드 싱글몰트.",
+    priceRange: "₩89,000–110,000", difficulty: "입문", tags: ["싱글몰트", "Speyside", "허브향", "논칠필터"],
+  },
+  {
+    id: "glenglassaugh-12", name: "글렌글라사 12년", distillery: "Glenglassaugh",
+    region: "Highland", country: "Scotland", category: "싱글몰트", age: 12, abv: 45,
+    nose: "살구, 무화과, 토스티드 바닐라", palate: "피스타치오, 대추야자, 모렐로 체리", finish: "크리미하고 코스탈한 여운",
+    description: "버번·셰리·레드와인 캐스크를 혼합 숙성해 진한 과일 풍미를 보여주는 반프셔 해안가 증류소의 2023년 리뉴얼 플래그십.",
+    priceRange: "₩79,000–99,000", difficulty: "중급", tags: ["싱글몰트", "Highland", "과일향", "코스탈"],
+  },
+  {
+    id: "glen-scotia-15", name: "글렌스코샤 15년", distillery: "Glen Scotia",
+    region: "Campbeltown", country: "Scotland", category: "싱글몰트", age: 15, abv: 46,
+    nose: "해양성 짠맛, 시트러스 필", palate: "진저스냅 비스킷, 살구", finish: "토피와 스파이스가 짧고 드라이하게 남는 여운",
+    description: "퍼스트필 버번과 리필 오크에서 숙성 후 올로로소 캐스크로 피니시한 캠벨타운의 언피티드 싱글몰트.",
+    priceRange: "₩169,000", difficulty: "중급", tags: ["싱글몰트", "캠벨타운", "언피티드", "짠맛"],
+  },
+  {
+    id: "glenturret-12", name: "글렌터렛 12년", distillery: "The Glenturret",
+    region: "Highland", country: "Scotland", category: "싱글몰트", age: 12, abv: 46.4,
+    nose: "건포도, 술타나, 바닐라, 시나몬", palate: "진저, 넛맥", finish: "헤지로우 프루트와 오크가 남는 여운",
+    description: "스코틀랜드 최고(最古) 증류소로 알려진 퍼스셔의 글렌터렛이 올로로소·페드로 히메네즈 시즈닝 캐스크로 마무리한 셰리 싱글몰트.",
+    priceRange: "₩130,000–139,000", difficulty: "중급", tags: ["싱글몰트", "Highland", "셰리", "최고증류소"],
+  },
+  {
+    id: "white-horse", name: "화이트 호스", distillery: "Diageo (White Horse Distillers)",
+    region: "Multiple", country: "Scotland", category: "블렌디드", age: null, abv: 40,
+    nose: "피트·훈연, 건포도, 시나몬", palate: "몰트, 후추, 부드러운 피트 단맛", finish: "은은한 피트와 후추가 남는 미디엄 여운",
+    description: "라가불린 원액을 핵심으로 블렌딩해 대중적인 블렌디드 스카치치고 피트감이 또렷한 것이 특징이다.",
+    priceRange: "₩13,900", difficulty: "중급", tags: ["블렌디드", "Scotch", "피트", "가성비"],
+  },
+  {
+    id: "bells-original", name: "벨즈 오리지널", distillery: "Diageo (Arthur Bell & Sons)",
+    region: "Multiple", country: "Scotland", category: "블렌디드", age: null, abv: 40,
+    nose: "오크, 아몬드, 바닐라", palate: "말린 과일, 꿀, 토피", finish: "화이트페퍼와 시트러스가 남는 여운",
+    description: "블레어 아톨 원액을 중심으로 블렌딩한 스코틀랜드에서 오랫동안 사랑받아온 대중적인 블렌디드 스카치.",
+    priceRange: "₩19,900–22,600", difficulty: "입문", tags: ["블렌디드", "Scotch", "대중적", "가성비"],
+  },
+  {
+    id: "label-5", name: "라벨5", distillery: "La Martiniquaise",
+    region: "Speyside", country: "Scotland", category: "블렌디드", age: null, abv: 40,
+    nose: "바닐라, 토피, 생강", palate: "사과, 배, 캐러멜", finish: "레몬 제스트와 흑설탕이 남는 여운",
+    description: "글렌 모레이 원액을 중심으로 블렌딩한 프랑스 라 마르티니케즈의 대중적인 스카치로, 가볍고 산뜻한 과일향이 특징이다.",
+    priceRange: "₩15,900", difficulty: "입문", tags: ["블렌디드", "Scotch", "가성비", "가벼움"],
+  },
+  {
+    id: "whyte-mackay", name: "화이트 앤 맥케이", distillery: "Whyte & Mackay",
+    region: "Multiple", country: "Scotland", category: "블렌디드", age: null, abv: 40,
+    nose: "대추야자, 무화과", palate: "캐러멜, 몰트, 스파이스", finish: "무화과가 비교적 길게 남는 여운",
+    description: "41종의 원액을 두 번 결합하는 '더블 매링' 공법으로 만들어 셰리 캐스크의 진한 단맛이 두드러지는 블렌디드 스카치.",
+    priceRange: "₩29,000", difficulty: "중급", tags: ["블렌디드", "Scotch", "더블매링", "셰리"],
+  },
+  {
+    id: "antiquary-12", name: "디 안티콰리 12년", distillery: "Tomatin Distillery",
+    region: "Highland", country: "Scotland", category: "블렌디드", age: 12, abv: 40,
+    nose: "바닐라, 꿀, 레몬라임", palate: "넛티, 바닐라, 크리미한 질감", finish: "오크와 스파이스가 미디엄~롱으로 남는 여운",
+    description: "토마틴 원액을 약 45% 비율로 사용해 일반 블렌디드보다 몰트 풍미가 진한 12년 숙성 블렌디드 스카치.",
+    priceRange: "₩48,500", difficulty: "중급", tags: ["블렌디드", "Scotch", "12년", "몰트비중높음"],
+  },
+  {
+    id: "old-smuggler", name: "올드 스머글러", distillery: "Campari Group (Glen Grant)",
+    region: "Multiple", country: "Scotland", category: "블렌디드", age: null, abv: 40,
+    nose: "비스킷, 캐러멜, 바닐라", palate: "토피, 오크, 크리미한 질감", finish: "스파이시하고 오키한 여운",
+    description: "글렌 그랜트와 함께 캄파리 그룹이 소유한 브랜드로, 부드럽고 무난한 스타일의 데일리 블렌디드 스카치.",
+    priceRange: "₩23,800", difficulty: "입문", tags: ["블렌디드", "Scotch", "데일리", "가성비"],
+  },
+  {
+    id: "100-pipers", name: "100 파이퍼스", distillery: "Chivas Brothers",
+    region: "Speyside", country: "Scotland", category: "블렌디드", age: null, abv: 40,
+    nose: "바닐라, 꿀, 과일", palate: "몰티, 은은한 스모키, 스파이스", finish: "플로럴과 오크가 남는 여운",
+    description: "시바스 브라더스가 알트 아 바인 원액을 중심으로 블렌딩한 대중적인 스카치로, 한국에서도 오랫동안 유통된 스테디셀러다.",
+    priceRange: "₩12,900–18,540", difficulty: "입문", tags: ["블렌디드", "Scotch", "가성비", "한국인기"],
+  },
+  {
+    id: "north-british-15-signatory", name: "노스 브리티쉬 15년 시그너토리 빈티지", distillery: "North British Distillery Co. (Signatory Vintage 병입)",
+    region: "Edinburgh, Lowland", country: "Scotland", category: "그레인", age: 15, abv: 57.1,
+    nose: "말린 과일, 캐러멜화 설탕, 토스티드 바닐라", palate: "셰리에 절인 건포도, 버터스카치, 스파이시 오크", finish: "넛맥과 다크초콜릿, 말린 무화과가 길게 남는 여운",
+    description: "디아지오와 에드링턴이 합작 소유한 노스 브리티쉬 증류소 원액을 시그너토리 빈티지가 캐스크 스트렝스로 독립병입한 싱글 그레인 위스키.",
+    priceRange: "₩135,900–169,000", difficulty: "중급", tags: ["싱글그레인", "Lowland", "독립병입", "캐스크스트렝스"],
+  },
+  {
+    id: "girvan-15-liquid-treasures", name: "기르반 15년 리퀴드 트레저스", distillery: "Girvan Distillery (Liquid Treasures 병입)",
+    region: "South Ayrshire, Lowland", country: "Scotland", category: "그레인", age: 15, abv: 54.4,
+    nose: "바닐라 커스터드, 코코넛 크림, 열대과일", palate: "파인애플, 코코넛, 바닐라", finish: "부드럽고 긴 바닐라 단맛과 은은한 오크 여운",
+    description: "윌리엄 그랜트 앤 선즈 산하 거번 증류소 원액을 독일 리퀴드 트레저스가 독립병입한 싱글 그레인 위스키로, 열대과일 풍미가 두드러진다.",
+    priceRange: "₩177,000", difficulty: "입문", tags: ["싱글그레인", "Lowland", "독립병입", "열대과일"],
+  },
 ];
 
 export const CATEGORY_TO_TYPE: Record<string, string> = {
   "싱글몰트": "Scotch",
   "블렌디드": "Scotch",
-  "논몰트": "Scotch",
+  "그레인": "Scotch",
   "아이리쉬": "Irish",
   "버번/라이": "Bourbon/Rye",
   "테네시": "Bourbon/Rye",
