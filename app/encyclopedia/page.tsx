@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 
 type WhiskeyEntry = EncyclopediaEntry;
 
-const CATEGORIES = ["전체", "블렌디드", "스카치", "아이리쉬", "버번/라이", "기타"] as const;
+const CATEGORIES = ["전체", "싱글몰트", "블렌디드", "논몰트", "아이리쉬", "버번/라이", "테네시", "기타"] as const;
 type Category = (typeof CATEGORIES)[number];
 
 const BLENDED_TAGS = new Set(["블렌디드", "블렌디드몰트"]);
@@ -31,7 +31,7 @@ const FILTER_OPTIONS = {
 type FilterKey = keyof typeof FILTER_OPTIONS;
 
 const EMPTY_FORM: Omit<WhiskeyEntry, "id"> = {
-  name: "", distillery: "", region: "", country: "", category: "스카치",
+  name: "", distillery: "", region: "", country: "", category: "싱글몰트",
   age: null, abv: 40, nose: "", palate: "", finish: "", description: "",
   priceRange: "", difficulty: "입문", tags: [],
 };
@@ -445,7 +445,7 @@ export default function EncyclopediaPage() {
                   <label className="block text-xs text-white/50 mb-1">카테고리</label>
                   <select value={F.category} onChange={(e) => setF({ category: e.target.value })}
                     className="glass-input surface w-full px-3 py-2 rounded-lg text-sm">
-                    {["스카치", "아이리쉬", "버번/라이", "기타"].map((c) => <option key={c} value={c}>{c}</option>)}
+                    {["싱글몰트", "블렌디드", "논몰트", "아이리쉬", "버번/라이", "테네시", "기타"].map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
