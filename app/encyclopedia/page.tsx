@@ -58,6 +58,14 @@ function matchAge(age: number | null, val: string) {
   if (val === "13년+") return age !== null && age > 12;
   return false;
 }
+function compareByDistilleryThenAge(a: WhiskeyEntry, b: WhiskeyEntry) {
+  const distilleryCompare = a.distillery.localeCompare(b.distillery);
+  if (distilleryCompare !== 0) return distilleryCompare;
+  const ageA = a.age ?? Infinity;
+  const ageB = b.age ?? Infinity;
+  if (ageA !== ageB) return ageA - ageB;
+  return a.name.localeCompare(b.name);
+}
 
 function dbRowToEntry(row: Record<string, unknown>): WhiskeyEntry {
   return {
@@ -150,7 +158,7 @@ export default function EncyclopediaPage() {
     if (filters.price.length && !filters.price.some((v) => matchPrice(w.priceRange, v))) return false;
     if (filters.age.length && !filters.age.some((v) => matchAge(w.age, v))) return false;
     return true;
-  });
+  }).sort(compareByDistilleryThenAge);
 
   const FILTER_LABELS: Record<FilterKey, string> = { difficulty: "난이도", abv: "도수", price: "가격", age: "숙성" };
 
