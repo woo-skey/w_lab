@@ -42,6 +42,7 @@ const DRAWER_NAV = [
 
 const SF = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif";
 const NO_SIDEBAR_PATHS = ["/login", "/signup"];
+const LAST_SEEN_UPDATE_INTERVAL_MS = 10 * 60 * 1000;
 
 const GLASS_SIDEBAR_DARK = {
   background: "rgba(255,255,255,0.04)",
@@ -113,6 +114,42 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
       window.removeEventListener("auth-change", sync);
     };
   }, []);
+
+  // 로그인 상태로 사이트를 열거나 다시 활성화할 때 최근 접속 시각을 갱신한다.
+  // 잦은 DB 쓰기를 막기 위해 브라우저별로 10분 간격으로 제한한다.
+  useEffect(() => {
+    if (!userId) return;
+
+    const storageKey = `lastSeenUpdatedAt:${userId}`;
+    let updating = false;
+
+    const updateLastSeen = async () => {
+      const now = Date.now();
+      const lastUpdatedAt = Number(localStorage.getItem(storageKey) || "0");
+      if (updating || now - lastUpdatedAt < LAST_SEEN_UPDATE_INTERVAL_MS) return;
+
+      updating = true;
+      const { error } = await supabase
+        .from("users")
+        .update({ last_seen_at: new Date(now).toISOString() })
+        .eq("id", userId);
+      updating = false;
+
+      if (!error) localStorage.setItem(storageKey, String(now));
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") void updateLastSeen();
+    };
+
+    void updateLastSeen();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", updateLastSeen);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", updateLastSeen);
+    };
+  }, [userId]);
 
   // 알림은 userId 변경 시 1회만 조회(라우트 이동마다 재조회하지 않음). 이후는 Realtime 구독이 갱신.
   useEffect(() => {

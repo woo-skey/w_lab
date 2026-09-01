@@ -51,6 +51,7 @@
 | password_hash | text | bcrypt 해시 |
 | is_admin | boolean | 관리자 여부 |
 | is_member | boolean | w_lab 회원 여부 (default false) |
+| last_seen_at | timestamptz | 최근 사이트 접속 시각 (10분 간격 갱신, nullable) |
 | created_at | timestamptz | |
 
 ### `whiskeys`
@@ -176,6 +177,7 @@ Bar 추천 목록 및 댓글. `bar_comments`는 bar_id, user_id, content.
 - `/admin`은 `/mypage?tab=admin&sub=users`로 redirect (실제 UI는 마이페이지 `🛡️ 관리자` 탭)
 - `isAdmin !== "true"` 이면 자동 redirect
 - 서브탭: 통계 / 유저 / 공지 / 리뷰 / 지식글 / Bar / 위스키 / 일정
+- 유저 관리: 관리자에게만 각 계정의 최근 사이트 접속 날짜·시간 표시
 - **통계 탭 = 운영 대시보드**:
   - 처리 필요 패널: 미답변 문의 수(→ `/contact`), 미확정 일정 수(→ `/schedule`)
   - 이번 주 활동: 신규 가입/리뷰/지식글 (최근 7일, 지난주 대비 증감)

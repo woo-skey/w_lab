@@ -52,6 +52,7 @@ interface AdminUser {
   name: string;
   username: string;
   created_at: string;
+  last_seen_at?: string | null;
   is_admin: boolean;
   is_member: boolean;
   avatar_url?: string;
@@ -97,6 +98,40 @@ const ADMIN_SUB_TAB_IDS = ["stats", "users", "notices", "reviews", "articles", "
 const ADMIN_CONTENT_SUB_TAB_IDS = ["notices", "reviews", "articles", "bars", "whiskeys", "schedules"] as const;
 
 type AdminSubTab = typeof ADMIN_SUB_TAB_IDS[number];
+
+async function fetchAdminUsers(): Promise<AdminUser[]> {
+  const fields = "id, name, username, created_at, last_seen_at, is_admin, is_member, avatar_url";
+  const { data, error } = await supabase
+    .from("users")
+    .select(fields)
+    .order("created_at", { ascending: false });
+
+  if (!error) return (data || []) as unknown as AdminUser[];
+
+  // last_seen_at 컬럼 적용 전에도 관리자 화면의 기존 기능은 유지한다.
+  const { data: fallbackData } = await supabase
+    .from("users")
+    .select("id, name, username, created_at, is_admin, is_member, avatar_url")
+    .order("created_at", { ascending: false });
+
+  return ((fallbackData || []) as unknown as AdminUser[]).map((user) => ({
+    ...user,
+    last_seen_at: null,
+  }));
+}
+
+function formatLastSeen(value?: string | null) {
+  if (!value) return "기록 없음";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "기록 없음";
+  return date.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export default function MyPage() {
   const router = useRouter();
@@ -269,7 +304,7 @@ export default function MyPage() {
     setAdminLoading(true);
     try {
       const [usersRes, reviewsRes, articlesRes, barsRes, whiskeysRes, schedulesRes, inquiriesRes] = await Promise.allSettled([
-        supabase.from("users").select("id, name, username, created_at, is_admin, is_member, avatar_url").order("created_at", { ascending: false }),
+        fetchAdminUsers(),
         supabase.from("reviews").select("id, user_id, created_at"),
         supabase.from("articles").select("id, author_id, created_at"),
         supabase.from("bars").select("id, user_id"),
@@ -278,7 +313,7 @@ export default function MyPage() {
         supabase.from("inquiries").select("id, status"),
       ]);
 
-      const usersData = usersRes.status === "fulfilled" ? (usersRes.value.data || []) : [];
+      const usersData = usersRes.status === "fulfilled" ? usersRes.value : [];
       const reviewsData = reviewsRes.status === "fulfilled" ? (reviewsRes.value.data || []) : [];
       const articlesData = articlesRes.status === "fulfilled" ? (articlesRes.value.data || []) : [];
       const barsData = barsRes.status === "fulfilled" ? (barsRes.value.data || []) : [];
@@ -1412,7 +1447,8 @@ export default function MyPage() {
                               {u.id === userId && <span className="px-1.5 py-0.5 bg-white/20 text-white text-xs rounded-full">본인</span>}
                             </div>
                             <p className="text-xs text-white/40">@{u.username}</p>
-                            <p className="text-xs text-white/30 mt-0.5">가입: {new Date(u.created_at).toLocaleDateString("ko-KR")} · 리뷰 {u.review_count} · 글 {u.article_count} · Bar {u.bar_count}</p>
+                            <p className="text-xs text-white/30 mt-0.5">가입: {new Date(u.created_at).toLocaleDateString("ko-KR")} · 최근 접속: {formatLastSeen(u.last_seen_at)}</p>
+                            <p className="text-xs text-white/30">리뷰 {u.review_count} · 글 {u.article_count} · Bar {u.bar_count}</p>
                           </div>
                         </div>
                         {u.id !== userId && (
