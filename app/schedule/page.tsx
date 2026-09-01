@@ -10,6 +10,7 @@ interface Schedule {
   created_by: string;
   created_at: string;
   confirmed_date?: string | null;
+  lastVotedDate: string | null;
 }
 
 interface AvailabilityMap {
@@ -40,6 +41,7 @@ export default function SchedulePage() {
   const togglingRef = useRef(false);
 
   const today = new Date();
+  const todayString = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
 
@@ -62,7 +64,7 @@ export default function SchedulePage() {
       .eq("is_member", true)
       .neq("is_admin", true)
       .then(({ count }) => setTotalMembersExcludingAdmin(count || 0));
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!selectedSchedule) return;
@@ -130,15 +132,50 @@ export default function SchedulePage() {
     fetch();
   }, [selectedSchedule, userId]);
 
-  const fetchSchedules = async () => {
+  const fetchSchedules = async (preferredScheduleId?: string) => {
     try {
-      const { data, error } = await supabase
-        .from("schedules")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      setSchedules(data || []);
-      if (data && data.length > 0) setSelectedSchedule(data[0]);
+      const [schedulesRes, datesRes, availabilityRes] = await Promise.all([
+        supabase.from("schedules").select("*").order("created_at", { ascending: false }),
+        supabase.from("schedule_dates").select("id, schedule_id, date"),
+        supabase.from("user_availability").select("schedule_date_id").eq("is_available", true),
+      ]);
+      if (schedulesRes.error) throw schedulesRes.error;
+
+      const lastVotedDateBySchedule: Record<string, string> = {};
+      if (datesRes.error || availabilityRes.error) {
+        console.error(datesRes.error || availabilityRes.error);
+      } else {
+        const votedDateIds = new Set((availabilityRes.data || []).map((row) => row.schedule_date_id));
+        (datesRes.data || []).forEach((row) => {
+          if (!votedDateIds.has(row.id)) return;
+          const currentLastDate = lastVotedDateBySchedule[row.schedule_id];
+          if (!currentLastDate || row.date > currentLastDate) {
+            lastVotedDateBySchedule[row.schedule_id] = row.date;
+          }
+        });
+      }
+
+      const nextSchedules: Schedule[] = (schedulesRes.data || []).map((schedule) => ({
+        ...schedule,
+        lastVotedDate: lastVotedDateBySchedule[schedule.id] || null,
+      }));
+      setSchedules(nextSchedules);
+
+      const nextSelected = preferredScheduleId
+        ? nextSchedules.find((schedule) => schedule.id === preferredScheduleId) || null
+        : nextSchedules.find((schedule) => !schedule.lastVotedDate || schedule.lastVotedDate >= todayString)
+          || nextSchedules[0]
+          || null;
+      setSelectedSchedule(nextSelected);
+
+      if (!preferredScheduleId && nextSelected) {
+        const focusDate = nextSelected.confirmed_date || nextSelected.lastVotedDate;
+        if (focusDate) {
+          const [year, month] = focusDate.split("-").map(Number);
+          setViewYear(year);
+          setViewMonth(month - 1);
+        }
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -198,7 +235,7 @@ export default function SchedulePage() {
           .insert([{ schedule_date_id: dateId, user_id: userId, is_available: true }]);
       }
 
-      setSelectedSchedule({ ...selectedSchedule });
+      await fetchSchedules(selectedSchedule.id);
     } finally {
       togglingRef.current = false;
     }
@@ -230,8 +267,9 @@ export default function SchedulePage() {
       if (error) throw error;
       setNewName("");
       setShowCreateForm(false);
-      setSchedules((prev) => [data, ...prev]);
-      setSelectedSchedule(data);
+      const createdSchedule: Schedule = { ...data, lastVotedDate: null };
+      setSchedules((prev) => [createdSchedule, ...prev]);
+      setSelectedSchedule(createdSchedule);
       setAvailabilityMap({});
     } catch (err) {
       console.error(err);
@@ -290,6 +328,28 @@ export default function SchedulePage() {
     .filter(([, v]) => v.count > 0)
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, 3);
+
+  const currentSchedules = schedules.filter(
+    (schedule) => !schedule.lastVotedDate || schedule.lastVotedDate >= todayString
+  );
+  const previousSchedules = schedules
+    .filter((schedule) => schedule.lastVotedDate && schedule.lastVotedDate < todayString)
+    .sort((a, b) => (b.lastVotedDate || "").localeCompare(a.lastVotedDate || ""));
+
+  const handleSelectSchedule = (schedule: Schedule) => {
+    if (selectedSchedule?.id === schedule.id) return;
+    setAvailabilityMap({});
+    setUserDateMap([]);
+    setHoveredDate(null);
+    setSelectedSchedule(schedule);
+
+    const focusDate = schedule.confirmed_date || schedule.lastVotedDate;
+    if (focusDate) {
+      const [year, month] = focusDate.split("-").map(Number);
+      setViewYear(year);
+      setViewMonth(month - 1);
+    }
+  };
 
   if (!authChecked) {
     return (
@@ -375,15 +435,15 @@ export default function SchedulePage() {
 
               {loading ? (
                 <p className="text-white/40 text-sm">로딩 중...</p>
-              ) : schedules.length === 0 ? (
-                <p className="text-white/35 text-sm">일정이 없습니다.</p>
+              ) : currentSchedules.length === 0 ? (
+                <p className="text-white/35 text-sm">진행 중인 일정이 없습니다.</p>
               ) : (
                 <div className="space-y-2">
-                  {schedules.map((s) => (
+                  {currentSchedules.map((s) => (
                     <div key={s.id} className={`flex items-center rounded-lg text-sm transition ${
                       selectedSchedule?.id === s.id ? "bg-indigo-500/80 text-white" : "text-white/70 bg-black/5 dark:bg-white/5"
                     }`}>
-                      <button onClick={() => { if (selectedSchedule?.id !== s.id) { setAvailabilityMap({}); setSelectedSchedule(s); } }}
+                      <button onClick={() => handleSelectSchedule(s)}
                         className="flex-1 text-left px-3 py-2">
                         <p className="font-medium truncate">{s.name}</p>
                       </button>
@@ -438,6 +498,41 @@ export default function SchedulePage() {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* 이전 일정 */}
+            {previousSchedules.length > 0 && (
+              <div className="glass-card card rounded-xl p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <h2 className="font-bold text-white">이전 일정</h2>
+                  <span className="text-xs text-white/35">{previousSchedules.length}</span>
+                </div>
+                <p className="text-xs text-white/30 mb-3">마지막 투표일이 지난 일정입니다.</p>
+                <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  {previousSchedules.map((s) => (
+                    <div key={s.id} className={`flex items-center rounded-lg text-sm transition ${
+                      selectedSchedule?.id === s.id ? "bg-indigo-500/70 text-white" : "text-white/55 bg-black/5 dark:bg-white/5"
+                    }`}>
+                      <button onClick={() => handleSelectSchedule(s)} className="flex-1 min-w-0 text-left px-3 py-2">
+                        <p className="font-medium truncate">{s.name}</p>
+                        {s.lastVotedDate && (
+                          <p className={`text-xs mt-0.5 ${selectedSchedule?.id === s.id ? "text-indigo-100/70" : "text-white/30"}`}>
+                            마지막 투표 {new Date(s.lastVotedDate + "T00:00:00").toLocaleDateString("ko-KR", {
+                              year: "numeric", month: "short", day: "numeric",
+                            })}
+                          </p>
+                        )}
+                      </button>
+                      {(s.created_by === userId || isAdmin) && (
+                        <button onClick={() => handleDeleteSchedule(s.id)}
+                          className={`px-2 py-1 mr-1 rounded text-xs transition ${
+                            selectedSchedule?.id === s.id ? "hover:bg-indigo-600 text-indigo-100" : "text-white/30 hover:text-red-400 hover:bg-red-500/10"
+                          }`}>✕</button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
