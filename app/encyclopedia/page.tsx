@@ -25,7 +25,7 @@ const FILTER_OPTIONS = {
   difficulty: ["입문", "중급", "상급"],
   abv: ["~40%", "40~45%", "45%+"],
   price: ["5만 이하", "5~10만", "10만+"],
-  age: ["NAS", "~12년", "13년+"],
+  age: ["NAS", "~12년", "13년+", "18년+"],
 } as const;
 
 type FilterKey = keyof typeof FILTER_OPTIONS;
@@ -56,6 +56,7 @@ function matchAge(age: number | null, val: string) {
   if (val === "NAS") return age === null;
   if (val === "~12년") return age !== null && age <= 12;
   if (val === "13년+") return age !== null && age > 12;
+  if (val === "18년+") return age !== null && age >= 18;
   return false;
 }
 function compareByDistilleryThenAge(a: WhiskeyEntry, b: WhiskeyEntry) {
