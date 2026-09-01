@@ -6,8 +6,14 @@ import { supabase } from "@/lib/supabase";
 
 type WhiskeyEntry = EncyclopediaEntry;
 
-const CATEGORIES = ["전체", "스카치", "아이리쉬", "버번/라이", "기타"] as const;
+const CATEGORIES = ["전체", "블렌디드", "스카치", "아이리쉬", "버번/라이", "기타"] as const;
 type Category = (typeof CATEGORIES)[number];
+
+const BLENDED_TAGS = new Set(["블렌디드", "블렌디드몰트"]);
+
+function isBlendedWhiskey(whiskey: WhiskeyEntry) {
+  return whiskey.tags.some((tag) => BLENDED_TAGS.has(tag));
+}
 
 const DIFFICULTY_COLOR: Record<WhiskeyEntry["difficulty"], string> = {
   입문: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
@@ -125,7 +131,9 @@ export default function EncyclopediaPage() {
 
   const baseList = selectedCategory === "전체"
     ? mergedWhiskeys
-    : mergedWhiskeys.filter((w) => w.category === selectedCategory);
+    : selectedCategory === "블렌디드"
+      ? mergedWhiskeys.filter(isBlendedWhiskey)
+      : mergedWhiskeys.filter((w) => w.category === selectedCategory);
 
   const filtered = baseList.filter((w) => {
     if (searchQuery.trim()) {
@@ -494,4 +502,3 @@ export default function EncyclopediaPage() {
     </div>
   );
 }
-

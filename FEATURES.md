@@ -138,6 +138,8 @@ Bar 추천 목록 및 댓글. `bar_comments`는 bar_id, user_id, content.
 
 ### 3. 위스키 백과 (`/encyclopedia`)
 - 정적 데이터 기반 + DB 편집 내용 merge
+- `블렌디드` 탭: 국가별 기존 분류를 유지하면서 `블렌디드`·`블렌디드몰트` 태그 항목을 한곳에 모아 표시
+- 발렌타인 주요 라인업과 클래식·프리미엄·블렌디드 몰트를 포함한 블렌디드 위스키 26종 추가
 - 모든 유저가 편집·추가·삭제 가능
 - 난이도 편집 저장 (upsert with full columns)
 - soft delete (`deleted = true`)
