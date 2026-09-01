@@ -164,16 +164,23 @@ export default function SchedulePage() {
       const nextSelected = preferredScheduleId
         ? nextSchedules.find((schedule) => schedule.id === preferredScheduleId) || null
         : nextSchedules.find((schedule) => !schedule.lastVotedDate || schedule.lastVotedDate >= todayString)
-          || nextSchedules[0]
           || null;
       setSelectedSchedule(nextSelected);
 
-      if (!preferredScheduleId && nextSelected) {
-        const focusDate = nextSelected.confirmed_date || nextSelected.lastVotedDate;
-        if (focusDate) {
-          const [year, month] = focusDate.split("-").map(Number);
-          setViewYear(year);
-          setViewMonth(month - 1);
+      if (!preferredScheduleId) {
+        if (nextSelected) {
+          const focusDate = nextSelected.confirmed_date || nextSelected.lastVotedDate;
+          if (focusDate) {
+            const [year, month] = focusDate.split("-").map(Number);
+            setViewYear(year);
+            setViewMonth(month - 1);
+          }
+        } else {
+          setAvailabilityMap({});
+          setUserDateMap([]);
+          setHoveredDate(null);
+          setViewYear(today.getFullYear());
+          setViewMonth(today.getMonth());
         }
       }
     } catch (err) {
@@ -248,8 +255,8 @@ export default function SchedulePage() {
     try {
       const { error } = await supabase.from("schedules").delete().eq("id", scheduleId);
       if (error) throw error;
-      if (selectedSchedule?.id === scheduleId) { setSelectedSchedule(null); setAvailabilityMap({}); }
-      setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+      const preferredScheduleId = selectedSchedule?.id === scheduleId ? undefined : selectedSchedule?.id;
+      await fetchSchedules(preferredScheduleId);
     } catch (err) {
       console.error(err);
     }
@@ -743,8 +750,76 @@ export default function SchedulePage() {
                 </div>
               </div>
             ) : (
-              <div className="glass-card card empty rounded-xl p-12 text-center text-white/40">
-                왼쪽에서 일정을 선택하거나 새 일정을 만들어보세요.
+              <div className="glass-card card rounded-xl p-3 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-white">진행 중인 일정이 없습니다</h2>
+                    <p className="text-sm text-white/40 mt-1">이전 일정은 왼쪽 목록에서 선택해 확인할 수 있습니다.</p>
+                  </div>
+                  <div className="flex items-center gap-3 self-end sm:self-auto">
+                    <button
+                      type="button"
+                      aria-label="이전 달"
+                      onClick={() => {
+                        const d = new Date(viewYear, viewMonth - 1);
+                        setViewYear(d.getFullYear());
+                        setViewMonth(d.getMonth());
+                      }}
+                      className="p-2 rounded-lg hover:bg-white/8 transition text-white/55"
+                    >
+                      ◀
+                    </button>
+                    <span className="font-semibold text-white min-w-[80px] text-center">
+                      {viewYear}년 {MONTHS[viewMonth]}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label="다음 달"
+                      onClick={() => {
+                        const d = new Date(viewYear, viewMonth + 1);
+                        setViewYear(d.getFullYear());
+                        setViewMonth(d.getMonth());
+                      }}
+                      className="p-2 rounded-lg hover:bg-white/8 transition text-white/55"
+                    >
+                      ▶
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-7 mb-2">
+                  {DAYS.map((day, i) => (
+                    <div key={day} className={`text-center text-sm font-medium py-2 ${
+                      i === 0 ? "text-red-400" : i === 6 ? "text-indigo-400" : "text-white/45"
+                    }`}>
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-7 gap-1">
+                  {calendarCells.map((day, idx) => {
+                    if (!day) return <div key={`empty-${idx}`} />;
+                    const isToday =
+                      today.getFullYear() === viewYear &&
+                      today.getMonth() === viewMonth &&
+                      today.getDate() === day;
+                    const dayOfWeek = (firstDay + day - 1) % 7;
+
+                    return (
+                      <div key={day} className="calendar-cell aspect-square">
+                        <div className="calendar-card">
+                          <div className={`calendar-front flex items-center justify-center text-sm bg-black/[0.025] dark:bg-white/[0.025]
+                            ${isToday ? "ring-2 ring-indigo-400/60" : ""}
+                            ${dayOfWeek === 0 ? "text-red-400" : dayOfWeek === 6 ? "text-indigo-400" : "text-white/55"}
+                          `}>
+                            {day}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
