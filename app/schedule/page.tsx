@@ -616,7 +616,7 @@ export default function SchedulePage() {
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-white/50 text-xs">투표 현황</span>
                       <span className="text-white/70 text-xs font-semibold">
-                        {userDateMap.length}명 완료 {totalMembersExcludingAdmin > 0 && <span className="text-white/35">/ 전체 {totalMembersExcludingAdmin}명 (관리자 제외)</span>}
+                        {userDateMap.length}명 완료 {totalMembersExcludingAdmin > 0 && <span className="text-white/35">/ 전체 {totalMembersExcludingAdmin}명</span>}
                       </span>
                     </div>
                     {totalMembersExcludingAdmin > 0 && (
