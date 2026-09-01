@@ -95,7 +95,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩60,000–80,000", difficulty: "중급", tags: ["팟스틸", "아이리쉬", "희귀", "전통"],
   },
   {
-    id: "bushmills-original", name: "부시밀즈 오리지널", distillery: "Old Bushmills",
+    id: "bushmills-original", name: "부쉬밀 오리지널", distillery: "Old Bushmills",
     region: "County Antrim", country: "Northern Ireland", category: "아이리쉬", age: null, abv: 40,
     nose: "꿀, 사과, 가벼운 바닐라", palate: "달콤한 과일, 몰트, 가벼운 스파이스", finish: "부드럽고 짧은 여운",
     description: "세계에서 가장 오래된 면허 증류소. 가볍고 달콤한 블렌디드 입문작.",
@@ -151,7 +151,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩150,000–250,000", difficulty: "중급", tags: ["싱글몰트", "Japanese", "미즈나라", "프리미엄"],
   },
   {
-    id: "nikka-from-barrel", name: "니카 프롬 더 배럴", distillery: "Nikka",
+    id: "nikka-from-barrel", name: "닛카 프롬 더 배럴", distillery: "Nikka",
     region: "Hokkaido / Miyagi", country: "Japan", category: "기타", age: null, abv: 51.4,
     nose: "캐러멜, 건포도, 바닐라", palate: "풍부한 오크, 과일, 스파이스", finish: "길고 복잡한 따뜻한 여운",
     description: "가성비 최고의 일본 블렌디드. 고도수에서 오는 묵직함과 복잡함이 특징.",
@@ -214,7 +214,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩55,000–75,000", difficulty: "중급", tags: ["블렌디드", "아이리쉬", "럼캐스크", "스파이시"],
   },
   {
-    id: "writers-tears-copper-pot", name: "라이터스 티어스 코퍼 팟", distillery: "Walsh Whiskey",
+    id: "writers-tears-copper-pot", name: "라이터즈 티어스 코퍼 팟", distillery: "Walsh Whiskey",
     region: "County Carlow", country: "Ireland", category: "아이리쉬", age: null, abv: 40,
     nose: "배, 사과, 꿀", palate: "부드러운 몰트, 바닐라, 은은한 오크", finish: "깔끔하고 고소한 여운",
     description: "싱글몰트와 싱글팟스틸 조합으로 부드럽고 우아한 과일향이 돋보인다.",
@@ -235,7 +235,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩45,000–65,000", difficulty: "중급", tags: ["블렌디드", "아이리쉬", "스파이시", "클래식"],
   },
   {
-    id: "bushmills-10", name: "부시밀즈 10년", distillery: "Old Bushmills",
+    id: "bushmills-10", name: "부쉬밀 10년", distillery: "Old Bushmills",
     region: "County Antrim", country: "Northern Ireland", category: "아이리쉬", age: 10, abv: 40,
     nose: "꿀, 바닐라, 잘 익은 과일", palate: "밀크초콜릿, 몰트, 사과", finish: "부드럽고 은은한 단맛",
     description: "셰리/버번 캐스크의 균형으로 입문자에게 편안한 10년 숙성 싱글몰트.",
@@ -256,7 +256,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩60,000–85,000", difficulty: "중급", tags: ["버번", "Kentucky", "100프루프", "풀바디"],
   },
   {
-    id: "elijah-craig-small-batch", name: "엘라이저 크레이그 스몰 배치", distillery: "Heaven Hill",
+    id: "elijah-craig-small-batch", name: "일라이저 크레이그 스몰 배치", distillery: "Heaven Hill",
     region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 47,
     nose: "토피, 오렌지, 오크", palate: "바닐라, 넛맥, 캐러멜", finish: "중간 길이의 달콤한 스파이스",
     description: "버번의 밸런스를 잘 보여주는 스몰 배치 스타일의 스테디셀러.",
@@ -291,7 +291,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩45,000–65,000", difficulty: "입문", tags: ["블렌디드", "Japanese", "하이볼", "입문추천"],
   },
   {
-    id: "nikka-days", name: "니카 데이즈", distillery: "Nikka",
+    id: "nikka-days", name: "닛카 데이즈", distillery: "Nikka",
     region: "Hokkaido / Miyagi", country: "Japan", category: "기타", age: null, abv: 40,
     nose: "시리얼, 바닐라, 가벼운 과일", palate: "부드러운 몰트, 배, 토피", finish: "은은하고 매끈한 여운",
     description: "데일리 음용을 겨냥한 가벼운 스타일의 일본 블렌디드 위스키.",
@@ -421,7 +421,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩75,000–100,000", difficulty: "입문", tags: ["싱글몰트", "Speyside", "셰리", "더블캐스크"],
   },
   {
-    id: "aberlour-abunadh", name: "아벨라워 아부나드", distillery: "Aberlour",
+    id: "aberlour-abunadh", name: "아벨라워 아부나흐", distillery: "Aberlour",
     region: "Speyside", country: "Scotland", category: "스카치", age: null, abv: 60.8,
     nose: "건포도, 다크 초콜릿, 오렌지 마멀레이드", palate: "올로로소 셰리, 무화과, 시나몬", finish: "길고 진한 셰리와 스파이스의 여운",
     description: "퍼스트필 올로로소 셰리 버트에서만 숙성한 캐스크 스트렝스 논칠필터 위스키로, 도수는 배치마다 약 59~61%로 상이하다.",
@@ -449,7 +449,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩70,000–95,000", difficulty: "중급", tags: ["싱글몰트", "Highland", "셰리피니시", "스무스"],
   },
   {
-    id: "balvenie-caribbean-14", name: "발베니 카리비안 캐스크 14년", distillery: "The Balvenie",
+    id: "balvenie-caribbean-14", name: "발베니 캐리비안 캐스크 14년", distillery: "The Balvenie",
     region: "Speyside", country: "Scotland", category: "스카치", age: 14, abv: 43,
     nose: "바닐라, 토피, 열대 과일", palate: "꿀, 바닐라, 망고", finish: "오렌지와 열대 과일이 은은하게 사라지는 여운",
     description: "전통 오크 숙성 후 카리브 럼 캐스크에서 마무리해 열대 과일 단맛이 도는 스페이사이드 싱글몰트.",
@@ -523,7 +523,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩70,000–95,000", difficulty: "중급", tags: ["버번", "Kentucky", "휘티드", "프렌치오크"],
   },
   {
-    id: "blantons-single-barrel", name: "블랜튼스 오리지널 싱글 배럴", distillery: "Buffalo Trace",
+    id: "blantons-single-barrel", name: "블랑톤 오리지널 싱글 배럴", distillery: "Buffalo Trace",
     region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 46.5,
     nose: "바닐라, 캐러멜, 베이킹 스파이스", palate: "감귤, 꿀, 오크, 라이 스파이스", finish: "옥수수와 따뜻한 향신료가 중간 길이로 이어짐",
     description: "버펄로 트레이스의 상징적인 프리미엄 싱글 배럴 버번으로, 균형 잡힌 단맛과 스파이스가 특징이다.",
@@ -558,7 +558,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩130,000–170,000", difficulty: "상급", tags: ["버번", "Kentucky", "배럴프루프", "프리미엄"],
   },
   {
-    id: "basil-hayden", name: "베이질 헤이든", distillery: "Jim Beam",
+    id: "basil-hayden", name: "베이즐 헤이든", distillery: "Jim Beam",
     region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 40,
     nose: "그을린 오크, 바닐라, 복숭아, 화이트 페퍼", palate: "흑설탕, 베리, 검은 후추, 가벼운 민트", finish: "은은한 향신료와 건과일이 깔끔하게 남는 마무리",
     description: "라이 비율을 높여 가볍고 스파이시하면서도 접근하기 쉬운 하이라이 버번.",
@@ -572,7 +572,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩45,000–60,000", difficulty: "중급", tags: ["버번", "Kentucky", "100프루프", "스파이시"],
   },
   {
-    id: "elijah-craig-barrel-proof", name: "엘라이저 크레이그 배럴 프루프", distillery: "Heaven Hill",
+    id: "elijah-craig-barrel-proof", name: "일라이저 크레이그 배럴 프루프", distillery: "Heaven Hill",
     region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 62.5,
     nose: "캐러멜, 바닐라, 오크, 다크체리", palate: "진한 토피, 계피, 다크초콜릿, 구운 견과", finish: "길고 묵직한 오크와 스파이스 여운",
     description: "연 3회 배치로 출시되는 무가수 배럴 프루프 버번으로, 도수는 배치마다 약 59~65%로 상이하다.",
@@ -586,14 +586,14 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩100,000–130,000", difficulty: "상급", tags: ["버번", "Kentucky", "배럴프루프", "프리미엄"],
   },
   {
-    id: "russells-reserve-10", name: "러셀스 리저브 10년", distillery: "Wild Turkey",
+    id: "russells-reserve-10", name: "러셀 리저브 10년", distillery: "Wild Turkey",
     region: "Kentucky", country: "USA", category: "버번/라이", age: 10, abv: 45,
     nose: "캐러멜, 바닐라, 오크, 말린 과일", palate: "토피, 계피, 꿀, 오렌지", finish: "부드럽고 둥근 오크 여운",
     description: "러셀 부자 마스터 디스틸러의 이름을 딴 10년 숙성 스몰 배치 버번.",
     priceRange: "₩90,000–120,000", difficulty: "중급", tags: ["버번", "Kentucky", "10년", "스몰배치"],
   },
   {
-    id: "michters-us1-bourbon", name: "미쉬터스 US*1 스몰 배치 버번", distillery: "Michter's",
+    id: "michters-us1-bourbon", name: "믹터스 US*1 스몰 배치 버번", distillery: "Michter's",
     region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 45.7,
     nose: "캐러멜, 바닐라, 스톤프루트, 베이킹 스파이스", palate: "토피, 다크프루트, 단 옥수수, 은은한 오크", finish: "부드럽게 이어지는 캐러멜과 스파이스 여운",
     description: "최대 20배럴 소량 배치로 병입하는 켄터키 스트레이트 버번.",
@@ -637,14 +637,14 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩60,000–80,000", difficulty: "입문", tags: ["싱글그레인", "Japanese", "하이볼", "부드러움"],
   },
   {
-    id: "nikka-yoichi", name: "니카 요이치 싱글몰트", distillery: "Yoichi",
+    id: "nikka-yoichi", name: "닛카 요이치 싱글몰트", distillery: "Yoichi",
     region: "Hokkaido", country: "Japan", category: "기타", age: null, abv: 45,
     nose: "은은한 피트 연기, 오렌지 껍질, 멜론", palate: "흙내 피트, 커피, 토피", finish: "연기와 열대과일이 길게 이어지는 마무리",
     description: "석탄 직화 증류와 이시카리만 해풍이 빚어낸 홋카이도 요이치 증류소의 묵직하고 스모키한 싱글몰트.",
     priceRange: "₩90,000–120,000", difficulty: "중급", tags: ["싱글몰트", "Japanese", "피트", "스모키"],
   },
   {
-    id: "nikka-miyagikyo", name: "니카 미야기쿄 싱글몰트", distillery: "Miyagikyo",
+    id: "nikka-miyagikyo", name: "닛카 미야기쿄 싱글몰트", distillery: "Miyagikyo",
     region: "Miyagi", country: "Japan", category: "기타", age: null, abv: 45,
     nose: "사과, 배, 꽃향", palate: "귤, 바나나, 바닐라", finish: "은은한 과일향과 가는 탄닌이 길게 남는 마무리",
     description: "증기 간접 가열 증류로 화사한 과일향이 돋보이는 미야기쿄 증류소의 우아한 싱글몰트.",
@@ -904,7 +904,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩70,000–95,000", difficulty: "상급", tags: ["싱글몰트", "Islay", "쿼터캐스크", "강한피트"],
   },
   {
-    id: "glendronach-18", name: "글렌드로낙 18년 알라다이스", distillery: "The GlenDronach",
+    id: "glendronach-18", name: "글렌드로낙 18년 앨러디스", distillery: "The GlenDronach",
     region: "Highland", country: "Scotland", category: "스카치", age: 18, abv: 46,
     nose: "올로로소 셰리, 대추, 건포도, 다크초콜릿, 크리스마스 스파이스", palate: "셰리 단맛, 스튜 과일, 코코아, 오렌지 필, 토스트 호두", finish: "셰리와 다크 프루트, 스파이스가 길게 남는 피니쉬",
     description: "올로로소 셰리 캐스크에서 18년 숙성해 진한 다크 프루트와 초콜릿 풍미가 가득한 프리미엄 하이랜드 싱글몰트.",
@@ -918,14 +918,14 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩70,000–95,000", difficulty: "입문", tags: ["싱글몰트", "Lowland", "가벼움", "입문용"],
   },
   {
-    id: "caol-ila-12", name: "카올일라 12년", distillery: "Caol Ila",
+    id: "caol-ila-12", name: "쿨일라 12년", distillery: "Caol Ila",
     region: "Islay", country: "Scotland", category: "스카치", age: 12, abv: 43,
     nose: "바다 소금, 풀향, 훈제 고기, 시트러스, 오일리한 스모크", palate: "오일리한 타르, 우아한 스모크, 브라인, 가벼운 스파이스", finish: "후추 같은 스파이스와 스모크가 길게 이어지는 피니쉬",
     description: "묵직하지 않으면서 깔끔한 스모크와 바다 향이 균형 잡힌 접근성 좋은 아일라 싱글몰트.",
     priceRange: "₩80,000–110,000", difficulty: "중급", tags: ["싱글몰트", "Islay", "스모키", "해풍"],
   },
   {
-    id: "clynelish-14", name: "클라이넬리시 14년", distillery: "Clynelish",
+    id: "clynelish-14", name: "클라이넬리쉬 14년", distillery: "Clynelish",
     region: "Highland", country: "Scotland", category: "스카치", age: 14, abv: 46,
     nose: "꿀, 바닐라, 배, 사과, 특유의 왁시함", palate: "오일리하고 왁시한 질감, 버터스카치, 배, 토피", finish: "스파이스와 꿀, 플로럴함이 길게 남는 피니쉬",
     description: "특유의 왁시한 질감과 꿀, 과일 풍미가 어우러진 하이랜드 코스탈 싱글몰트.",
@@ -941,7 +941,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩100,000–130,000", difficulty: "중급", tags: ["싱글몰트", "캠벨타운", "약한피트", "코스탈"],
   },
   {
-    id: "auchentoshan-12", name: "아우크타샨 12년", distillery: "Auchentoshan",
+    id: "auchentoshan-12", name: "오켄토션 12년", distillery: "Auchentoshan",
     region: "Lowland", country: "Scotland", category: "스카치", age: 12, abv: 40,
     nose: "푸른 사과, 시트러스, 토피", palate: "바닐라, 헤이즐넛, 귤", finish: "생강, 견과류, 가벼운 드라이",
     description: "삼중 증류로 가볍고 부드러운 질감을 지닌 로우랜드 입문용 싱글몰트.",
@@ -955,14 +955,14 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩90,000–120,000", difficulty: "중급", tags: ["싱글몰트", "아일라", "언피티드", "셰리"],
   },
   {
-    id: "bruichladdich-classic-laddie", name: "브룩라디 더 클래식 래디", distillery: "Bruichladdich",
+    id: "bruichladdich-classic-laddie", name: "브룩라디 더 클래식 라디", distillery: "Bruichladdich",
     region: "Islay", country: "Scotland", category: "스카치", age: null, abv: 50,
     nose: "보리, 레몬, 바닐라, 해염", palate: "후추, 꿀, 몰트 비스킷, 시나몬", finish: "오크 탄닌, 레몬 껍질, 드라이",
     description: "보리 본연의 풍미를 강조한 50도 언피티드 아일라 싱글몰트.",
     priceRange: "₩90,000–120,000", difficulty: "중급", tags: ["싱글몰트", "아일라", "언피티드", "하이프루프"],
   },
   {
-    id: "aberfeldy-12", name: "아벨펠디 12년", distillery: "Aberfeldy",
+    id: "aberfeldy-12", name: "애버펠디 12년", distillery: "Aberfeldy",
     region: "Highland", country: "Scotland", category: "스카치", age: 12, abv: 40,
     nose: "꿀, 헤더, 바닐라, 구운 사과", palate: "버터스카치, 몰트, 시트러스, 시나몬", finish: "부드러운 꿀, 가벼운 스파이스",
     description: "시그니처 꿀맛으로 골든 드램이라 불리는 하이랜드 싱글몰트.",
@@ -1006,7 +1006,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
 
   // ─── 추가 3차: 세계 위스키 (인도·대만·캐나다·일본 프리미엄) ───
   {
-    id: "amrut-fusion", name: "아무르트 퓨전", distillery: "Amrut",
+    id: "amrut-fusion", name: "암룻 퓨전", distillery: "Amrut",
     region: "Bangalore", country: "India", category: "기타", age: null, abv: 50,
     nose: "열대과일, 시나몬, 옅은 스모크", palate: "캐러멜, 꿀, 시리얼, 후추 스파이스", finish: "꿀과 스모크가 은은하게 길게",
     description: "인도산 보리와 피트 스코틀랜드 보리를 결합해 100프루프로 병입한 인도 싱글몰트의 대표작.",
@@ -1050,7 +1050,7 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩70,000–110,000", difficulty: "입문", tags: ["버번", "Kentucky", "휘티드", "부드러움"],
   },
   {
-    id: "larceny", name: "라르세니", distillery: "Heaven Hill",
+    id: "larceny", name: "라세니", distillery: "Heaven Hill",
     region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 46,
     nose: "꿀, 바닐라, 버터", palate: "캐러멜, 토피, 부드러운 곡물", finish: "달콤한 꿀과 오크의 중간 여운",
     description: "헤븐 힐의 대표 휘티드 버번으로 밀 함량이 높아 둥글고 달콤한 풍미가 가성비 좋게 다가오는 보틀.",
@@ -1078,11 +1078,139 @@ export const ENCYCLOPEDIA_WHISKEYS: EncyclopediaEntry[] = [
     priceRange: "₩50,000–75,000", difficulty: "입문", tags: ["버번", "Tennessee", "테네시", "메이플"],
   },
   {
-    id: "whistlepig-10", name: "위슬피그 10년 라이", distillery: "WhistlePig",
+    id: "whistlepig-10", name: "휘슬피그 10년 라이", distillery: "WhistlePig",
     region: "Vermont", country: "USA", category: "버번/라이", age: 10, abv: 50,
     nose: "꿀, 바닐라, 캐러멜", palate: "베이킹 스파이스, 다크 초콜릿, 민트", finish: "바닐라와 라이 스파이스의 길고 크리미한 여운",
     description: "버몬트 농장에서 10년 숙성·병입하는 100프루프 프리미엄 스트레이트 라이로 라이 특유의 향신료와 크리미함이 돋보이는 보틀.",
     priceRange: "₩130,000–180,000", difficulty: "상급", tags: ["라이", "Vermont", "프리미엄", "10년"],
+  },
+
+  // ─── 추가 6차: 테마별 공백 보강 (싱글몰트·블렌디드·아이리쉬·버번·일본) ───
+  {
+    id: "macallan-double-cask-15", name: "맥캘란 더블 캐스크 15년", distillery: "The Macallan",
+    region: "Speyside", country: "Scotland", category: "스카치", age: 15, abv: 43,
+    nose: "말린 과일, 진저브레드, 바닐라, 시트러스", palate: "토피, 오렌지, 스위트 스파이스, 크리미한 오크", finish: "길고 따뜻하며 스파이시한 여운",
+    description: "아메리칸·유러피언 오크 셰리 캐스크를 함께 숙성해 12년보다 한층 깊고 진한 단맛을 보여주는 더블 캐스크 상위 라인.",
+    priceRange: "₩150,000–200,000", difficulty: "중급", tags: ["싱글몰트", "Speyside", "셰리", "더블캐스크"],
+  },
+  {
+    id: "glenfiddich-21", name: "글렌피딕 21년 그란 레세르바", distillery: "Glenfiddich",
+    region: "Speyside", country: "Scotland", category: "스카치", age: 21, abv: 40,
+    nose: "다크 초콜릿, 오렌지, 스파이스, 캐러멜라이즈드 슈거", palate: "럼 캐스크의 달콤함, 바나나, 헤이즐넛, 오크", finish: "길고 부드러운 럼 캐스크 여운",
+    description: "카리브해 럼 캐스크에서 추가 숙성해 이국적인 단맛과 부드러움을 더한 21년 숙성 프리미엄 스페이사이드.",
+    priceRange: "₩280,000–360,000", difficulty: "상급", tags: ["싱글몰트", "Speyside", "럼캐스크", "프리미엄"],
+  },
+  {
+    id: "benromach-10", name: "벤로막 10년", distillery: "Benromach",
+    region: "Speyside", country: "Scotland", category: "스카치", age: 10, abv: 43,
+    nose: "바닐라, 몰트, 은은한 스모크, 시트러스", palate: "셰리 단맛, 오크, 가벼운 피트, 과일", finish: "부드럽고 스모키한 중간 길이 여운",
+    description: "전통 방식으로 되살린 소규모 증류소의 스타일을 보여주는, 은은한 피트감의 클래식 스페이사이드 싱글몰트.",
+    priceRange: "₩70,000–90,000", difficulty: "중급", tags: ["싱글몰트", "Speyside", "약한피트", "전통방식"],
+  },
+  {
+    id: "tomatin-12", name: "토마틴 12년", distillery: "Tomatin",
+    region: "Highland", country: "Scotland", category: "스카치", age: 12, abv: 43,
+    nose: "잘 익은 사과, 바닐라, 꿀", palate: "부드러운 몰트, 오크, 은은한 스파이스", finish: "가볍고 산뜻한 여운",
+    description: "버번·셰리 캐스크에서 숙성해 가볍고 접근성 좋은 풍미를 보여주는 하이랜드 입문용 싱글몰트.",
+    priceRange: "₩55,000–75,000", difficulty: "입문", tags: ["싱글몰트", "Highland", "가벼움", "입문추천"],
+  },
+  {
+    id: "tamdhu-12", name: "탐듀 12년", distillery: "Tamdhu",
+    region: "Speyside", country: "Scotland", category: "스카치", age: 12, abv: 43,
+    nose: "건포도, 오렌지, 셰리, 바닐라", palate: "토피, 다크초콜릿, 스파이스, 견과류", finish: "따뜻하고 묵직한 셰리 여운",
+    description: "전량 올로로소 셰리 캐스크에서만 숙성해 진한 과일과 견과 풍미를 보여주는 스페이사이드 싱글몰트.",
+    priceRange: "₩75,000–100,000", difficulty: "중급", tags: ["싱글몰트", "Speyside", "올로로소셰리", "풀셰리"],
+  },
+  {
+    id: "kilchoman-machir-bay", name: "킬호만 마키어 베이", distillery: "Kilchoman",
+    region: "Islay", country: "Scotland", category: "스카치", age: null, abv: 46,
+    nose: "레몬, 바닐라, 피트 스모크, 소금기", palate: "달콤한 몰트, 스모크, 시트러스, 후추", finish: "짭짤하고 스모키한 산뜻한 여운",
+    description: "아일라에서 보리 재배부터 병입까지 직접 하는 팜 증류소의 대표작으로, 젊지만 신선한 피트 캐릭터가 돋보인다.",
+    priceRange: "₩90,000–120,000", difficulty: "중급", tags: ["싱글몰트", "Islay", "피트", "팜디스틸러리"],
+  },
+  {
+    id: "deanston-12", name: "딘스턴 12년", distillery: "Deanston",
+    region: "Highland", country: "Scotland", category: "스카치", age: 12, abv: 46.3,
+    nose: "꿀, 바닐라, 시트러스, 갓 구운 빵", palate: "크리미한 몰트, 꿀, 은은한 스파이스", finish: "부드럽고 달콤한 여운",
+    description: "논칠필터로 병입해 질감이 크리미하고, 옛 방직 공장을 개조한 증류소로도 유명한 하이랜드 싱글몰트.",
+    priceRange: "₩60,000–80,000", difficulty: "입문", tags: ["싱글몰트", "Highland", "논칠필터", "크리미"],
+  },
+  {
+    id: "arran-10", name: "아란 몰트 10년", distillery: "Arran",
+    region: "Isle of Arran", country: "Scotland", category: "스카치", age: 10, abv: 46,
+    nose: "풋사과, 배, 바닐라, 몰트", palate: "과일, 오크, 가벼운 스파이스", finish: "산뜻하고 깨끗한 여운",
+    description: "1995년 재건된 아란 증류소의 대표작으로, 논칠필터의 신선하고 과일향 가득한 아일랜드 싱글몰트.",
+    priceRange: "₩65,000–85,000", difficulty: "입문", tags: ["싱글몰트", "Island", "논칠필터", "과일향"],
+  },
+  {
+    id: "something-special", name: "썸싱 스페셜", distillery: "Chivas Brothers",
+    region: "Multiple", country: "Scotland", category: "스카치", age: null, abv: 40,
+    nose: "꿀, 헤더, 은은한 오크", palate: "부드러운 몰트, 꿀, 가벼운 스파이스", finish: "짧고 부드러운 여운",
+    description: "1970~90년대 한국에서 폭발적인 인기를 누렸던 시바스 브라더스의 블렌디드 스카치로, 지금도 올드 스쿨 바에서 만날 수 있다.",
+    priceRange: "₩40,000–55,000", difficulty: "입문", tags: ["블렌디드", "Scotch", "레트로", "한국인기"],
+  },
+  {
+    id: "passport-scotch", name: "패스포트", distillery: "Pernod Ricard",
+    region: "Multiple", country: "Scotland", category: "스카치", age: null, abv: 40,
+    nose: "가벼운 곡물, 꽃향, 시트러스", palate: "라이트한 몰트, 은은한 단맛", finish: "짧고 깔끔한 여운",
+    description: "가볍고 부담 없는 스타일로 8090년대 한국 룸살롱·바에서 꾸준히 사랑받았던 블렌디드 스카치.",
+    priceRange: "₩30,000–40,000", difficulty: "입문", tags: ["블렌디드", "Scotch", "레트로", "한국인기"],
+  },
+  {
+    id: "powers-johns-lane", name: "파워스 존스 레인 릴리즈", distillery: "Midleton",
+    region: "County Cork", country: "Ireland", category: "아이리쉬", age: 12, abv: 46,
+    nose: "오렌지, 스파이스, 바닐라, 팟스틸 특유의 오일리함", palate: "시나몬, 잘 익은 과일, 오크, 후추", finish: "길고 스파이시한 여운",
+    description: "12년 이상 숙성한 싱글 팟 스틸 원액을 캐스크 스트렝스에 가깝게 병입한 파워스의 프리미엄 라인.",
+    priceRange: "₩130,000–170,000", difficulty: "상급", tags: ["싱글팟스틸", "아이리쉬", "프리미엄", "캐스크스트렝스급"],
+  },
+  {
+    id: "connemara-peated", name: "코네마라 피티드 싱글몰트", distillery: "Kilbeggan",
+    region: "County Westmeath", country: "Ireland", category: "아이리쉬", age: null, abv: 40,
+    nose: "피트 스모크, 바닐라, 몰트", palate: "스모키, 꿀, 부드러운 곡물", finish: "은은한 스모크가 남는 여운",
+    description: "피트를 사용하는 몇 안 되는 아이리쉬 싱글몰트로, 스코틀랜드와는 다른 부드러운 스모키함이 특징이다.",
+    priceRange: "₩55,000–75,000", difficulty: "중급", tags: ["싱글몰트", "아이리쉬", "피트", "희귀스타일"],
+  },
+  {
+    id: "makers-mark-cask-strength", name: "메이커스 마크 캐스크 스트렝스", distillery: "Maker's Mark",
+    region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 55.8,
+    nose: "캐러멜, 바닐라, 오크, 진한 곡물향", palate: "묵직한 캐러멜, 시나몬, 뜨거운 오크 스파이스", finish: "길고 강렬한 오크와 스파이스의 여운",
+    description: "메이커스 마크를 가수 없이 캐스크 스트렝스 그대로 병입한 버전으로, 도수는 배치마다 약 54~57%로 상이하며 기본 라인보다 훨씬 진하고 강렬한 밀 매시빌 버번이다.",
+    priceRange: "₩70,000–95,000", difficulty: "중급", tags: ["버번", "Kentucky", "캐스크스트렝스", "휘티드"],
+  },
+  {
+    id: "1792-bottled-in-bond", name: "1792 보틀드 인 본드", distillery: "Barton 1792",
+    region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 50,
+    nose: "캐러멜, 바닐라, 라이 스파이스, 오크", palate: "묵직한 캐러멜, 후추, 건조한 오크", finish: "길고 스파이시한 여운",
+    description: "보틀드 인 본드 규정에 따라 최소 4년 숙성·100프루프로 병입한 1792의 진하고 균형 잡힌 라인.",
+    priceRange: "₩65,000–90,000", difficulty: "중급", tags: ["버번", "Kentucky", "BiB", "하이라이"],
+  },
+  {
+    id: "eh-taylor-small-batch", name: "E.H. 테일러 스몰 배치", distillery: "Buffalo Trace",
+    region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 50,
+    nose: "바닐라, 오크, 민트, 가벼운 과일", palate: "캐러멜, 스파이스, 토스티드 오크", finish: "길고 드라이한 오크 여운",
+    description: "버번의 아버지로 불리는 E.H. 테일러 대령의 이름을 딴 보틀드 인 본드 스타일의 프리미엄 버번.",
+    priceRange: "₩120,000–160,000", difficulty: "중급", tags: ["버번", "Kentucky", "BiB", "프리미엄"],
+  },
+  {
+    id: "old-grand-dad-114", name: "올드 그랜드대드 114", distillery: "Jim Beam",
+    region: "Kentucky", country: "USA", category: "버번/라이", age: null, abv: 57,
+    nose: "오크, 후추, 캐러멜, 민트", palate: "강렬한 라이 스파이스, 캐러멜, 오크", finish: "뜨겁고 긴 스파이시 여운",
+    description: "114프루프로 병입한 하이라이 버번으로, 가성비와 강렬한 스파이스감으로 마니아층이 두터운 보틀.",
+    priceRange: "₩50,000–70,000", difficulty: "중급", tags: ["버번", "Kentucky", "하이라이", "고도수"],
+  },
+  {
+    id: "mars-iwai-tradition", name: "마스 이와이 트래디션", distillery: "Mars Shinshu",
+    region: "Nagano", country: "Japan", category: "기타", age: null, abv: 40,
+    nose: "곡물, 바닐라, 가벼운 과일", palate: "부드러운 몰트, 캐러멜, 은은한 스파이스", finish: "짧고 깔끔한 여운",
+    description: "혼슈 마스 신슈 증류소의 가볍고 부담 없는 데일리 블렌디드로, 하이볼용으로 특히 인기가 많다.",
+    priceRange: "₩35,000–50,000", difficulty: "입문", tags: ["블렌디드", "Japanese", "하이볼", "가성비"],
+  },
+  {
+    id: "fuji-single-blended", name: "후지 싱글 블렌디드", distillery: "Fuji Gotemba",
+    region: "Shizuoka", country: "Japan", category: "기타", age: null, abv: 46,
+    nose: "꿀, 바닐라, 열대과일, 오크", palate: "크리미한 몰트, 카라멜, 은은한 스파이스", finish: "부드럽고 따뜻한 여운",
+    description: "후지고텐바 증류소 한 곳의 몰트·그레인 원액만으로 블렌딩한 싱글 블렌디드 위스키.",
+    priceRange: "₩90,000–120,000", difficulty: "중급", tags: ["싱글블렌디드", "Japanese", "후지산", "프리미엄"],
   },
 ];
 
