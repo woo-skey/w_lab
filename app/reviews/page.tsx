@@ -208,7 +208,8 @@ export default function ReviewsPage() {
     try {
       const { data, error } = await supabase
         .from("reviews")
-        .select("*, users(name)")
+        // users!user_id — review_likes 때문에 관계가 모호해져 힌트가 필요하다 (없으면 300)
+        .select("*, users!user_id(name)")
         .eq("whiskey_id", whiskeyId)
         .order("created_at", { ascending: false });
       if (error) throw error;

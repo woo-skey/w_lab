@@ -415,7 +415,8 @@ export default function MyPage() {
         const userNameMap = await getUserNameMap([...new Set(rows.map((a) => a.author_id).filter(Boolean))]);
         setAllArticles(rows.map((a) => ({ ...a, author_name: userNameMap[a.author_id] || "알 수 없음" })));
       } else if (tab === "reviews") {
-        const { data } = await supabase.from("reviews").select("*, users(name), whiskeys(name)").order("created_at", { ascending: false });
+        // users!user_id — review_likes 때문에 관계가 모호해져 힌트가 필요하다 (없으면 300)
+        const { data } = await supabase.from("reviews").select("*, users!user_id(name), whiskeys(name)").order("created_at", { ascending: false });
         setAllReviews((data || []) as unknown as AllReview[]);
       } else if (tab === "bars") {
         const { data } = await supabase.from("bars").select("*").order("created_at", { ascending: false });

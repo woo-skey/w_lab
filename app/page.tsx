@@ -76,7 +76,9 @@ export default function Home() {
       const [reviewsRes, schedulesRes, whiskeyRatingsRes] = await Promise.all([
         supabase
           .from("reviews")
-          .select("id, rating, review_text, created_at, users(name), whiskeys(name)")
+          // users!user_id — review_likes가 reviews↔users 간 두 번째(다대다) 관계를 만들어서
+          // 힌트 없이 users(name)만 쓰면 PostgREST가 300 Multiple Choices를 반환한다.
+          .select("id, rating, review_text, created_at, users!user_id(name), whiskeys(name)")
           .order("created_at", { ascending: false })
           .limit(5),
         isLoggedIn

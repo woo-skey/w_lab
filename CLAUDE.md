@@ -28,6 +28,13 @@
 
 ## Supabase / TypeScript 주의사항
 - 중첩 select 결과는 TypeScript가 타입 추론 못 함 → `as unknown as T[]` 패턴 사용
+- **`reviews`/`articles`/`bars`에서 `users`를 임베드할 때는 FK 힌트 필수**
+  - `review_likes`, `article_likes`, `bar_favorites`가 junction 테이블로 인식돼 다대다 관계가
+    추가로 잡히기 때문에, 힌트 없이 쓰면 PostgREST가 `300 Multiple Choices`를 반환하고
+    `data`가 null이 된다 (에러가 안 보이고 목록이 조용히 비어버림)
+  - `reviews` → `users!user_id(name)` / `articles` → `users!author_id(name)` / `bars` → `users!user_id(name)`
+  - `comments`, `review_comments`, `bar_comments`, `bar_favorites`, `user_availability`는 관계가
+    하나뿐이라 힌트 없이 `users(name)` 그대로 사용 가능
 - JSX 내 따옴표 직접 사용 금지 (ESLint 빌드 오류) → `&ldquo;` `&rdquo;` 사용
 - userId, userName, isAdmin 은 모두 localStorage 기반 (Supabase JWT 인증 아님)
   - SSR/서버 컴포넌트에서 localStorage 접근 시 `typeof window !== "undefined"` 체크 필요
