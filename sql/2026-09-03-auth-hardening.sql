@@ -14,9 +14,37 @@
 -- 1) 비밀번호 해시 노출 차단
 --    지금까지 anon 롤이 users.password_hash를 읽을 수 있었기 때문에,
 --    로그인하지 않은 사람도 REST API 한 번으로 전 회원의 bcrypt 해시를 받아갈 수 있었다.
---    컬럼 단위로만 회수하므로 id/name/username 등을 쓰는 기존 화면은 그대로 동작한다.
+--
+--    주의: `REVOKE SELECT (password_hash) ...` 는 동작하지 않는다.
+--    PostgreSQL은 테이블 단위 SELECT 권한이 있으면 컬럼 단위 REVOKE를 무시한다
+--    (테이블 권한이 모든 컬럼을 덮기 때문). Supabase는 기본적으로 anon/authenticated에
+--    테이블 단위 권한을 부여하므로, 테이블 SELECT를 먼저 회수하고 허용할 컬럼만 다시 줘야 한다.
+--
+--    컬럼 목록은 스키마에서 직접 읽어 password_hash만 제외한다.
+--    → 나중에 컬럼을 추가하면 anon이 못 읽으므로 이 블록을 다시 실행할 것.
 -- ----------------------------------------------------------------------------
-REVOKE SELECT (password_hash) ON public.users FROM anon, authenticated;
+DO $$
+DECLARE
+  cols text;
+BEGIN
+  SELECT string_agg(quote_ident(column_name), ', ' ORDER BY ordinal_position)
+    INTO cols
+    FROM information_schema.columns
+   WHERE table_schema = 'public'
+     AND table_name   = 'users'
+     AND column_name <> 'password_hash';
+
+  IF cols IS NULL THEN
+    RAISE EXCEPTION 'public.users 테이블을 찾을 수 없습니다';
+  END IF;
+
+  EXECUTE 'REVOKE SELECT ON public.users FROM anon, authenticated';
+  -- 이전에 컬럼 단위로 부여된 권한이 남아 있을 수 있으므로 명시적으로 한 번 더 회수
+  EXECUTE 'REVOKE SELECT (password_hash) ON public.users FROM anon, authenticated';
+  EXECUTE format('GRANT SELECT (%s) ON public.users TO anon, authenticated', cols);
+
+  RAISE NOTICE '허용된 컬럼: %', cols;
+END $$;
 
 
 -- ----------------------------------------------------------------------------
@@ -29,7 +57,7 @@ REVOKE SELECT (password_hash) ON public.users FROM anon, authenticated;
 --    AppSidebar가 브라우저에서 직접 update 하던 것을 /api/account/heartbeat 로 옮겼으므로,
 --    반드시 그 코드가 배포된 뒤에 이 SQL을 실행할 것. 순서가 바뀌면 최근 접속일이 갱신되지 않는다.
 -- ----------------------------------------------------------------------------
-REVOKE INSERT, UPDATE, DELETE ON public.users FROM anon, authenticated;
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES ON public.users FROM anon, authenticated;
 
 
 -- ----------------------------------------------------------------------------
