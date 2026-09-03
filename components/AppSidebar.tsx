@@ -130,13 +130,18 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
       if (updating || now - lastUpdatedAt < LAST_SEEN_UPDATE_INTERVAL_MS) return;
 
       updating = true;
-      const { error } = await supabase
-        .from("users")
-        .update({ last_seen_at: new Date(now).toISOString() })
-        .eq("id", userId);
+      // users 테이블은 브라우저에서 직접 쓸 수 없다(anon UPDATE 권한 회수).
+      // 서버가 세션 쿠키로 본인 확인 후 갱신한다.
+      let ok = false;
+      try {
+        const res = await fetch("/api/account/heartbeat", { method: "POST" });
+        ok = res.ok;
+      } catch {
+        ok = false;
+      }
       updating = false;
 
-      if (!error) localStorage.setItem(storageKey, String(now));
+      if (ok) localStorage.setItem(storageKey, String(now));
     };
 
     const handleVisibilityChange = () => {

@@ -24,6 +24,10 @@ REVOKE SELECT (password_hash) ON public.users FROM anon, authenticated;
 --    브라우저 콘솔에서 supabase.from("users").update({is_admin:true}) 를 직접
 --    호출해 스스로 관리자가 되는 것을 막는다.
 --    회원가입·프로필 수정·권한 변경·탈퇴는 모두 service_role을 쓰는 서버 라우트로 이동했다.
+--
+--    주의: 최근 접속 시각(last_seen_at) 갱신도 이 REVOKE에 걸린다.
+--    AppSidebar가 브라우저에서 직접 update 하던 것을 /api/account/heartbeat 로 옮겼으므로,
+--    반드시 그 코드가 배포된 뒤에 이 SQL을 실행할 것. 순서가 바뀌면 최근 접속일이 갱신되지 않는다.
 -- ----------------------------------------------------------------------------
 REVOKE INSERT, UPDATE, DELETE ON public.users FROM anon, authenticated;
 

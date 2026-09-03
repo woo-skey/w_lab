@@ -28,7 +28,7 @@
 | `lib/supabaseAdmin.ts` | service_role Supabase 클라이언트 (**서버 전용**, 지연 초기화) |
 | `lib/serverAuth.ts` | `requireUser` / `requireAdmin` 가드, `jsonError` |
 | `app/api/auth/*` | login, signup, logout, check-username |
-| `app/api/account/*` | password, profile, avatar (본인 것만 수정 가능) |
+| `app/api/account/*` | password, profile, avatar, heartbeat(last_seen_at) — 본인 것만 수정 가능 |
 | `app/api/admin/users` | PATCH=권한 토글, DELETE=회원 탈퇴 (관리자 세션 필수) |
 | `sql/2026-09-03-auth-hardening.sql` | 권한 회수 + `delete_user_cascade` 마이그레이션 |
 | `lib/notifications.ts` | `createNotification`, `notifyAllUsers` |
