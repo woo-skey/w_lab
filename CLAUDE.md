@@ -31,10 +31,22 @@
 - JSX 내 따옴표 직접 사용 금지 (ESLint 빌드 오류) → `&ldquo;` `&rdquo;` 사용
 - userId, userName, isAdmin 은 모두 localStorage 기반 (Supabase JWT 인증 아님)
   - SSR/서버 컴포넌트에서 localStorage 접근 시 `typeof window !== "undefined"` 체크 필요
+  - **단, 이 값들은 사용자가 임의로 바꿀 수 있으므로 권한 판단에 쓰지 말 것** (UI 분기용으로만)
+
+## 보안 규칙 (중요)
+- `users` 테이블은 anon 롤에게 **INSERT/UPDATE/DELETE 권한이 없고 `password_hash` SELECT도 막혀 있음**
+  - 회원가입·로그인·비밀번호 변경·프로필 수정·아바타 업로드·권한 변경·회원 탈퇴는 전부 `app/api/*` Route Handler 경유
+  - 클라이언트에서 `supabase.from("users").update(...)` 같은 코드를 새로 추가하지 말 것 → 런타임에 권한 오류
+- `users`를 `select("*")`로 조회하지 말 것 → `password_hash` 컬럼 권한 때문에 실패. 필요한 컬럼만 명시
+- 서버에서 권한이 필요한 작업은 `lib/serverAuth.ts`의 `requireUser` / `requireAdmin` 사용
+  - `requireAdmin`은 토큰이 아니라 **DB에서 `is_admin`을 매번 다시 읽음** (권한 회수 즉시 반영)
+- `lib/supabaseAdmin.ts`(service_role)는 **서버 전용** — 클라이언트 컴포넌트에서 import 금지
+- 환경변수: `SUPABASE_SERVICE_ROLE_KEY`, `SESSION_SECRET` (둘 다 `NEXT_PUBLIC_` 접두사 없이 서버 전용)
 
 ## 기술 스택
 - Next.js 15 App Router, Supabase, Tailwind CSS v3, TypeScript
-- 인증: localStorage (`userId`, `userName`, `isAdmin`, `isMember`) — Supabase JWT 아님
+- 인증: **httpOnly 세션 쿠키(`wlab_session`) + 서버 Route Handler** — Supabase JWT 아님
+  - localStorage(`userId`, `userName`, `isAdmin`, `isMember`)는 **UI 표시용 힌트일 뿐** 권한 근거가 아님
 - 알림: Supabase Realtime (`postgres_changes`) + `lib/notifications.ts`의 `createNotification`
 - 글로벌 레이아웃: `components/AppSidebar.tsx` (Navigation 대체)
 

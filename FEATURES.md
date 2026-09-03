@@ -13,7 +13,7 @@
 | DB / BaaS | Supabase (PostgreSQL + Realtime) |
 | 스타일 | Tailwind CSS v3, Glass morphism (`glass-card`, `glass-input`) |
 | 언어 | TypeScript |
-| 인증 | localStorage 기반 (Supabase JWT 미사용) |
+| 인증 | httpOnly 세션 쿠키 + 서버 Route Handler (Supabase JWT 미사용). localStorage는 UI 힌트용 |
 | 알림 | Supabase Realtime `postgres_changes` + `lib/notifications.ts` |
 
 ---
@@ -23,7 +23,14 @@
 | 파일 | 역할 |
 |------|------|
 | `components/AppSidebar.tsx` | 전체 레이아웃, 사이드바 네비, 검색, 알림 |
-| `lib/auth.ts` | 로그인·회원가입 함수 |
+| `lib/auth.ts` | 로그인·회원가입·로그아웃 (서버 API 호출 래퍼, bcrypt 없음) |
+| `lib/session.ts` | 세션 토큰 HMAC 서명/검증, 쿠키 set/clear (**서버 전용**) |
+| `lib/supabaseAdmin.ts` | service_role Supabase 클라이언트 (**서버 전용**, 지연 초기화) |
+| `lib/serverAuth.ts` | `requireUser` / `requireAdmin` 가드, `jsonError` |
+| `app/api/auth/*` | login, signup, logout, check-username |
+| `app/api/account/*` | password, profile, avatar (본인 것만 수정 가능) |
+| `app/api/admin/users` | PATCH=권한 토글, DELETE=회원 탈퇴 (관리자 세션 필수) |
+| `sql/2026-09-03-auth-hardening.sql` | 권한 회수 + `delete_user_cascade` 마이그레이션 |
 | `lib/notifications.ts` | `createNotification`, `notifyAllUsers` |
 | `lib/encyclopediaData.ts` | 위스키 백과 정적 데이터 (`ENCYCLOPEDIA_WHISKEYS`) |
 | `app/page.tsx` | 대시보드 (최근 리뷰, 상위 위스키, 확정 일정 배너) |
@@ -209,6 +216,32 @@ Bar 추천 목록 및 댓글. `bar_comments`는 bar_id, user_id, content.
 ### 확장 카드 빈 배열 캐시
 - **원인**: `if (!data[id])` 가드 → 빈 배열이 캐시되면 재요청 안 함
 - **해결**: `useEffect(() => { if (expandedId) fetch(expandedId); }, [expandedId])` 패턴 사용
+
+### 인증 구조 취약점 (2026-09-03 수정)
+- **원인**: `login()`이 브라우저에서 `password_hash`를 SELECT → anon 롤에 해시 읽기 권한이 열려 있어야 동작
+  → 로그인 안 한 사람도 REST API로 전 회원 bcrypt 해시 취득 가능. 세션 토큰이 없어
+  `localStorage.setItem("isAdmin","true")` 만으로 관리자 UI 진입, 콘솔에서 DB 직접 변조도 가능
+- **해결**: 로그인·비밀번호 검증을 서버 Route Handler로 이동(해시가 브라우저로 내려오지 않음),
+  HMAC 서명된 httpOnly 세션 쿠키 도입, `users` 테이블의 anon INSERT/UPDATE/DELETE 및
+  `password_hash` SELECT 권한 회수. 권한 판단은 항상 서버가 DB에서 재확인
+- **주의**: `users`를 `select("*")`로 조회하면 컬럼 권한 때문에 실패 → 필요한 컬럼만 명시할 것
+
+### 일정 유저별 날짜표 동명이인 병합 (2026-09-03 수정)
+- **원인**: `byUser[name]`으로 그룹핑 → 이름이 같은 두 회원의 투표가 한 사람으로 합쳐져
+  "N명 완료" 인원이 실제보다 적게 표시됨
+- **해결**: `user_id`로 그룹핑하고 이름은 표시용으로만 사용
+
+### 회원 탈퇴 반쪽 삭제 (2026-09-03 수정)
+- **원인**: 클라이언트가 테이블별 개별 delete를 `Promise.allSettled`로 날리고 결과를 무시 →
+  일부 실패 시 리뷰·지식글만 사라지고 계정은 남음. `notifications`, `user_collection`,
+  `bar_favorites` 등 참조 테이블도 다수 누락돼 FK 위반 가능
+- **해결**: `delete_user_cascade(uuid)` plpgsql 함수로 한 트랜잭션 처리 (전부 성공 or 전부 롤백)
+
+### 아바타 확장자 오류 (2026-09-03 수정)
+- **원인**: `file.name.split(".").pop()` → 확장자 없는 파일이면 파일명 전체가 확장자가 됨.
+  업로드 경로도 localStorage의 userId 기반이라 남의 아바타 덮어쓰기 가능
+- **해결**: 서버에서 MIME 타입으로 확장자 결정 + 경로는 세션 userId로 강제,
+  타입/용량(2MB) 검증, 확장자 변경 시 이전 파일 정리
 
 ### isMember localStorage 미설정
 - **원인**: 기존 로그인 유저는 `isMember` 키가 없음

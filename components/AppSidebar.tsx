@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { logout } from "@/lib/auth";
 import SpotlightSearch from "@/components/SpotlightSearch";
 
 interface Notification {
@@ -268,7 +269,9 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     document.documentElement.classList.toggle("dark", next);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // 서버 세션 쿠키까지 지워야 실제 로그아웃이 된다.
+    await logout();
     localStorage.clear();
     setUserName("");
     setUserId("");

@@ -133,6 +133,16 @@ function formatLastSeen(value?: string | null) {
   });
 }
 
+/** Route Handler가 내려준 { error } 메시지를 꺼낸다. 없으면 fallback 사용. */
+async function readApiError(res: Response, fallback: string): Promise<string> {
+  try {
+    const body = await res.json();
+    return typeof body?.error === "string" ? body.error : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function MyPage() {
   const router = useRouter();
   const [userId, setUserId] = useState("");
@@ -524,14 +534,21 @@ export default function MyPage() {
     setEditingAdminWhiskey(null);
   };
 
+  // 권한 변경·탈퇴는 서버가 세션 쿠키로 관리자 여부를 다시 확인한 뒤 처리한다.
+  // (localStorage의 isAdmin은 UI 표시용일 뿐이라 신뢰하지 않는다)
   const handleToggleAdmin = async (targetId: string, currentAdmin: boolean) => {
     if (targetId === userId) { alert("본인의 관리자 권한은 변경할 수 없습니다."); return; }
     try {
-      const { error } = await supabase.from("users").update({ is_admin: !currentAdmin }).eq("id", targetId);
-      if (error) throw error;
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetId, is_admin: !currentAdmin }),
+      });
+      if (!res.ok) throw new Error(await readApiError(res, "관리자 권한 변경에 실패했습니다."));
       setAdminUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, is_admin: !currentAdmin } : u));
     } catch (err) {
       console.error(err);
+      alert(err instanceof Error ? err.message : "관리자 권한 변경에 실패했습니다.");
     }
   };
 
@@ -539,12 +556,16 @@ export default function MyPage() {
     if (isTargetAdmin) { alert("관리자 계정은 w_lab 회원 토글이 불가합니다."); return; }
     setMemberUpdatingId(targetId);
     try {
-      const { error } = await supabase.from("users").update({ is_member: !currentMember }).eq("id", targetId);
-      if (error) throw error;
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetId, is_member: !currentMember }),
+      });
+      if (!res.ok) throw new Error(await readApiError(res, "w_lab 회원 상태 변경에 실패했습니다."));
       setAdminUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, is_member: !currentMember } : u));
     } catch (err) {
       console.error(err);
-      alert("w_lab 회원 상태 변경에 실패했습니다.");
+      alert(err instanceof Error ? err.message : "w_lab 회원 상태 변경에 실패했습니다.");
     } finally {
       setMemberUpdatingId(null);
     }
@@ -555,23 +576,14 @@ export default function MyPage() {
     if (!confirm(`"${targetName}" 회원을 탈퇴시킬까요?\n해당 유저의 모든 데이터가 삭제됩니다.`)) return;
     setDeletingUserId(targetId);
     try {
-      // 연관 데이터 삭제
-      await Promise.allSettled([
-        supabase.from("reviews").delete().eq("user_id", targetId),
-        supabase.from("articles").delete().eq("author_id", targetId),
-        supabase.from("bars").delete().eq("user_id", targetId),
-        supabase.from("schedules").delete().eq("created_by", targetId),
-        supabase.from("whiskeys").delete().eq("created_by", targetId),
-        supabase.from("comments").delete().eq("user_id", targetId),
-        supabase.from("review_comments").delete().eq("user_id", targetId),
-      ]);
-      const { error } = await supabase.from("users").delete().eq("id", targetId);
-      if (error) throw error;
+      // 연관 데이터까지 서버에서 한 트랜잭션으로 삭제 — 중간 실패 시 아무것도 지워지지 않는다.
+      const res = await fetch(`/api/admin/users?id=${encodeURIComponent(targetId)}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(await readApiError(res, "삭제에 실패했습니다."));
       setAdminUsers((prev) => prev.filter((u) => u.id !== targetId));
       if (adminStats) setAdminStats({ ...adminStats, totalUsers: adminStats.totalUsers - 1 });
     } catch (err) {
       console.error(err);
-      alert("삭제에 실패했습니다.");
+      alert(err instanceof Error ? err.message : "삭제에 실패했습니다.");
     } finally {
       setDeletingUserId(null);
     }
@@ -582,36 +594,52 @@ export default function MyPage() {
     if (!file || !userId) return;
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${userId}/avatar.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-      const avatarUrl = data.publicUrl + `?t=${Date.now()}`;
-
-      await supabase.from("users").update({ avatar_url: avatarUrl }).eq("id", userId);
+      // 업로드 경로는 서버가 세션 userId로 결정한다 — 남의 아바타를 덮어쓸 수 없다.
+      // 확장자도 서버가 MIME 타입에서 정하므로 확장자 없는 파일에서 생기던 버그가 사라진다.
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/account/avatar", { method: "POST", body: form });
+      if (!res.ok) throw new Error(await readApiError(res, "업로드에 실패했습니다."));
+      const { avatarUrl } = await res.json();
       setProfile((prev) => prev ? { ...prev, avatar_url: avatarUrl } : prev);
     } catch (err) {
       console.error(err);
-      alert("업로드에 실패했습니다.");
+      alert(err instanceof Error ? err.message : "업로드에 실패했습니다.");
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
   const handleSaveProfile = async () => {
     if (!userId) return;
     setProfileSaving(true);
-    await supabase.from("users").update({
-      name: profileForm.name || null,
-      bio: profileForm.bio || null,
-      favorite_category: profileForm.favorite_category || null,
-      favorite_whiskey: profileForm.favorite_whiskey || null,
-    }).eq("id", userId);
-    await fetchAll(userId);
-    setEditingProfile(false);
-    setProfileSaving(false);
+    try {
+      const res = await fetch("/api/account/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: profileForm.name,
+          bio: profileForm.bio,
+          favorite_category: profileForm.favorite_category,
+          favorite_whiskey: profileForm.favorite_whiskey,
+        }),
+      });
+      if (!res.ok) throw new Error(await readApiError(res, "프로필 저장에 실패했습니다."));
+      // 표시 이름이 바뀌었으면 사이드바 등 다른 화면에도 즉시 반영
+      const nextName = profileForm.name.trim();
+      if (nextName) {
+        localStorage.setItem("userName", nextName);
+        window.dispatchEvent(new Event("auth-change"));
+      }
+      await fetchAll(userId);
+      setEditingProfile(false);
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "프로필 저장에 실패했습니다.");
+    } finally {
+      setProfileSaving(false);
+    }
   };
 
   const handleChangePassword = async () => {
@@ -627,18 +655,23 @@ export default function MyPage() {
       setPwError("새 비밀번호는 6자 이상이어야 합니다."); return;
     }
     setPwChanging(true);
-    const { data } = await supabase.from("users").select("password_hash").eq("id", userId).single();
-    if (!data) { setPwError("사용자 정보를 불러올 수 없습니다."); setPwChanging(false); return; }
-    const bcrypt = (await import("bcryptjs")).default;
-    const match = await bcrypt.compare(pwForm.current, data.password_hash);
-    if (!match) { setPwError("현재 비밀번호가 올바르지 않습니다."); setPwChanging(false); return; }
-    const newHash = await bcrypt.hash(pwForm.newPw, 10);
-    const { error } = await supabase.from("users").update({ password_hash: newHash }).eq("id", userId);
-    if (error) { setPwError("비밀번호 변경에 실패했습니다."); setPwChanging(false); return; }
-    setPwSuccess(true);
-    setPwForm({ current: "", newPw: "", confirm: "" });
-    setTimeout(() => { setShowPwChange(false); setPwSuccess(false); }, 2000);
-    setPwChanging(false);
+    try {
+      // 현재 비밀번호 검증과 새 해시 생성 모두 서버에서 수행 — 해시가 브라우저로 내려오지 않는다.
+      const res = await fetch("/api/account/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.newPw }),
+      });
+      if (!res.ok) { setPwError(await readApiError(res, "비밀번호 변경에 실패했습니다.")); return; }
+      setPwSuccess(true);
+      setPwForm({ current: "", newPw: "", confirm: "" });
+      setTimeout(() => { setShowPwChange(false); setPwSuccess(false); }, 2000);
+    } catch (err) {
+      console.error(err);
+      setPwError("비밀번호 변경에 실패했습니다.");
+    } finally {
+      setPwChanging(false);
+    }
   };
 
   const handleAddCollection = async (item: { whiskey_id?: string; encyclopedia_id?: string; custom_name?: string }) => {

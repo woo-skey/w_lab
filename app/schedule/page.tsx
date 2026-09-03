@@ -60,7 +60,8 @@ export default function SchedulePage() {
     fetchSchedules();
     supabase
       .from("users")
-      .select("*", { count: "exact", head: true })
+      // select("*")는 password_hash 컬럼 권한이 회수된 뒤 실패하므로 id만 센다
+      .select("id", { count: "exact", head: true })
       .eq("is_member", true)
       .neq("is_admin", true)
       .then(({ count }) => setTotalMembersExcludingAdmin(count || 0));
@@ -110,18 +111,20 @@ export default function SchedulePage() {
         setAvailabilityMap(map);
 
         // 유저별 날짜 맵 — 관리자 제외, Set으로 날짜 중복 제거
-        const byUser: Record<string, Set<string>> = {};
+        // 이름이 아니라 user_id로 그룹핑한다. 이름으로 묶으면 동명이인 두 명의 투표가
+        // 한 사람으로 합쳐져 투표 완료 인원이 실제보다 적게 나온다.
+        const byUser: Record<string, { name: string; dates: Set<string> }> = {};
         avail?.forEach((a) => {
-          if ((a.users as any)?.is_admin) return; // 관리자 제외
-          const name = (a.users as any)?.name || "알 수 없음";
+          const user = a.users as { name?: string; is_admin?: boolean } | null;
+          if (user?.is_admin) return; // 관리자 제외
           const date = dates.find((d) => d.id === a.schedule_date_id)?.date;
           if (!date) return;
-          if (!byUser[name]) byUser[name] = new Set();
-          byUser[name].add(date);
+          if (!byUser[a.user_id]) byUser[a.user_id] = { name: user?.name || "알 수 없음", dates: new Set() };
+          byUser[a.user_id].dates.add(date);
         });
         setUserDateMap(
-          Object.entries(byUser)
-            .map(([name, dateSet]) => ({ name, dates: [...dateSet].sort() }))
+          Object.values(byUser)
+            .map(({ name, dates: dateSet }) => ({ name, dates: [...dateSet].sort() }))
             .sort((a, b) => b.dates.length - a.dates.length)
         );
       } catch (err) {
