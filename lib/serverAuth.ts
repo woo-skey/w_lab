@@ -38,3 +38,37 @@ export async function requireAdmin(
 export function isResponse(value: unknown): value is NextResponse {
   return value instanceof NextResponse;
 }
+
+export interface SessionUser {
+  userId: string;
+  name: string;
+  isAdmin: boolean;
+  isMember: boolean;
+}
+
+/**
+ * 세션 유저의 권한 플래그를 DB에서 읽어온다.
+ * 토큰에 담아두지 않는 이유는 requireAdmin과 같다 — 권한 회수를 즉시 반영하기 위함.
+ */
+export async function requireSessionUser(
+  req: NextRequest
+): Promise<SessionUser | NextResponse> {
+  const session = requireUser(req);
+  if (session instanceof NextResponse) return session;
+
+  const { data, error } = await getAdminClient()
+    .from("users")
+    .select("name, is_admin, is_member")
+    .eq("id", session.userId)
+    .maybeSingle();
+
+  if (error) return jsonError("권한 확인에 실패했습니다", 500);
+  if (!data) return jsonError("사용자 정보를 불러올 수 없습니다", 401);
+
+  return {
+    userId: session.userId,
+    name: data.name || "",
+    isAdmin: !!data.is_admin,
+    isMember: !!data.is_member,
+  };
+}

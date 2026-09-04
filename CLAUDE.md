@@ -47,6 +47,14 @@
 - `users`를 `select("*")`로 조회하지 말 것 → `password_hash` 컬럼 권한 때문에 실패. 필요한 컬럼만 명시
 - 서버에서 권한이 필요한 작업은 `lib/serverAuth.ts`의 `requireUser` / `requireAdmin` 사용
   - `requireAdmin`은 토큰이 아니라 **DB에서 `is_admin`을 매번 다시 읽음** (권한 회수 즉시 반영)
+- **콘텐츠 쓰기(리뷰·지식글·Bar·위스키·일정·공지·댓글)도 anon 권한이 회수됨**
+  - 클라이언트에서 `supabase.from("reviews").insert(...)` 같은 코드 새로 추가 금지 → 런타임 권한 오류
+  - 대신 `lib/contentApi.ts`의 `createContent` / `updateContent` / `deleteContent` 사용
+  - 테이블을 새로 보호하려면 `lib/contentResources.ts` 표에 한 줄 추가 + SQL로 REVOKE
+  - 소유자 컬럼(user_id/author_id/created_by)은 서버가 세션에서 채움 → 호출부에서 보내지 말 것
+  - 아직 클라이언트 직접 쓰기가 열려 있는 테이블: `review_likes`, `article_likes`,
+    `bar_favorites`, `user_collection`, `user_availability`, `schedule_dates`,
+    `notifications`, `encyclopedia`
 - `lib/supabaseAdmin.ts`(service_role)는 **서버 전용** — 클라이언트 컴포넌트에서 import 금지
 - 환경변수: `SUPABASE_SERVICE_ROLE_KEY`, `SESSION_SECRET` (둘 다 `NEXT_PUBLIC_` 접두사 없이 서버 전용)
 

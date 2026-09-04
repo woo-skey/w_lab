@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
+import { createContent, updateContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
 
 interface Schedule {
   id: string;
@@ -256,8 +257,7 @@ export default function SchedulePage() {
     if (!target || (target.created_by !== userId && !isAdmin)) return;
     if (!confirm("일정을 삭제할까요?")) return;
     try {
-      const { error } = await supabase.from("schedules").delete().eq("id", scheduleId);
-      if (error) throw error;
+      await deleteContent("schedules", scheduleId);
       const preferredScheduleId = selectedSchedule?.id === scheduleId ? undefined : selectedSchedule?.id;
       await fetchSchedules(preferredScheduleId);
     } catch (err) {
@@ -269,12 +269,8 @@ export default function SchedulePage() {
     e.preventDefault();
     if (!newName.trim()) return;
     try {
-      const { data, error } = await supabase
-        .from("schedules")
-        .insert([{ name: newName, created_by: userId }])
-        .select()
-        .single();
-      if (error) throw error;
+      // created_by는 서버가 채우고, is_member 여부도 서버가 검증한다
+      const data = await createContent<Omit<Schedule, "lastVotedDate">>("schedules", { name: newName });
       setNewName("");
       setShowCreateForm(false);
       const createdSchedule: Schedule = { ...data, lastVotedDate: null };
@@ -283,6 +279,7 @@ export default function SchedulePage() {
       setAvailabilityMap({});
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "일정 생성에 실패했습니다"));
     }
   };
 
@@ -293,8 +290,13 @@ export default function SchedulePage() {
       const label = new Date(newDate + "T00:00:00").toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" });
       if (!confirm(`${label}로 확정하고 참여자에게 알림을 보낼까요?`)) return;
     }
-    const { error } = await supabase.from("schedules").update({ confirmed_date: newDate }).eq("id", selectedSchedule.id);
-    if (error) { console.error(error); return; }
+    try {
+      await updateContent("schedules", selectedSchedule.id, { confirmed_date: newDate });
+    } catch (err) {
+      console.error(err);
+      alert(contentErrorMessage(err, "일정 확정에 실패했습니다"));
+      return;
+    }
     const updated = { ...selectedSchedule, confirmed_date: newDate };
     setSelectedSchedule(updated);
     setSchedules((prev) => prev.map((s) => s.id === selectedSchedule.id ? updated : s));

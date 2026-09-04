@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
+import { createContent, updateContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
 import { ENCYCLOPEDIA_WHISKEYS } from "@/lib/encyclopediaData";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
@@ -131,6 +132,21 @@ function formatLastSeen(value?: string | null) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+/**
+ * 관리자 모더레이션용 래퍼. 서버가 권한을 거부하면 알림을 띄우고 false를 반환해
+ * 로컬 state를 낙관적으로 지우지 않도록 한다.
+ */
+async function adminMutate(fn: () => Promise<unknown>, fallback = "삭제에 실패했습니다"): Promise<boolean> {
+  try {
+    await fn();
+    return true;
+  } catch (err) {
+    console.error(err);
+    alert(contentErrorMessage(err, fallback));
+    return false;
+  }
 }
 
 /** Route Handler가 내려준 { error } 메시지를 꺼낸다. 없으면 fallback 사용. */
@@ -455,72 +471,79 @@ export default function MyPage() {
     if (!announcementForm.title.trim() || !announcementForm.content.trim()) return;
     setAnnouncementSubmitting(true);
     try {
-      const authorName = localStorage.getItem("userName") || "관리자";
-      const { error } = await supabase.from("announcements").insert([{
+      // author_id/author_name과 관리자 권한 검증은 서버가 처리한다
+      await createContent("announcements", {
         title: announcementForm.title, content: announcementForm.content,
-        author_id: userId, author_name: authorName,
-      }]);
-      if (error) throw error;
+      });
       await notifyAllUsers("announcement", `📢 새 공지: ${announcementForm.title}`, "/notices", userId);
       setAnnouncementForm({ title: "", content: "" });
       setShowAnnouncementForm(false);
       fetchAdminContent("notices");
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+      alert(contentErrorMessage(err, "공지 등록에 실패했습니다"));
+    }
     finally { setAnnouncementSubmitting(false); }
   };
   const handleAdminSaveAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdminAnnouncement) return;
-    await supabase.from("announcements").update({ title: editingAdminAnnouncement.title, content: editingAdminAnnouncement.content }).eq("id", editingAdminAnnouncement.id);
+    if (!(await adminMutate(() => updateContent("announcements", editingAdminAnnouncement.id, {
+      title: editingAdminAnnouncement.title, content: editingAdminAnnouncement.content,
+    }), "수정에 실패했습니다"))) return;
     setAllAnnouncements((prev) => prev.map((a) => a.id === editingAdminAnnouncement.id ? { ...a, ...editingAdminAnnouncement } : a));
     setEditingAdminAnnouncement(null);
   };
   const handleAdminDeleteAnnouncement = async (id: string) => {
     if (!confirm("이 공지를 삭제할까요?")) return;
-    await supabase.from("announcements").delete().eq("id", id);
+    if (!(await adminMutate(() => deleteContent("announcements", id)))) return;
     setAllAnnouncements((prev) => prev.filter((a) => a.id !== id));
   };
 
   const handleAdminDeleteArticle = async (id: string) => {
     if (!confirm("이 글을 삭제할까요?")) return;
-    await supabase.from("articles").delete().eq("id", id);
+    if (!(await adminMutate(() => deleteContent("articles", id)))) return;
     setAllArticles((prev) => prev.filter((a) => a.id !== id));
   };
   const handleAdminSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdminArticle) return;
-    await supabase.from("articles").update({ title: editingAdminArticle.title, content: editingAdminArticle.content, category: editingAdminArticle.category }).eq("id", editingAdminArticle.id);
+    if (!(await adminMutate(() => updateContent("articles", editingAdminArticle.id, {
+      title: editingAdminArticle.title, content: editingAdminArticle.content, category: editingAdminArticle.category,
+    }), "수정에 실패했습니다"))) return;
     setAllArticles((prev) => prev.map((a) => a.id === editingAdminArticle.id ? { ...a, ...editingAdminArticle } : a));
     setEditingAdminArticle(null);
   };
 
   const handleAdminDeleteReview = async (id: string) => {
     if (!confirm("이 리뷰를 삭제할까요?")) return;
-    await supabase.from("reviews").delete().eq("id", id);
+    if (!(await adminMutate(() => deleteContent("reviews", id)))) return;
     setAllReviews((prev) => prev.filter((r) => r.id !== id));
   };
 
   const handleAdminDeleteBar = async (id: string) => {
     if (!confirm("이 Bar를 삭제할까요?")) return;
-    await supabase.from("bars").delete().eq("id", id);
+    if (!(await adminMutate(() => deleteContent("bars", id)))) return;
     setAllBars((prev) => prev.filter((b) => b.id !== id));
   };
   const handleAdminSaveBar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdminBar) return;
-    await supabase.from("bars").update({ bar_name: editingAdminBar.bar_name, link: editingAdminBar.link, notes: editingAdminBar.notes }).eq("id", editingAdminBar.id);
+    if (!(await adminMutate(() => updateContent("bars", editingAdminBar.id, {
+      bar_name: editingAdminBar.bar_name, link: editingAdminBar.link, notes: editingAdminBar.notes,
+    }), "수정에 실패했습니다"))) return;
     setAllBars((prev) => prev.map((b) => b.id === editingAdminBar.id ? { ...b, ...editingAdminBar } : b));
     setEditingAdminBar(null);
   };
 
   const handleAdminDeleteWhiskey = async (id: string) => {
     if (!confirm("이 위스키를 삭제할까요? 관련 리뷰도 삭제됩니다.")) return;
-    await supabase.from("whiskeys").delete().eq("id", id);
+    if (!(await adminMutate(() => deleteContent("whiskeys", id)))) return;
     setAllWhiskeys((prev) => prev.filter((w) => w.id !== id));
   };
   const handleAdminDeleteSchedule = async (id: string) => {
     if (!confirm("이 일정을 삭제할까요?")) return;
-    await supabase.from("schedules").delete().eq("id", id);
+    if (!(await adminMutate(() => deleteContent("schedules", id)))) return;
     setAllSchedules((prev) => prev.filter((s) => s.id !== id));
     setSchedules((prev) => prev.filter((s) => s.id !== id));
     if (adminStats) {
@@ -530,7 +553,10 @@ export default function MyPage() {
   const handleAdminSaveWhiskey = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdminWhiskey) return;
-    await supabase.from("whiskeys").update({ name: editingAdminWhiskey.name, type: editingAdminWhiskey.type, region: editingAdminWhiskey.region, age: editingAdminWhiskey.age, abv: editingAdminWhiskey.abv }).eq("id", editingAdminWhiskey.id);
+    if (!(await adminMutate(() => updateContent("whiskeys", editingAdminWhiskey.id, {
+      name: editingAdminWhiskey.name, type: editingAdminWhiskey.type, region: editingAdminWhiskey.region,
+      age: editingAdminWhiskey.age, abv: editingAdminWhiskey.abv,
+    }), "수정에 실패했습니다"))) return;
     setAllWhiskeys((prev) => prev.map((w) => w.id === editingAdminWhiskey.id ? { ...w, ...editingAdminWhiskey } : w));
     setEditingAdminWhiskey(null);
   };

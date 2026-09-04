@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
+import { createContent, updateContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
 import SafeHtml from "@/components/SafeHtml";
@@ -191,14 +192,14 @@ export default function ArticlesPage() {
     e.preventDefault();
     if (!formData.title.trim() || !formData.content.trim()) { alert("제목과 내용을 입력해주세요"); return; }
     try {
-      const { data, error } = await supabase.from("articles").insert([{
-        title: formData.title, content: formData.content, category: formData.category, author_id: userId,
-      }]).select().single();
-      if (error) throw error;
+      // author_id는 서버가 세션에서 채운다
+      const data = await createContent<{ id: string }>("articles", {
+        title: formData.title, content: formData.content, category: formData.category,
+      });
 
       if (imageFile && data) {
         const imageUrl = await uploadImage(imageFile, data.id);
-        if (imageUrl) await supabase.from("articles").update({ image_url: imageUrl }).eq("id", data.id);
+        if (imageUrl) await updateContent("articles", data.id, { image_url: imageUrl });
       }
 
       setFormData({ title: "", content: "", category: "기초 지식" });
@@ -216,12 +217,12 @@ export default function ArticlesPage() {
   const handleDeleteArticle = async (articleId: string) => {
     if (!confirm("글을 삭제할까요?")) return;
     try {
-      const { error } = await supabase.from("articles").delete().eq("id", articleId);
-      if (error) throw error;
+      await deleteContent("articles", articleId);
       if (expandedId === articleId) setExpandedId(null);
       fetchArticles();
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -229,14 +230,14 @@ export default function ArticlesPage() {
     e.preventDefault();
     if (!editingArticle) return;
     try {
-      const { error } = await supabase.from("articles").update({
+      await updateContent("articles", editingArticle.id, {
         title: editingArticle.title, content: editingArticle.content, category: editingArticle.category,
-      }).eq("id", editingArticle.id);
-      if (error) throw error;
+      });
       setEditingArticle(null);
       fetchArticles();
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "수정에 실패했습니다"));
     }
   };
 
@@ -244,8 +245,7 @@ export default function ArticlesPage() {
     const content = commentText[articleId]?.trim();
     if (!content) return;
     try {
-      const { error } = await supabase.from("comments").insert([{ article_id: articleId, user_id: userId, content }]);
-      if (error) throw error;
+      await createContent("comments", { article_id: articleId, content });
       // 글 작성자에게 알림 (본인 제외)
       const targetArticle = articles.find((a) => a.id === articleId);
       if (targetArticle && targetArticle.author_id !== userId) {
@@ -256,16 +256,17 @@ export default function ArticlesPage() {
       fetchComments(articleId);
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
     }
   };
 
   const handleDeleteComment = async (commentId: string, articleId: string) => {
     try {
-      const { error } = await supabase.from("comments").delete().eq("id", commentId);
-      if (error) throw error;
+      await deleteContent("comments", commentId);
       fetchComments(articleId);
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 

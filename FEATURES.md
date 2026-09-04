@@ -30,6 +30,9 @@
 | `app/api/auth/*` | login, signup, logout, check-username |
 | `app/api/account/*` | password, profile, avatar, heartbeat(last_seen_at) — 본인 것만 수정 가능 |
 | `app/api/admin/users` | PATCH=권한 토글, DELETE=회원 탈퇴 (관리자 세션 필수) |
+| `app/api/content/[resource]` | 콘텐츠 생성·수정·삭제 단일 라우트 (소유자/관리자 검증) |
+| `lib/contentResources.ts` | 테이블별 소유자 컬럼·허용 필드·생성 권한 레지스트리 |
+| `lib/contentApi.ts` | 콘텐츠 쓰기 클라이언트 헬퍼 |
 | `sql/2026-09-03-auth-hardening.sql` | 권한 회수 + `delete_user_cascade` 마이그레이션 |
 | `lib/notifications.ts` | `createNotification`, `notifyAllUsers` |
 | `lib/encyclopediaData.ts` | 위스키 백과 정적 데이터 (`ENCYCLOPEDIA_WHISKEYS`) |
@@ -242,6 +245,15 @@ Bar 추천 목록 및 댓글. `bar_comments`는 bar_id, user_id, content.
   업로드 경로도 localStorage의 userId 기반이라 남의 아바타 덮어쓰기 가능
 - **해결**: 서버에서 MIME 타입으로 확장자 결정 + 경로는 세션 userId로 강제,
   타입/용량(2MB) 검증, 확장자 변경 시 이전 파일 정리
+
+### 콘텐츠 쓰기 권한 취약점 (2026-09-04 수정)
+- **원인**: anon 롤이 reviews/articles/bars/whiskeys/schedules/announcements/댓글 테이블에
+  직접 INSERT·UPDATE·DELETE 가능 → 콘솔에서 남의 글 삭제, user_id 바꿔치기로 작성자 위조 가능
+- **해결**: 모든 쓰기를 `app/api/content/[resource]` 경유로 이동. 소유자 컬럼은 서버가
+  세션에서 채우고, 수정·삭제는 소유자 본인 또는 관리자만. 필드는 화이트리스트로 제한.
+  9개 테이블의 anon 쓰기 권한 회수(`sql/2026-09-04-content-hardening.sql`)
+- **주의**: 관리자 모더레이션은 `adminMutate` 래퍼로 감쌀 것. 서버가 거부했는데
+  로컬 state만 지우면 화면에서만 사라지고 실제로는 남는다
 
 ### isMember localStorage 미설정
 - **원인**: 기존 로그인 유저는 `isMember` 키가 없음

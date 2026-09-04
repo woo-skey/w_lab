@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { notifyAllUsers } from "@/lib/notifications";
+import { createContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
 import SafeHtml from "@/components/SafeHtml";
@@ -54,14 +55,11 @@ export default function NoticesPage() {
     if (!formData.title.trim() || !formData.content.trim()) { alert("제목과 내용을 입력해주세요"); return; }
     setSubmitting(true);
     try {
-      const authorName = localStorage.getItem("userName") || "관리자";
-      const { error } = await supabase.from("announcements").insert([{
+      // author_id/author_name은 서버가 세션에서 채우고, 관리자 여부도 서버가 검증한다
+      await createContent("announcements", {
         title: formData.title,
         content: formData.content,
-        author_id: userId,
-        author_name: authorName,
-      }]);
-      if (error) throw error;
+      });
 
       // 전체 유저에게 알림
       await notifyAllUsers("announcement", `📢 새 공지: ${formData.title}`, "/notices", userId);
@@ -71,7 +69,7 @@ export default function NoticesPage() {
       fetchAnnouncements();
     } catch (err) {
       console.error(err);
-      alert("공지 등록에 실패했습니다");
+      alert(contentErrorMessage(err, "공지 등록에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -80,12 +78,12 @@ export default function NoticesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("공지를 삭제할까요?")) return;
     try {
-      const { error } = await supabase.from("announcements").delete().eq("id", id);
-      if (error) throw error;
+      await deleteContent("announcements", id);
       if (expandedId === id) setExpandedId(null);
       fetchAnnouncements();
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 

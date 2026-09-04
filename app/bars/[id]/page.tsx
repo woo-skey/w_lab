@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { createContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
 import SafeHtml from "@/components/SafeHtml";
 import UserProfilePopup from "@/components/UserProfilePopup";
 
@@ -90,21 +91,29 @@ export default function BarDetailPage() {
     e.preventDefault();
     if (!commentText.trim() || !userId) return;
     setSubmitting(true);
-    const { data, error } = await supabase
-      .from("bar_comments")
-      .insert([{ bar_id: id, user_id: userId, content: commentText.trim() }])
-      .select("*, users(name)")
-      .single();
-    if (!error && data) {
-      setComments((prev) => [...prev, data as unknown as BarComment]);
+    try {
+      // user_id는 서버가 세션에서 채운다
+      const data = await createContent<BarComment>("bar-comments", {
+        bar_id: id, content: commentText.trim(),
+      });
+      setComments((prev) => [...prev, data]);
       setCommentText("");
+    } catch (err) {
+      console.error(err);
+      alert(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    await supabase.from("bar_comments").delete().eq("id", commentId);
-    setComments((prev) => prev.filter((c) => c.id !== commentId));
+    try {
+      await deleteContent("bar-comments", commentId);
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+    } catch (err) {
+      console.error(err);
+      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+    }
   };
 
   if (loading) return <div className="tone min-h-screen flex items-center justify-center text-white/40">로딩 중...</div>;

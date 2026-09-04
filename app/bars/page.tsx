@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { createContent, updateContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
 import Link from "next/link";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
@@ -93,11 +94,11 @@ export default function BarsPage() {
     setSubmitting(true);
     if (!formData.bar_name.trim()) { setError("바 이름을 입력해주세요"); setSubmitting(false); return; }
     try {
-      const { error } = await supabase.from("bars").insert([{
-        user_id: userId, bar_name: formData.bar_name,
+      // user_id는 서버가 세션에서 채운다
+      await createContent("bars", {
+        bar_name: formData.bar_name,
         link: formData.link || null, notes: formData.notes || null,
-      }]);
-      if (error) throw error;
+      });
       setFormData({ bar_name: "", link: "", notes: "" });
       setShowModal(false);
       fetchBars();
@@ -112,11 +113,11 @@ export default function BarsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("이 바를 삭제할까요?")) return;
     try {
-      const { error } = await supabase.from("bars").delete().eq("id", id);
-      if (error) throw error;
+      await deleteContent("bars", id);
       fetchBars();
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -124,12 +125,11 @@ export default function BarsPage() {
     e.preventDefault();
     if (!editingBar) return;
     try {
-      const { error } = await supabase.from("bars").update({
+      await updateContent("bars", editingBar.id, {
         bar_name: editingBar.bar_name,
         link: editingBar.link || null,
         notes: editingBar.notes || null,
-      }).eq("id", editingBar.id);
-      if (error) throw error;
+      });
       setEditingBar(null);
       fetchBars();
     } catch (err) {

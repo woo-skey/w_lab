@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
+import { createContent, updateContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
 import { ENCYCLOPEDIA_WHISKEYS, CATEGORY_TO_TYPE } from "@/lib/encyclopediaData";
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
@@ -236,12 +237,12 @@ export default function ReviewsPage() {
   const handleDeleteWhiskey = async (whiskeyId: string) => {
     if (!confirm("위스키를 삭제하면 관련 리뷰도 모두 삭제됩니다. 계속할까요?")) return;
     try {
-      const { error } = await supabase.from("whiskeys").delete().eq("id", whiskeyId);
-      if (error) throw error;
+      await deleteContent("whiskeys", whiskeyId);
       if (expandedWhiskey === whiskeyId) setExpandedWhiskey(null);
       fetchWhiskeys();
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -250,19 +251,19 @@ export default function ReviewsPage() {
     if (!editingWhiskey || submitting) return;
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("whiskeys").update({
+      await updateContent("whiskeys", editingWhiskey.id, {
         name: editingWhiskey.name, type: editingWhiskey.type, region: editingWhiskey.region,
         age: editingWhiskey.age, abv: editingWhiskey.abv,
         nose: editingWhiskey.nose || null,
         palate: editingWhiskey.palate || null,
         finish_note: editingWhiskey.finish_note || null,
         tasting_notes: editingWhiskey.tasting_notes, price: editingWhiskey.price,
-      }).eq("id", editingWhiskey.id);
-      if (error) throw error;
+      });
       setEditingWhiskey(null);
       fetchWhiskeys();
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "수정에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -290,7 +291,8 @@ export default function ReviewsPage() {
     if (submitting) return;
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("whiskeys").insert([{
+      // created_by는 서버가 세션에서 채운다
+      await createContent("whiskeys", {
         name: whiskey.name, type: whiskey.type,
         region: whiskey.region || null,
         age: whiskey.age ? parseInt(whiskey.age) : null,
@@ -300,15 +302,13 @@ export default function ReviewsPage() {
         finish_note: whiskey.finish_note || null,
         tasting_notes: whiskey.tasting_notes || null,
         price: whiskey.price ? parseFloat(whiskey.price) : null,
-        created_by: userId || null,
-      }]);
-      if (error) throw error;
+      });
       setWhiskey({ name: "", type: "Scotch", region: "", age: "", abv: "", nose: "", palate: "", finish_note: "", tasting_notes: "", price: "" });
       setShowAddForm(false);
       fetchWhiskeys();
     } catch (err) {
       console.error(err);
-      alert("위스키 추가에 실패했습니다");
+      alert(contentErrorMessage(err, "위스키 추가에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -319,9 +319,9 @@ export default function ReviewsPage() {
     if (!reviewForm || submitting) return;
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("reviews").insert([{
+      // user_id는 서버가 세션에서 채운다
+      await createContent("reviews", {
         whiskey_id: reviewForm.whiskey_id,
-        user_id: userId,
         rating: reviewForm.rating,
         review_text: reviewForm.review_text,
         taste_profile: reviewForm.taste_profile,
@@ -329,8 +329,7 @@ export default function ReviewsPage() {
         palate: reviewForm.palate || null,
         finish_note: reviewForm.finish_note || null,
         remarks: reviewForm.remarks || null,
-      }]);
-      if (error) throw error;
+      });
       // 위스키 등록자에게 알림 (본인 제외)
       const w = whiskeys.find((w) => w.id === reviewForm.whiskey_id);
       if (w?.created_by && w.created_by !== userId) {
@@ -342,7 +341,7 @@ export default function ReviewsPage() {
       fetchReviews(reviewForm.whiskey_id);
     } catch (err) {
       console.error(err);
-      alert("리뷰 등록에 실패했습니다");
+      alert(contentErrorMessage(err, "리뷰 등록에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -351,11 +350,11 @@ export default function ReviewsPage() {
   const handleDeleteReview = async (reviewId: string, whiskeyId: string) => {
     if (!confirm("리뷰를 삭제할까요?")) return;
     try {
-      const { error } = await supabase.from("reviews").delete().eq("id", reviewId);
-      if (error) throw error;
+      await deleteContent("reviews", reviewId);
       fetchReviews(whiskeyId);
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -364,7 +363,7 @@ export default function ReviewsPage() {
     if (!editingReview || submitting) return;
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("reviews").update({
+      await updateContent("reviews", editingReview.id, {
         rating: editingReview.rating,
         review_text: editingReview.review_text,
         taste_profile: editingReview.taste_profile,
@@ -372,13 +371,12 @@ export default function ReviewsPage() {
         palate: editingReview.palate || null,
         finish_note: editingReview.finish_note || null,
         remarks: editingReview.remarks || null,
-      }).eq("id", editingReview.id);
-      if (error) throw error;
+      });
       setEditingReview(null);
       fetchReviews(whiskeyId);
     } catch (err) {
       console.error(err);
-      alert("편집에 실패했습니다");
+      alert(contentErrorMessage(err, "편집에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -387,11 +385,11 @@ export default function ReviewsPage() {
   const handleDeleteComment = async (commentId: string, reviewId: string) => {
     if (!confirm("댓글을 삭제할까요?")) return;
     try {
-      const { error } = await supabase.from("review_comments").delete().eq("id", commentId);
-      if (error) throw error;
+      await deleteContent("review-comments", commentId);
       fetchComments(reviewId);
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -400,12 +398,7 @@ export default function ReviewsPage() {
     if (!content || commentSubmitting) return;
     setCommentSubmitting(true);
     try {
-      const { error } = await supabase.from("review_comments").insert([{
-        review_id: reviewId,
-        user_id: userId,
-        content,
-      }]);
-      if (error) throw error;
+      await createContent("review-comments", { review_id: reviewId, content });
       // 리뷰 작성자에게 알림 (본인 제외)
       const reviewList = Object.values(reviews).flat();
       const targetReview = reviewList.find((r) => r.id === reviewId);
@@ -417,6 +410,7 @@ export default function ReviewsPage() {
       fetchComments(reviewId);
     } catch (err) {
       console.error(err);
+      alert(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
     } finally {
       setCommentSubmitting(false);
     }
