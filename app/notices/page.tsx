@@ -7,6 +7,7 @@ import { createContent, deleteContent, contentErrorMessage } from "@/lib/content
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
 import SafeHtml from "@/components/SafeHtml";
+import { useToast } from "@/components/Toast";
 
 interface Announcement {
   id: string;
@@ -19,6 +20,7 @@ interface Announcement {
 }
 
 export default function NoticesPage() {
+  const toast = useToast();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
@@ -45,6 +47,7 @@ export default function NoticesPage() {
       setAnnouncements(data || []);
     } catch (err) {
       console.error(err);
+      toast.error("공지를 불러오지 못했습니다");
     } finally {
       setLoading(false);
     }
@@ -52,7 +55,7 @@ export default function NoticesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim() || !formData.content.trim()) { alert("제목과 내용을 입력해주세요"); return; }
+    if (!formData.title.trim() || !formData.content.trim()) { toast.error("제목과 내용을 입력해주세요"); return; }
     setSubmitting(true);
     try {
       // author_id/author_name은 서버가 세션에서 채우고, 관리자 여부도 서버가 검증한다
@@ -69,7 +72,7 @@ export default function NoticesPage() {
       fetchAnnouncements();
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "공지 등록에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "공지 등록에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -83,7 +86,7 @@ export default function NoticesPage() {
       fetchAnnouncements();
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 

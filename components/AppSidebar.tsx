@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { logout } from "@/lib/auth";
 import SpotlightSearch from "@/components/SpotlightSearch";
+import { useToast } from "@/components/Toast";
 
 interface Notification {
   id: string;
@@ -63,6 +64,7 @@ const BG_DARK = "radial-gradient(ellipse at 20% 50%, #1a1f3c 0%, #0d0d1a 40%, #0
 const BG_LIGHT = "radial-gradient(ellipse at 20% 50%, #dde3f8 0%, #eef1fb 40%, #f4f6ff 100%)";
 
 export default function AppSidebar({ children }: { children: React.ReactNode }) {
+  const toast = useToast();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -189,7 +191,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     const { error } = await supabase.from("notifications").update({ is_read: true }).in("id", unreadIds);
     if (error) {
       setNotifications(previous);
-      alert("읽음 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      toast.error("읽음 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
   };
 
@@ -203,7 +205,7 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
     const { error } = await supabase.from("notifications").delete().eq("user_id", userId);
     if (error) {
       setNotifications(previous);
-      alert("알림 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      toast.error("알림 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
   };
 

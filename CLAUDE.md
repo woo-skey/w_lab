@@ -16,6 +16,18 @@
   - AppSidebar 인라인 스타일은 CSS 클래스 오버라이드가 안 먹히므로 반드시 `T.*` 테마 변수 사용
 - Glass morphism 디자인 시스템(`glass-card`, `glass-input`) 유지
 
+## 에러 표시 규칙
+- **`alert()` 사용 금지** → `components/Toast.tsx`의 `useToast()` 사용
+  - `toast.error(msg)` / `toast.success(msg)` / `toast.info(msg)`
+  - 에러 5초, 성공 2.6초 자동 소멸. 클릭하면 즉시 닫힘
+- **catch 블록에서 `console.error`만 하고 끝내지 말 것**
+  - 로드 실패가 조용히 빈 목록으로 보이면 버그를 발견할 수 없다
+    (리뷰 목록이 PostgREST 300으로 비어 있던 것을 오래 못 잡은 원인)
+  - mutation 실패: `toast.error(contentErrorMessage(err, "..."))`
+  - 로드 실패: `toast.error("...을 불러오지 못했습니다")`
+- 모듈 스코프 함수는 훅을 못 쓰므로 알림 함수를 인자로 받을 것 (`adminMutate` 참고)
+- `confirm()`은 유지 — 되돌릴 수 없는 동작을 막는 장치라 토스트로 대체 불가
+
 ## 버그 방지 패턴
 - **그리드 레이아웃**: 확장 가능한 카드가 있는 그리드는 반드시 `items-start` 추가
   - 안 하면 한쪽 카드 펼칠 때 같은 행 다른 카드 높이도 같이 늘어남

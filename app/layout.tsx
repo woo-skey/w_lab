@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AppSidebar from "@/components/AppSidebar";
 import TwemojiProvider from "@/components/TwemojiProvider";
+import ToastProvider from "@/components/Toast";
 
 export const metadata: Metadata = {
   title: "위스키 연구소",
@@ -21,7 +22,9 @@ export default function RootLayout({
       </head>
       <body>
         <TwemojiProvider>
-          <AppSidebar>{children}</AppSidebar>
+          <ToastProvider>
+            <AppSidebar>{children}</AppSidebar>
+          </ToastProvider>
         </TwemojiProvider>
       </body>
     </html>

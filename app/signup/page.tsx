@@ -4,8 +4,10 @@ import { useState } from "react";
 import { signup, checkUsernameExists } from "@/lib/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 export default function SignupPage() {
+  const toast = useToast();
   const router = useRouter();
   const [formData, setFormData] = useState({
     username: "",
@@ -98,7 +100,7 @@ export default function SignupPage() {
     );
 
     if (result.success) {
-      alert("회원가입이 완료되었습니다!");
+      toast.success("회원가입이 완료되었습니다!");
       router.push("/login");
     } else {
       setErrors({ submit: result.error || "회원가입에 실패했습니다" });

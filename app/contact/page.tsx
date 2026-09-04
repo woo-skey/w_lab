@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
+import { useToast } from "@/components/Toast";
 
 interface Inquiry {
   id: string;
@@ -19,6 +20,7 @@ interface Inquiry {
 }
 
 export default function ContactPage() {
+  const toast = useToast();
   const [userId, setUserId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -65,7 +67,7 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim() || !formData.content.trim()) { alert("제목과 내용을 입력해주세요"); return; }
+    if (!formData.title.trim() || !formData.content.trim()) { toast.error("제목과 내용을 입력해주세요"); return; }
     setSubmitting(true);
     try {
       const userName = localStorage.getItem("userName") || "알 수 없음";
@@ -80,7 +82,7 @@ export default function ContactPage() {
       fetchMyInquiries(userId);
     } catch (err) {
       console.error(err);
-      alert("문의 등록에 실패했습니다");
+      toast.error("문의 등록에 실패했습니다");
     } finally {
       setSubmitting(false);
     }
@@ -111,7 +113,7 @@ export default function ContactPage() {
       }
     } catch (err) {
       console.error(err);
-      alert("답변 등록에 실패했습니다.");
+      toast.error("답변 등록에 실패했습니다.");
     } finally {
       setReplying(null);
     }

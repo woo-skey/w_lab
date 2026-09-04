@@ -34,6 +34,7 @@
 | `app/api/schedule/absence` | 일정 참여 불가 표시 POST/DELETE (본인만) |
 | `lib/contentResources.ts` | 테이블별 소유자 컬럼·허용 필드·생성 권한 레지스트리 |
 | `lib/contentApi.ts` | 콘텐츠 쓰기 클라이언트 헬퍼 |
+| `components/Toast.tsx` | 토스트 알림 (`useToast`) — alert 대체 |
 | `sql/2026-09-03-auth-hardening.sql` | 권한 회수 + `delete_user_cascade` 마이그레이션 |
 | `lib/notifications.ts` | `createNotification`, `notifyAllUsers` |
 | `lib/encyclopediaData.ts` | 위스키 백과 정적 데이터 (`ENCYCLOPEDIA_WHISKEYS`) |

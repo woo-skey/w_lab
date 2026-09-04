@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { createContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
 import SafeHtml from "@/components/SafeHtml";
 import UserProfilePopup from "@/components/UserProfilePopup";
+import { useToast } from "@/components/Toast";
 
 interface Bar {
   id: string;
@@ -33,6 +34,7 @@ interface Favorite {
 }
 
 export default function BarDetailPage() {
+  const toast = useToast();
   const { id } = useParams<{ id: string }>();
   const [bar, setBar] = useState<Bar | null>(null);
   const [comments, setComments] = useState<BarComment[]>([]);
@@ -69,13 +71,14 @@ export default function BarDetailPage() {
       setIsFavorited(favData.some((f) => f.user_id === uid));
     } catch (err) {
       console.error(err);
+      toast.error("Bar 정보를 불러오지 못했습니다");
     } finally {
       setLoading(false);
     }
   };
 
   const handleToggleFavorite = async () => {
-    if (!userId) { alert("로그인이 필요합니다."); return; }
+    if (!userId) { toast.error("로그인이 필요합니다."); return; }
     if (isFavorited) {
       await supabase.from("bar_favorites").delete().eq("bar_id", id).eq("user_id", userId);
       setIsFavorited(false);
@@ -100,7 +103,7 @@ export default function BarDetailPage() {
       setCommentText("");
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -112,7 +115,7 @@ export default function BarDetailPage() {
       setComments((prev) => prev.filter((c) => c.id !== commentId));
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 

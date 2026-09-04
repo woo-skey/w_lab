@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useToast } from "@/components/Toast";
 
 type NameRelation = { name: string } | { name: string }[] | null;
 
@@ -55,6 +56,7 @@ function getScheduleCountdown(date: string) {
 }
 
 export default function Home() {
+  const toast = useToast();
   const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const [recentReviews, setRecentReviews] = useState<RecentReview[]>([]);
@@ -134,6 +136,7 @@ export default function Home() {
       setTopWhiskeys(top);
     } catch (err) {
       console.error(err);
+      toast.error("대시보드를 불러오지 못했습니다");
     } finally {
       setLoading(false);
     }

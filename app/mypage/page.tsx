@@ -10,6 +10,7 @@ import { ENCYCLOPEDIA_WHISKEYS } from "@/lib/encyclopediaData";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
 import { passthroughImageLoader } from "@/lib/imageLoader";
+import { useToast } from "@/components/Toast";
 
 interface UserProfile {
   id: string;
@@ -138,13 +139,17 @@ function formatLastSeen(value?: string | null) {
  * 관리자 모더레이션용 래퍼. 서버가 권한을 거부하면 알림을 띄우고 false를 반환해
  * 로컬 state를 낙관적으로 지우지 않도록 한다.
  */
-async function adminMutate(fn: () => Promise<unknown>, fallback = "삭제에 실패했습니다"): Promise<boolean> {
+async function adminMutate(
+  notifyError: (message: string) => void,
+  fn: () => Promise<unknown>,
+  fallback = "삭제에 실패했습니다"
+): Promise<boolean> {
   try {
     await fn();
     return true;
   } catch (err) {
     console.error(err);
-    alert(contentErrorMessage(err, fallback));
+    notifyError(contentErrorMessage(err, fallback));
     return false;
   }
 }
@@ -160,6 +165,7 @@ async function readApiError(res: Response, fallback: string): Promise<string> {
 }
 
 export default function MyPage() {
+  const toast = useToast();
   const router = useRouter();
   const [userId, setUserId] = useState("");
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
@@ -408,6 +414,7 @@ export default function MyPage() {
       });
     } catch (err) {
       console.error(err);
+      toast.error("관리자 통계를 불러오지 못했습니다");
     } finally {
       setAdminLoading(false);
     }
@@ -450,6 +457,7 @@ export default function MyPage() {
       }
     } catch (err) {
       console.error(err);
+      toast.error("목록을 불러오지 못했습니다");
     } finally {
       setContentLoading(false);
     }
@@ -481,14 +489,14 @@ export default function MyPage() {
       fetchAdminContent("notices");
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "공지 등록에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "공지 등록에 실패했습니다"));
     }
     finally { setAnnouncementSubmitting(false); }
   };
   const handleAdminSaveAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdminAnnouncement) return;
-    if (!(await adminMutate(() => updateContent("announcements", editingAdminAnnouncement.id, {
+    if (!(await adminMutate(toast.error, () => updateContent("announcements", editingAdminAnnouncement.id, {
       title: editingAdminAnnouncement.title, content: editingAdminAnnouncement.content,
     }), "수정에 실패했습니다"))) return;
     setAllAnnouncements((prev) => prev.map((a) => a.id === editingAdminAnnouncement.id ? { ...a, ...editingAdminAnnouncement } : a));
@@ -496,19 +504,19 @@ export default function MyPage() {
   };
   const handleAdminDeleteAnnouncement = async (id: string) => {
     if (!confirm("이 공지를 삭제할까요?")) return;
-    if (!(await adminMutate(() => deleteContent("announcements", id)))) return;
+    if (!(await adminMutate(toast.error, () => deleteContent("announcements", id)))) return;
     setAllAnnouncements((prev) => prev.filter((a) => a.id !== id));
   };
 
   const handleAdminDeleteArticle = async (id: string) => {
     if (!confirm("이 글을 삭제할까요?")) return;
-    if (!(await adminMutate(() => deleteContent("articles", id)))) return;
+    if (!(await adminMutate(toast.error, () => deleteContent("articles", id)))) return;
     setAllArticles((prev) => prev.filter((a) => a.id !== id));
   };
   const handleAdminSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdminArticle) return;
-    if (!(await adminMutate(() => updateContent("articles", editingAdminArticle.id, {
+    if (!(await adminMutate(toast.error, () => updateContent("articles", editingAdminArticle.id, {
       title: editingAdminArticle.title, content: editingAdminArticle.content, category: editingAdminArticle.category,
     }), "수정에 실패했습니다"))) return;
     setAllArticles((prev) => prev.map((a) => a.id === editingAdminArticle.id ? { ...a, ...editingAdminArticle } : a));
@@ -517,19 +525,19 @@ export default function MyPage() {
 
   const handleAdminDeleteReview = async (id: string) => {
     if (!confirm("이 리뷰를 삭제할까요?")) return;
-    if (!(await adminMutate(() => deleteContent("reviews", id)))) return;
+    if (!(await adminMutate(toast.error, () => deleteContent("reviews", id)))) return;
     setAllReviews((prev) => prev.filter((r) => r.id !== id));
   };
 
   const handleAdminDeleteBar = async (id: string) => {
     if (!confirm("이 Bar를 삭제할까요?")) return;
-    if (!(await adminMutate(() => deleteContent("bars", id)))) return;
+    if (!(await adminMutate(toast.error, () => deleteContent("bars", id)))) return;
     setAllBars((prev) => prev.filter((b) => b.id !== id));
   };
   const handleAdminSaveBar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdminBar) return;
-    if (!(await adminMutate(() => updateContent("bars", editingAdminBar.id, {
+    if (!(await adminMutate(toast.error, () => updateContent("bars", editingAdminBar.id, {
       bar_name: editingAdminBar.bar_name, link: editingAdminBar.link, notes: editingAdminBar.notes,
     }), "수정에 실패했습니다"))) return;
     setAllBars((prev) => prev.map((b) => b.id === editingAdminBar.id ? { ...b, ...editingAdminBar } : b));
@@ -538,12 +546,12 @@ export default function MyPage() {
 
   const handleAdminDeleteWhiskey = async (id: string) => {
     if (!confirm("이 위스키를 삭제할까요? 관련 리뷰도 삭제됩니다.")) return;
-    if (!(await adminMutate(() => deleteContent("whiskeys", id)))) return;
+    if (!(await adminMutate(toast.error, () => deleteContent("whiskeys", id)))) return;
     setAllWhiskeys((prev) => prev.filter((w) => w.id !== id));
   };
   const handleAdminDeleteSchedule = async (id: string) => {
     if (!confirm("이 일정을 삭제할까요?")) return;
-    if (!(await adminMutate(() => deleteContent("schedules", id)))) return;
+    if (!(await adminMutate(toast.error, () => deleteContent("schedules", id)))) return;
     setAllSchedules((prev) => prev.filter((s) => s.id !== id));
     setSchedules((prev) => prev.filter((s) => s.id !== id));
     if (adminStats) {
@@ -553,7 +561,7 @@ export default function MyPage() {
   const handleAdminSaveWhiskey = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdminWhiskey) return;
-    if (!(await adminMutate(() => updateContent("whiskeys", editingAdminWhiskey.id, {
+    if (!(await adminMutate(toast.error, () => updateContent("whiskeys", editingAdminWhiskey.id, {
       name: editingAdminWhiskey.name, type: editingAdminWhiskey.type, region: editingAdminWhiskey.region,
       age: editingAdminWhiskey.age, abv: editingAdminWhiskey.abv,
     }), "수정에 실패했습니다"))) return;
@@ -564,7 +572,7 @@ export default function MyPage() {
   // 권한 변경·탈퇴는 서버가 세션 쿠키로 관리자 여부를 다시 확인한 뒤 처리한다.
   // (localStorage의 isAdmin은 UI 표시용일 뿐이라 신뢰하지 않는다)
   const handleToggleAdmin = async (targetId: string, currentAdmin: boolean) => {
-    if (targetId === userId) { alert("본인의 관리자 권한은 변경할 수 없습니다."); return; }
+    if (targetId === userId) { toast.error("본인의 관리자 권한은 변경할 수 없습니다."); return; }
     try {
       const res = await fetch("/api/admin/users", {
         method: "PATCH",
@@ -575,12 +583,12 @@ export default function MyPage() {
       setAdminUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, is_admin: !currentAdmin } : u));
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "관리자 권한 변경에 실패했습니다.");
+      toast.error(err instanceof Error ? err.message : "관리자 권한 변경에 실패했습니다.");
     }
   };
 
   const handleToggleMember = async (targetId: string, currentMember: boolean, isTargetAdmin: boolean) => {
-    if (isTargetAdmin) { alert("관리자 계정은 w_lab 회원 토글이 불가합니다."); return; }
+    if (isTargetAdmin) { toast.error("관리자 계정은 w_lab 회원 토글이 불가합니다."); return; }
     setMemberUpdatingId(targetId);
     try {
       const res = await fetch("/api/admin/users", {
@@ -592,14 +600,14 @@ export default function MyPage() {
       setAdminUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, is_member: !currentMember } : u));
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "w_lab 회원 상태 변경에 실패했습니다.");
+      toast.error(err instanceof Error ? err.message : "w_lab 회원 상태 변경에 실패했습니다.");
     } finally {
       setMemberUpdatingId(null);
     }
   };
 
   const handleDeleteUser = async (targetId: string, targetName: string) => {
-    if (targetId === userId) { alert("본인 계정은 여기서 탈퇴할 수 없습니다."); return; }
+    if (targetId === userId) { toast.error("본인 계정은 여기서 탈퇴할 수 없습니다."); return; }
     if (!confirm(`"${targetName}" 회원을 탈퇴시킬까요?\n해당 유저의 모든 데이터가 삭제됩니다.`)) return;
     setDeletingUserId(targetId);
     try {
@@ -610,7 +618,7 @@ export default function MyPage() {
       if (adminStats) setAdminStats({ ...adminStats, totalUsers: adminStats.totalUsers - 1 });
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "삭제에 실패했습니다.");
+      toast.error(err instanceof Error ? err.message : "삭제에 실패했습니다.");
     } finally {
       setDeletingUserId(null);
     }
@@ -631,7 +639,7 @@ export default function MyPage() {
       setProfile((prev) => prev ? { ...prev, avatar_url: avatarUrl } : prev);
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "업로드에 실패했습니다.");
+      toast.error(err instanceof Error ? err.message : "업로드에 실패했습니다.");
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -663,7 +671,7 @@ export default function MyPage() {
       setEditingProfile(false);
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "프로필 저장에 실패했습니다.");
+      toast.error(err instanceof Error ? err.message : "프로필 저장에 실패했습니다.");
     } finally {
       setProfileSaving(false);
     }

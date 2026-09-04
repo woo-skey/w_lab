@@ -9,6 +9,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
 import SafeHtml from "@/components/SafeHtml";
 import { passthroughImageLoader } from "@/lib/imageLoader";
+import { useToast } from "@/components/Toast";
 
 interface Article {
   id: string;
@@ -33,6 +34,7 @@ interface Comment {
 const CATEGORIES = ["전체", "기초 지식", "테이스팅", "역사", "문화", "기타"];
 
 export default function ArticlesPage() {
+  const toast = useToast();
   const deepLinkHandledRef = useRef<string | null>(null);
   const [deepLinkArticleId, setDeepLinkArticleId] = useState<string | null>(null);
 
@@ -96,6 +98,7 @@ export default function ArticlesPage() {
           setComments((prev) => ({ ...prev, [target.id]: data || [] }));
         } catch (err) {
           console.error(err);
+          toast.error("댓글을 불러오지 못했습니다");
         }
       })();
     }
@@ -119,7 +122,7 @@ export default function ArticlesPage() {
   };
 
   const handleLikeArticle = async (articleId: string) => {
-    if (!userId) { alert("로그인이 필요합니다."); return; }
+    if (!userId) { toast.error("로그인이 필요합니다."); return; }
     if (likedArticles.has(articleId)) {
       await supabase.from("article_likes").delete().eq("article_id", articleId).eq("user_id", userId);
       setLikedArticles((prev) => { const n = new Set(prev); n.delete(articleId); return n; });
@@ -146,6 +149,7 @@ export default function ArticlesPage() {
       setArticles(rows.map((a) => ({ ...a, users: { name: userMap[a.author_id] || "알 수 없음" } })));
     } catch (err) {
       console.error(err);
+      toast.error("지식글을 불러오지 못했습니다");
     } finally {
       setLoading(false);
     }
@@ -160,6 +164,7 @@ export default function ArticlesPage() {
       setComments((prev) => ({ ...prev, [articleId]: data || [] }));
     } catch (err) {
       console.error(err);
+      toast.error("댓글을 불러오지 못했습니다");
     }
   };
 
@@ -190,7 +195,7 @@ export default function ArticlesPage() {
 
   const handleSubmitArticle = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim() || !formData.content.trim()) { alert("제목과 내용을 입력해주세요"); return; }
+    if (!formData.title.trim() || !formData.content.trim()) { toast.error("제목과 내용을 입력해주세요"); return; }
     try {
       // author_id는 서버가 세션에서 채운다
       const data = await createContent<{ id: string }>("articles", {
@@ -210,7 +215,7 @@ export default function ArticlesPage() {
       fetchArticles();
     } catch (err) {
       console.error(err);
-      alert("글 등록에 실패했습니다");
+      toast.error("글 등록에 실패했습니다");
     }
   };
 
@@ -222,7 +227,7 @@ export default function ArticlesPage() {
       fetchArticles();
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -237,7 +242,7 @@ export default function ArticlesPage() {
       fetchArticles();
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "수정에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "수정에 실패했습니다"));
     }
   };
 
@@ -256,7 +261,7 @@ export default function ArticlesPage() {
       fetchComments(articleId);
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
     }
   };
 
@@ -266,7 +271,7 @@ export default function ArticlesPage() {
       fetchComments(articleId);
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 

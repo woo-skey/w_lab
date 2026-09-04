@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ENCYCLOPEDIA_WHISKEYS, type EncyclopediaEntry } from "@/lib/encyclopediaData";
 import { supabase } from "@/lib/supabase";
+import { useToast } from "@/components/Toast";
 
 type WhiskeyEntry = EncyclopediaEntry;
 
@@ -89,6 +90,7 @@ function dbRowToEntry(row: Record<string, unknown>): WhiskeyEntry {
 }
 
 export default function EncyclopediaPage() {
+  const toast = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category>("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -193,7 +195,7 @@ export default function EncyclopediaPage() {
       difficulty: formData.difficulty, tags: formData.tags,
     };
     const { error } = await supabase.from("encyclopedia").upsert([payload], { onConflict: "id" });
-    if (error) { console.error("encyclopedia upsert error:", error); alert("저장 실패: " + error.message); setSaving(false); return; }
+    if (error) { console.error("encyclopedia upsert error:", error); toast.error("저장 실패: " + error.message); setSaving(false); return; }
     await fetchDbEntries();
     setShowModal(false);
     setSaving(false);

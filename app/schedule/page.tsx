@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 import { createContent, updateContent, deleteContent, contentErrorMessage } from "@/lib/contentApi";
+import { useToast } from "@/components/Toast";
 
 interface Schedule {
   id: string;
@@ -26,6 +27,7 @@ function formatDate(year: number, month: number, day: number) {
 }
 
 export default function SchedulePage() {
+  const toast = useToast();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [availabilityMap, setAvailabilityMap] = useState<AvailabilityMap>({});
@@ -146,6 +148,7 @@ export default function SchedulePage() {
         );
       } catch (err) {
         console.error(err);
+        toast.error("일정 정보를 불러오지 못했습니다");
       }
     };
 
@@ -205,6 +208,7 @@ export default function SchedulePage() {
       }
     } catch (err) {
       console.error(err);
+      toast.error("일정 목록을 불러오지 못했습니다");
     } finally {
       setLoading(false);
     }
@@ -239,7 +243,7 @@ export default function SchedulePage() {
       await fetchSchedules(selectedSchedule.id);
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "참여 여부 변경에 실패했습니다");
+      toast.error(err instanceof Error ? err.message : "참여 여부 변경에 실패했습니다");
     } finally {
       setAbsenceSaving(false);
     }
@@ -314,6 +318,7 @@ export default function SchedulePage() {
       await fetchSchedules(preferredScheduleId);
     } catch (err) {
       console.error(err);
+      toast.error(contentErrorMessage(err, "일정 삭제에 실패했습니다"));
     }
   };
 
@@ -331,7 +336,7 @@ export default function SchedulePage() {
       setAvailabilityMap({});
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "일정 생성에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "일정 생성에 실패했습니다"));
     }
   };
 
@@ -346,7 +351,7 @@ export default function SchedulePage() {
       await updateContent("schedules", selectedSchedule.id, { confirmed_date: newDate });
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "일정 확정에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "일정 확정에 실패했습니다"));
       return;
     }
     const updated = { ...selectedSchedule, confirmed_date: newDate };

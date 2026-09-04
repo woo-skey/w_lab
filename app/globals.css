@@ -265,3 +265,15 @@ img.emoji {
   vertical-align: -0.1em;
   display: inline;
 }
+
+
+/* 토스트 등장 애니메이션 */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.toast-in { animation: toastIn 180ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-in { animation: none; }
+}

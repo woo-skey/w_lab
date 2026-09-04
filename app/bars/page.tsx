@@ -8,6 +8,7 @@ import Link from "next/link";
 import RichTextEditor from "@/components/RichTextEditor";
 import SafeHtml from "@/components/SafeHtml";
 import UserProfilePopup from "@/components/UserProfilePopup";
+import { useToast } from "@/components/Toast";
 
 interface Bar {
   id: string;
@@ -20,6 +21,7 @@ interface Bar {
 }
 
 export default function BarsPage() {
+  const toast = useToast();
   const router = useRouter();
   const [bars, setBars] = useState<Bar[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ export default function BarsPage() {
   };
 
   const handleToggleFavorite = async (barId: string) => {
-    if (!userId) { alert("로그인이 필요합니다."); return; }
+    if (!userId) { toast.error("로그인이 필요합니다."); return; }
     const wasFavorited = favoritedBars.has(barId);
     // 낙관적 업데이트 (빠른 더블클릭 중복 요청 방지)
     setFavoritedBars((prev) => {
@@ -117,7 +119,7 @@ export default function BarsPage() {
       fetchBars();
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -134,6 +136,7 @@ export default function BarsPage() {
       fetchBars();
     } catch (err) {
       console.error(err);
+      toast.error(contentErrorMessage(err, "수정에 실패했습니다"));
     }
   };
 

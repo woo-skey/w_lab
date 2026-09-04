@@ -8,6 +8,7 @@ import { ENCYCLOPEDIA_WHISKEYS, CATEGORY_TO_TYPE } from "@/lib/encyclopediaData"
 import RichTextEditor from "@/components/RichTextEditor";
 import UserProfilePopup from "@/components/UserProfilePopup";
 import SafeHtml from "@/components/SafeHtml";
+import { useToast } from "@/components/Toast";
 
 interface Whiskey {
   id: string;
@@ -66,6 +67,7 @@ function RatingGauge({ rating, size = "md" }: { rating: number; size?: "sm" | "m
 }
 
 export default function ReviewsPage() {
+  const toast = useToast();
   const deepLinkHandledRef = useRef<string | null>(null);
   const [deepLinkWhiskeyId, setDeepLinkWhiskeyId] = useState<string | null>(null);
 
@@ -174,6 +176,7 @@ export default function ReviewsPage() {
       setUserReviewedWhiskeys(new Set((userRevData || []).map((r) => r.whiskey_id)));
     } catch (err) {
       console.error(err);
+      toast.error("위스키 목록을 불러오지 못했습니다");
     } finally {
       setLoading(false);
     }
@@ -193,7 +196,7 @@ export default function ReviewsPage() {
   };
 
   const handleLikeReview = async (reviewId: string) => {
-    if (!userId) { alert("로그인이 필요합니다."); return; }
+    if (!userId) { toast.error("로그인이 필요합니다."); return; }
     if (likedReviews.has(reviewId)) {
       await supabase.from("review_likes").delete().eq("review_id", reviewId).eq("user_id", userId);
       setLikedReviews((prev) => { const n = new Set(prev); n.delete(reviewId); return n; });
@@ -217,6 +220,7 @@ export default function ReviewsPage() {
       setReviews((prev) => ({ ...prev, [whiskeyId]: data || [] }));
     } catch (err) {
       console.error(err);
+      toast.error("리뷰를 불러오지 못했습니다");
     }
   };
 
@@ -231,6 +235,7 @@ export default function ReviewsPage() {
       setComments((prev) => ({ ...prev, [reviewId]: data || [] }));
     } catch (err) {
       console.error(err);
+      toast.error("댓글을 불러오지 못했습니다");
     }
   };
 
@@ -242,7 +247,7 @@ export default function ReviewsPage() {
       fetchWhiskeys();
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -263,7 +268,7 @@ export default function ReviewsPage() {
       fetchWhiskeys();
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "수정에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "수정에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -308,7 +313,7 @@ export default function ReviewsPage() {
       fetchWhiskeys();
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "위스키 추가에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "위스키 추가에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -341,7 +346,7 @@ export default function ReviewsPage() {
       fetchReviews(reviewForm.whiskey_id);
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "리뷰 등록에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "리뷰 등록에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -354,7 +359,7 @@ export default function ReviewsPage() {
       fetchReviews(whiskeyId);
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -376,7 +381,7 @@ export default function ReviewsPage() {
       fetchReviews(whiskeyId);
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "편집에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "편집에 실패했습니다"));
     } finally {
       setSubmitting(false);
     }
@@ -389,7 +394,7 @@ export default function ReviewsPage() {
       fetchComments(reviewId);
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "삭제에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "삭제에 실패했습니다"));
     }
   };
 
@@ -410,7 +415,7 @@ export default function ReviewsPage() {
       fetchComments(reviewId);
     } catch (err) {
       console.error(err);
-      alert(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
+      toast.error(contentErrorMessage(err, "댓글 등록에 실패했습니다"));
     } finally {
       setCommentSubmitting(false);
     }
