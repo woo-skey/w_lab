@@ -70,15 +70,19 @@ export async function DELETE(req: NextRequest) {
   try {
     const { error } = await getAdminClient().rpc("delete_user_cascade", { p_user_id: targetId });
     if (error) {
-      // 마이그레이션 SQL을 아직 실행하지 않은 경우를 구분해서 안내
       const code = (error as { code?: string }).code;
-      if (code === "PGRST202" || code === "42883") {
+      // PGRST202만이 "함수를 못 찾음"의 신뢰할 수 있는 신호다.
+      // 42883은 함수 안의 연산자 불일치(text = uuid 등)에도 쓰여서, 이걸 함수 없음으로
+      // 해석하면 엉뚱한 안내를 하게 된다 (실제로 그런 오진이 있었다).
+      if (code === "PGRST202") {
         return jsonError(
           "delete_user_cascade 함수가 DB에 없습니다. 마이그레이션 SQL을 먼저 실행해주세요.",
           501
         );
       }
-      throw error;
+      // 관리자 전용 라우트이므로 원인 파악을 위해 DB 에러를 그대로 전달한다
+      const detail = [error.message, code && `(${code})`].filter(Boolean).join(" ");
+      return jsonError(`삭제에 실패했습니다: ${detail || "알 수 없는 오류"}`, 500);
     }
     return NextResponse.json({ ok: true });
   } catch (err) {

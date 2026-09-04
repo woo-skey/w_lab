@@ -711,6 +711,26 @@ export default function SchedulePage() {
                         />
                       </div>
                     )}
+
+                    {absentees.length > 0 && (
+                      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                        <span className="text-[11px] text-white/40 mr-0.5">
+                          <span className="text-indigo-400/70 mr-1">·</span>참여불가
+                        </span>
+                        {absentees.map((a) => (
+                          <span
+                            key={a.userId}
+                            className="px-2 py-0.5 rounded-md text-[11px] border
+                                       bg-red-500/10 dark:bg-red-400/10
+                                       border-red-500/30 dark:border-red-400/30
+                                       text-red-600 dark:text-red-300"
+                          >
+                            {a.name}
+                            {a.userId === userId && <span className="opacity-60"> (나)</span>}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -910,24 +930,6 @@ export default function SchedulePage() {
         </div>
 
         {/* 관리자 전용: 계정별 선택 날짜 */}
-        {selectedSchedule && absentees.length > 0 && (
-          <div className="mt-8 glass-card card rounded-xl p-4 md:p-6">
-            <h2 className="text-lg font-bold text-white mb-1">참여불가</h2>
-            <p className="text-xs text-white/30 mb-4">이번 일정에 참석하지 못한다고 표시한 멤버입니다.</p>
-            <div className="flex flex-wrap gap-2">
-              {absentees.map((a) => (
-                <span
-                  key={a.userId}
-                  className="px-2.5 py-1 rounded-lg text-xs"
-                  style={{ background: "rgba(248,113,113,0.14)", border: "1px solid rgba(248,113,113,0.32)", color: "rgb(252,165,165)" }}
-                >
-                  {a.name}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
         {isAdmin && selectedSchedule && userDateMap.length > 0 && (
           <div className="mt-8 glass-card card rounded-xl p-6">
             <h2 className="text-lg font-bold text-white mb-1">🔐 관리자 — 계정별 가능 날짜</h2>
