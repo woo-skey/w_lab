@@ -38,6 +38,9 @@ export default function SchedulePage() {
   const [newName, setNewName] = useState("");
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   const [userDateMap, setUserDateMap] = useState<{ name: string; dates: string[] }[]>([]);
+  // 참여 불가로 표시한 사람들 — "아직 투표 안 함"과 구분하기 위해 별도로 관리
+  const [absentees, setAbsentees] = useState<{ userId: string; name: string }[]>([]);
+  const [absenceSaving, setAbsenceSaving] = useState(false);
   const [totalMembersExcludingAdmin, setTotalMembersExcludingAdmin] = useState(0);
   const togglingRef = useRef(false);
 
@@ -74,6 +77,19 @@ export default function SchedulePage() {
 
     const fetch = async () => {
       try {
+        const { data: absenceRows } = await supabase
+          .from("schedule_absences")
+          .select("user_id, users(name, is_admin)")
+          .eq("schedule_id", scheduleId);
+        setAbsentees(
+          (absenceRows || [])
+            .filter((a) => !(a.users as unknown as { is_admin?: boolean } | null)?.is_admin)
+            .map((a) => ({
+              userId: a.user_id as string,
+              name: (a.users as unknown as { name?: string } | null)?.name || "알 수 없음",
+            }))
+        );
+
         const { data: dates, error: datesError } = await supabase
           .from("schedule_dates")
           .select("*")
@@ -194,10 +210,46 @@ export default function SchedulePage() {
     }
   };
 
+  const isAbsent = absentees.some((a) => a.userId === userId);
+  // 응답을 마친 사람 = 날짜를 고른 사람 + 참여 불가로 표시한 사람
+  const respondedCount = userDateMap.length + absentees.length;
+
+  const handleToggleAbsence = async () => {
+    if (!userId || !isMember || isAdmin || !selectedSchedule) return;
+    if (selectedSchedule.confirmed_date || absenceSaving) return;
+    if (!isAbsent && !confirm("이 일정에 참여 불가로 표시할까요?\n체크해둔 날짜가 있으면 함께 해제됩니다.")) return;
+
+    setAbsenceSaving(true);
+    try {
+      const res = isAbsent
+        ? await fetch(`/api/schedule/absence?scheduleId=${encodeURIComponent(selectedSchedule.id)}`, { method: "DELETE" })
+        : await fetch("/api/schedule/absence", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ scheduleId: selectedSchedule.id }),
+          });
+      if (!res.ok) {
+        let message = "참여 여부 변경에 실패했습니다";
+        try {
+          const body = await res.json();
+          if (typeof body?.error === "string") message = body.error;
+        } catch { /* 본문이 JSON이 아니면 기본 메시지 */ }
+        throw new Error(message);
+      }
+      await fetchSchedules(selectedSchedule.id);
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "참여 여부 변경에 실패했습니다");
+    } finally {
+      setAbsenceSaving(false);
+    }
+  };
+
   const handleToggleDate = async (dateStr: string) => {
     if (!userId || !isMember || isAdmin) return;
     if (!selectedSchedule) return;
     if (selectedSchedule.confirmed_date) return;
+    if (isAbsent) return; // 참여 불가로 표시한 상태에서는 날짜를 고를 수 없다
     if (togglingRef.current) return; // 진행 중이면 중복 클릭 무시
     togglingRef.current = true;
     try {
@@ -580,8 +632,26 @@ export default function SchedulePage() {
                       <p className="text-sm text-white/45 mt-1">
                         {selectedSchedule.confirmed_date
                           ? "일정이 확정되어 날짜 체크가 잠겨 있습니다."
-                          : "가능한 날짜를 클릭해서 체크하세요 ✓"}
+                          : isAbsent
+                            ? "참여 불가로 표시했습니다. 날짜 선택이 잠겨 있어요."
+                            : "가능한 날짜를 클릭해서 체크하세요 ✓"}
                       </p>
+                    )}
+                    {userId && isMember && !isAdmin && !selectedSchedule.confirmed_date && (
+                      <button
+                        type="button"
+                        onClick={handleToggleAbsence}
+                        disabled={absenceSaving}
+                        aria-pressed={isAbsent}
+                        className="mt-2 px-3 py-1.5 rounded-lg text-xs font-medium transition disabled:opacity-50"
+                        style={
+                          isAbsent
+                            ? { background: "rgba(248,113,113,0.18)", border: "1px solid rgba(248,113,113,0.45)", color: "rgb(252,165,165)" }
+                            : { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.55)" }
+                        }
+                      >
+                        {absenceSaving ? "처리 중..." : isAbsent ? "참여 불가 해제" : "이번엔 참여 불가"}
+                      </button>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -621,14 +691,18 @@ export default function SchedulePage() {
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-white/50 text-xs">투표 현황</span>
                       <span className="text-white/70 text-xs font-semibold">
-                        {userDateMap.length}명 완료 {totalMembersExcludingAdmin > 0 && <span className="text-white/35">/ 전체 {totalMembersExcludingAdmin}명</span>}
+                        {respondedCount}명 응답
+                        {absentees.length > 0 && (
+                          <span className="text-red-300/70"> (불가 {absentees.length})</span>
+                        )}
+                        {totalMembersExcludingAdmin > 0 && <span className="text-white/35"> / 전체 {totalMembersExcludingAdmin}명</span>}
                       </span>
                     </div>
                     {totalMembersExcludingAdmin > 0 && (
                       <div className="w-full h-1.5 rounded-full bg-black/[0.08] dark:bg-white/[0.08]">
                         <div
                           className="h-1.5 rounded-full transition-all duration-500"
-                          style={{ width: `${Math.min((userDateMap.length / totalMembersExcludingAdmin) * 100, 100)}%`, background: "rgba(99,102,241,0.8)" }}
+                          style={{ width: `${Math.min((respondedCount / totalMembersExcludingAdmin) * 100, 100)}%`, background: "rgba(99,102,241,0.8)" }}
                         />
                       </div>
                     )}
@@ -656,7 +730,7 @@ export default function SchedulePage() {
                     const isMyDate = info?.isAvailable || false;
                     const count = info?.count || 0;
                     const isConfirmed = selectedSchedule.confirmed_date === dateStr;
-                    const canVoteDate = !!userId && isMember && !isAdmin && !selectedSchedule.confirmed_date;
+                    const canVoteDate = !!userId && isMember && !isAdmin && !selectedSchedule.confirmed_date && !isAbsent;
                     const isToday =
                       today.getFullYear() === viewYear &&
                       today.getMonth() === viewMonth &&
@@ -831,6 +905,24 @@ export default function SchedulePage() {
         </div>
 
         {/* 관리자 전용: 계정별 선택 날짜 */}
+        {selectedSchedule && absentees.length > 0 && (
+          <div className="mt-8 glass-card card rounded-xl p-4 md:p-6">
+            <h2 className="text-lg font-bold text-white mb-1">참여 불가</h2>
+            <p className="text-xs text-white/30 mb-4">이번 일정에 참석하지 못한다고 표시한 멤버입니다.</p>
+            <div className="flex flex-wrap gap-2">
+              {absentees.map((a) => (
+                <span
+                  key={a.userId}
+                  className="px-2.5 py-1 rounded-lg text-xs"
+                  style={{ background: "rgba(248,113,113,0.14)", border: "1px solid rgba(248,113,113,0.32)", color: "rgb(252,165,165)" }}
+                >
+                  {a.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {isAdmin && selectedSchedule && userDateMap.length > 0 && (
           <div className="mt-8 glass-card card rounded-xl p-6">
             <h2 className="text-lg font-bold text-white mb-1">🔐 관리자 — 계정별 가능 날짜</h2>

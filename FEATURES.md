@@ -31,6 +31,7 @@
 | `app/api/account/*` | password, profile, avatar, heartbeat(last_seen_at) — 본인 것만 수정 가능 |
 | `app/api/admin/users` | PATCH=권한 토글, DELETE=회원 탈퇴 (관리자 세션 필수) |
 | `app/api/content/[resource]` | 콘텐츠 생성·수정·삭제 단일 라우트 (소유자/관리자 검증) |
+| `app/api/schedule/absence` | 일정 참여 불가 표시 POST/DELETE (본인만) |
 | `lib/contentResources.ts` | 테이블별 소유자 컬럼·허용 필드·생성 권한 레지스트리 |
 | `lib/contentApi.ts` | 콘텐츠 쓰기 클라이언트 헬퍼 |
 | `sql/2026-09-03-auth-hardening.sql` | 권한 회수 + `delete_user_cascade` 마이그레이션 |
@@ -89,6 +90,15 @@
 | date | date |
 
 > 중복 row가 생길 수 있음 (동시 클릭 race condition). 삭제 시 같은 날짜의 모든 row ID 조회 후 일괄 삭제.
+
+### `schedule_absences`
+| 컬럼 | 설명 |
+|------|------|
+| schedule_id | FK → schedules (ON DELETE CASCADE) |
+| user_id | FK → users (ON DELETE CASCADE) |
+| | `UNIQUE (schedule_id, user_id)` — 참여 불가 표시 |
+
+> 읽기만 anon 허용, 쓰기는 서버 라우트 전용.
 
 ### `user_availability`
 | 컬럼 | 설명 |
@@ -165,6 +175,12 @@ Bar 추천 목록 및 댓글. `bar_comments`는 bar_id, user_id, content.
 - 첫 진입 시 진행 중인 일정을 우선 선택하고, 없으면 이전 일정을 열지 않은 빈 캘린더 표시
 - 일정 생성자가 날짜 확정 기능
 - 확정 시 투표한 유저들에게 알림 발송
+- **참여 불가 표시**: 이번 일정에 참석 못 하는 멤버가 직접 표시 (`이번엔 참여 불가` 버튼)
+  - 표시하면 날짜 선택이 잠기고, 이미 체크한 날짜는 함께 삭제됨 (모순 데이터 방지)
+  - 투표 현황이 `N명 응답 (불가 M) / 전체 K명` 으로 표시되어 누굴 더 기다려야 하는지 알 수 있음
+  - 달력 아래 참여 불가 명단 패널 (전체 공개)
+  - 투표와 동일 규칙: `is_member`만 가능, 관리자 제외, 확정된 일정은 잠금
+  - 쓰기는 `/api/schedule/absence` 경유 (대상은 항상 세션 userId)
 - 관리자: 계정별 선택 날짜 테이블 열람
 
 ### 5. Bar 추천 (`/bars`, `/bars/[id]`)
