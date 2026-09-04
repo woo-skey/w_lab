@@ -67,6 +67,14 @@
   - 아직 클라이언트 직접 쓰기가 열려 있는 테이블: `review_likes`, `article_likes`,
     `bar_favorites`, `user_collection`, `user_availability`, `schedule_dates`,
     `notifications`, `encyclopedia`
+- **새 테이블을 만들면 anon 읽기를 실제 행으로 검증할 것**
+  - Supabase는 새 테이블에 RLS가 켜진 채로 생성될 수 있고, 그러면 GRANT SELECT를 줘도
+    정책이 없어서 anon 조회가 항상 빈 배열이 된다
+  - service_role은 RLS를 우회하므로 **쓰기는 성공하는데 화면에만 안 보이는** 형태가 된다
+    (에러가 안 나서 원인을 찾기 어렵다 — schedule_absences에서 실제로 겪음)
+  - 빈 테이블에 200이 나오는 것은 검증이 아니다. 행을 하나 넣고
+    service_role과 anon 결과가 같은지 비교할 것
+  - 읽기 공개가 필요하면: `CREATE POLICY ... FOR SELECT USING (true)`
 - `lib/supabaseAdmin.ts`(service_role)는 **서버 전용** — 클라이언트 컴포넌트에서 import 금지
 - 환경변수: `SUPABASE_SERVICE_ROLE_KEY`, `SESSION_SECRET` (둘 다 `NEXT_PUBLIC_` 접두사 없이 서버 전용)
 
