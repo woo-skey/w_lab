@@ -217,7 +217,7 @@ export default function SchedulePage() {
   const handleToggleAbsence = async () => {
     if (!userId || !isMember || isAdmin || !selectedSchedule) return;
     if (selectedSchedule.confirmed_date || absenceSaving) return;
-    if (!isAbsent && !confirm("이 일정에 참여 불가로 표시할까요?\n체크해둔 날짜가 있으면 함께 해제됩니다.")) return;
+    if (!isAbsent && !confirm("이 일정에 참여불가로 표시할까요?\n체크해둔 날짜가 있으면 함께 해제됩니다.")) return;
 
     setAbsenceSaving(true);
     try {
@@ -633,7 +633,7 @@ export default function SchedulePage() {
                         {selectedSchedule.confirmed_date
                           ? "일정이 확정되어 날짜 체크가 잠겨 있습니다."
                           : isAbsent
-                            ? "참여 불가로 표시했습니다. 날짜 선택이 잠겨 있어요."
+                            ? "참여불가로 표시했습니다. 날짜 선택이 잠겨 있어요."
                             : "가능한 날짜를 클릭해서 체크하세요 ✓"}
                       </p>
                     )}
@@ -643,14 +643,14 @@ export default function SchedulePage() {
                         onClick={handleToggleAbsence}
                         disabled={absenceSaving}
                         aria-pressed={isAbsent}
-                        className="mt-2 px-3 py-1.5 rounded-lg text-xs font-medium transition disabled:opacity-50"
-                        style={
+                        aria-label={isAbsent ? "참여불가 해제" : "이 일정에 참여불가로 표시"}
+                        className={`mt-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition disabled:opacity-50 ${
                           isAbsent
-                            ? { background: "rgba(248,113,113,0.18)", border: "1px solid rgba(248,113,113,0.45)", color: "rgb(252,165,165)" }
-                            : { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.55)" }
-                        }
+                            ? "bg-red-500/20 dark:bg-red-400/20 border-red-500/50 dark:border-red-400/50 text-red-700 dark:text-red-200"
+                            : "bg-red-500/10 dark:bg-red-400/10 border-red-500/30 dark:border-red-400/30 text-red-600 dark:text-red-300 hover:bg-red-500/[0.16] dark:hover:bg-red-400/[0.16]"
+                        }`}
                       >
-                        {absenceSaving ? "처리 중..." : isAbsent ? "참여 불가 해제" : "이번엔 참여 불가"}
+                        {absenceSaving ? "처리 중..." : isAbsent ? "참여불가 해제" : "참여불가"}
                       </button>
                     )}
                   </div>
@@ -907,7 +907,7 @@ export default function SchedulePage() {
         {/* 관리자 전용: 계정별 선택 날짜 */}
         {selectedSchedule && absentees.length > 0 && (
           <div className="mt-8 glass-card card rounded-xl p-4 md:p-6">
-            <h2 className="text-lg font-bold text-white mb-1">참여 불가</h2>
+            <h2 className="text-lg font-bold text-white mb-1">참여불가</h2>
             <p className="text-xs text-white/30 mb-4">이번 일정에 참석하지 못한다고 표시한 멤버입니다.</p>
             <div className="flex flex-wrap gap-2">
               {absentees.map((a) => (
